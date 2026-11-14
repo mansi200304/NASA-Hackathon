@@ -21,7 +21,15 @@ for r in res:
         best[key] = r
 res = sorted(best.values(), key=lambda r: r.properties["startTime"])
 raw = ROOT / "data" / "raw"; raw.mkdir(parents=True, exist_ok=True)
-todo = [r for r in res if not (raw / r.properties["fileName"]).exists()]
+import h5py
+def ok(path):
+    if not path.exists(): return False
+    try:
+        with h5py.File(path, "r") as f: f["science/LSAR/GUNW/grids/frequencyA/unwrappedInterferogram/HH/unwrappedPhase"]
+        return True
+    except Exception:
+        print("removing incomplete file", path.name[:60]); path.unlink(); return False
+todo = [r for r in res if not ok(raw / r.properties["fileName"])]
 if a.max: todo = todo[:a.max]
 print(f"{len(res)} granules for track {a.track} frame {a.frame}; {len(todo)} not yet on disk; ~{len(todo)*2.4:.0f} GB")
 free = __import__("shutil").disk_usage(raw).free / 1e9; print(f"free disk {free:.0f} GB")
@@ -36,5 +44,11 @@ if not tok: sys.exit("EARTHDATA_TOKEN not found in .env")
 session = asf.ASFSession().auth_with_token(tok)
 for i, r in enumerate(todo, 1):
     print(f"[{i}/{len(todo)}] {r.properties['startTime'][:10]}", flush=True)
-    r.download(path=str(raw), session=session)
+    for attempt in range(4):
+        try: r.download(path=str(raw), session=session); break
+        except Exception as e:
+            print("  retry", attempt + 1, type(e).__name__, flush=True)
+            f = raw / r.properties["fileName"]
+            if f.exists(): f.unlink()
+    else: print("  FAILED", r.properties["fileName"][:60], flush=True)
 print("done")
