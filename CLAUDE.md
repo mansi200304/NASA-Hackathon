@@ -236,3 +236,7 @@ The three tracks run **in parallel from hour 0**. They connect only through the 
 - Willcox playa (-109.84, 32.10): -1.45 to -1.68 cm/yr over 10 years, last 3 years -1.69 to -2.74 (reference-sensitive). Fastest 1% of pixels about -5.6 to -5.8 cm/yr. Willcox town about -0.1 to -0.3; area north of the playa about 0.
 - NISAR 077 A at Eloy: -3.92 +/- 3.00 cm/yr over 3.9 months, NOT significant; consistent with Sentinel-1 (about -1) within 1 sigma. Residual rms 9.2 mm vs the few mm expected over this span.
 - All values are LOS, not vertical. Not yet compared with ADWR (no sourced ADWR value yet).
+
+### Nov 14, night: Sentinel-1 vs NISAR cross-check at Willcox playa (overlap Oct 26 2025 to Apr 12/14 2026, 168 days)
+- Sentinel-1 (frame 34478, track 129 D) change Oct 28 to Apr 14: -21.4 mm (3,600 px). NISAR (track 128 D) change Oct 26 to Apr 12: -12.9 mm, but from only 20 pixels valid in all 10 pairs (playa coherence is patchy in NISAR). Same sign, not the same size; difference (8.5 mm) is within the single-date noise (Sentinel-1 itself moves +20.5 mm between Oct 4 and Oct 28). Only a consistency check, not a validation.
+- Eloy/West Valley: no Sentinel-1 overlap with usable NISAR (Sentinel-1 ends Feb 2026, NISAR 077 A usable from Jun 2026).
