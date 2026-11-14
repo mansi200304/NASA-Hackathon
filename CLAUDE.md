@@ -1,5 +1,7 @@
 # Arizona Is Sinking — NASA Space Apps 2026, "Dancing with the SARs" (NISAR)
 
+Team of three: Reshma Panibhate, Mansi, Rhythm. Repo: github.com/mansi200304/NASA-Hackathon. Locked in Nov 14 2026.
+
 ---
 
 ## 1. One-line pitch
@@ -141,3 +143,63 @@ docs/            # method + limits text
 
 ## 11. Immediate next step
 Print the HDF5 group tree of the downloaded `.h5` file and explain what each group is.
+
+## 12. HARD TIME LIMIT: 12 hours total (started ~1:40 PM Sat Nov 14 2026, Arizona time; done by ~1:40 AM)
+This section overrides the scope above. The guiding rule: **one excellent hotspot plus a working map beats three half-done ones.**
+
+**Must ship (MVP)**
+- Eloy: NISAR track-128 stack, then a rate in cm/yr ± uncertainty, then validation against ADWR. This is the core result.
+- A single-page web map (Leaflet or MapLibre, static, no backend) with: a rate raster overlay (PNG + bounds), hotspot outlines, ADWR subsidence features, a small hand-compiled data-center GeoJSON, one protected/riparian layer, and a click-panel with Eloy's time-series chart and headline number.
+- A Limits section, a short How-we-measured section, and the submission package.
+
+**Ship if time allows (in this order)**
+1. Willcox and Buckeye rates. FIRST check whether track 128 frame 072 (~348 x 343 km) already covers them. If it does, they come from the same stack almost for free.
+2. Farmland overlay (USDA Cropland Data Layer).
+3. Sedona flood sidebar (one paragraph).
+
+**Cut**
+- Sentinel-1 multi-year history (cite ADWR for the long-term history instead).
+- Time slider and animation.
+- Farmland-vs-desert coherence study.
+
+**Time plan (approximate)**
+| Hours | Work |
+|---|---|
+| 0–1 | Valid-pixel rule, ionosphere/sign check, Eloy crop. Start track-128 downloads in the background now. |
+| 1–4 | Stack track 128 at Eloy: reference to a stable area, cumulative series, linear rate, ADWR check |
+| 4–5 | Coverage check, then Willcox/Buckeye rates if they're in the frame |
+| 5–6 | Export: rate PNG/COG, GeoJSON overlays, time-series JSON |
+| 6–9 | Web map |
+| 9–11 | Write-up, Limits, demo video/slides, repo README, deploy (GitHub Pages) |
+| 11–12 | Buffer: fixes and submit |
+
+**Speed rules**
+- Disk: D: has ~220 GB free. Track 128 is ~16 files x ~2.4 GB (~38 GB), which is fine. The first download took ~1 minute.
+- Before downloading full files, check whether h5py over HTTPS (fsspec/earthaccess) can read just the Eloy window. If that's not quick to set up, just download the full files.
+- Downloads run in the background while other work continues.
+- Explain the "why" briefly at each step, but don't stop and wait unless there's a decision, a surprise, or a download/cost gate.
+- If a step runs more than ~30 min over its slot, stop and tell Reshma, with a cut option.
+
+## 13. Team and work split (3 people, 12 hours)
+The three tracks run **in parallel from hour 0**. They connect only through the file contracts below, so nobody waits on anyone. The frontend starts with mock files in the same format and swaps in the real ones when they land.
+
+| Person | Track | Owns |
+|---|---|---|
+| **Reshma** | Radar processing | NISAR downloads, valid-pixel rule, ionosphere, Eloy stack, rate ± uncertainty, ADWR validation, Willcox/Buckeye if in frame, export of rate raster + time series |
+| **Mansi** | Web map | Static map app (MapLibre or Leaflet), layer panel, hotspot click-panel with time-series chart, How-we-measured + Limits pages, deploy on GitHub Pages |
+| **Rhythm** | Overlays + story | ADWR subsidence features + AMA boundaries, hand-compiled data-center GeoJSON (with sources), protected/riparian layer, hotspot outline GeoJSON, ADWR validation rates for Eloy/Willcox, write-up, demo video/slides, submission form |
+
+(Swap roles if skills fit differently; keep the contracts.)
+
+**File contracts (all in `data/processed/`, committed to the repo, small files only)**
+- `rate_<hotspot>.png` + `rate_<hotspot>.json`: color-mapped rate image; JSON = `{"bounds": [[south, west], [north, east]], "units": "cm/yr", "vmin": .., "vmax": .., "colormap": "..", "track": "128D", "dates": ["YYYY-MM-DD", ".."]}` (lat/lon, EPSG:4326)
+- `timeseries_<hotspot>.json`: `{"hotspot": "eloy", "units": "cm", "reference": "<stable area>", "dates": [...], "displacement": [...], "rate_cm_yr": .., "rate_sigma": .., "adwr_rate_cm_yr": .. | null}`
+- `hotspots.geojson`: polygons with `name`, `slug`, `story`
+- `datacenters.geojson`: points with `name`, `operator`, `status` (operating/planned/under construction), `mw` | null, `water_use` | null, `source_url`
+- `adwr_subsidence.geojson`, `ama.geojson`, `habitat.geojson`: as downloaded, simplified to stay < 5 MB each
+- Hotspot slugs: `eloy`, `buckeye`, `willcox`
+
+**Repo rules**
+- Never commit `.h5` or raw data. `.gitignore`: `data/raw/`, `*.h5`, `*.tif` over 5 MB.
+- Each person works on their own branch (`radar`, `web`, `overlays`) and merges into `main` at checkpoints.
+- **Sync checkpoints:** hour 4 (Eloy number + mock-free map shell), hour 8 (all real data in the map), hour 11 (freeze, submit).
