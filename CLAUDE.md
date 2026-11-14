@@ -1,5 +1,11 @@
 # Arizona Is Sinking — NASA Space Apps 2026, "Dancing with the SARs" (NISAR)
 
+## Current radar decision — November 14, 2026
+
+The original track-128 Eloy plan is superseded by the coverage findings recorded in section 14. Test a provisional **track 077 ascending / frame 018** file over Eloy first; **track 056 descending / frame 072** is the alternative. Final selection depends on valid pixels, coherence, correction checks and a usable reference area. Track 128 descending / frame 072 remains a **Willcox candidate**, not the Eloy MVP track.
+
+See [the track-selection handoff](docs/track_selection.md) for acquisition-pair counts, connected date ranges, duplicate handling and the next checkpoint. These changes are based on the committed scene list and Reshma's status log; they are not a new inspection of the raw HDF5 file.
+
 Team of three: Reshma Panibhate, Mansi, Rhythm. Repo: github.com/mansi200304/NASA-Hackathon. Locked in Nov 14 2026.
 
 ---
@@ -95,7 +101,7 @@ A single-page web app that opens on a full-screen map of central Arizona.
 2. **Phase → displacement:** `d = -(λ / 4π) · φ` (L-band λ ≈ 0.24 m). Read λ and sign convention from metadata; don't assume.
 3. **Mask** low coherence and unreliable connected components.
 4. **Reference** to a stable area (bedrock/mountains) set to zero.
-5. **Stack:** single 12-day pairs are mostly noise (Eloy moves a few mm in 12 days). Chain consecutive pairs on **one track** (128 D first) into a cumulative time series; fit a linear rate with uncertainty. Never mix ascending and descending directly.
+5. **Stack:** single short-baseline pairs may be dominated by noise. Deduplicate processing versions and chain only connected acquisition pairs on **one track/frame**, using actual reference/secondary dates (12- and 24-day baselines occur in the current scene list). First inspect 077 A frame 018 over Eloy, with 056 D frame 072 as the alternative; select using valid coverage, coherence and a reference area. Do not bridge the track-077 December 2025–June 2026 gap. Fit a rate with uncertainty over the actual supported interval. Never mix ascending and descending directly.
 6. **Validate** at Eloy against ADWR rates.
 7. **Repeat** for Buckeye and Willcox (check which tracks cover each).
 8. **Regional mosaic** of rates → map tiles.
@@ -119,7 +125,7 @@ docs/            # method + limits text
 |---|---|---|
 | 1 | Open the test file | Array shapes, pixel spacing, wavelength, % pixels above coherence threshold |
 | 2 | One-pair displacement | Mean/std of 12-day LOS displacement over Eloy vs stable reference (expect ≈ noise) |
-| 3 | Track-128 stack | Cumulative displacement at Eloy center over the full record |
+| 3 | Selected Eloy-track stack | Cumulative displacement at Eloy over a connected, quality-checked observation interval |
 | 4 | Rate + validation | Eloy rate ± uncertainty vs ADWR rate, difference in cm/yr |
 | 5 | Other hotspots | Rates for Buckeye and Willcox |
 | 6 | Overlays | Acres of farmland, # data centers, km² of habitat inside sinking zones |
@@ -142,18 +148,18 @@ docs/            # method + limits text
 - My input is often voice-transcribed; ask when something is unclear.
 
 ## 11. Immediate next step
-Print the HDF5 group tree of the downloaded `.h5` file and explain what each group is.
+The track-128 test-file inspection is already recorded in the README and section 14. Open one provisional track-077 ascending / frame-018 GUNW file over Eloy; 056 descending / frame-072 is the alternative. Inspect its HDF5 groups and metadata, verify actual valid coverage over Eloy/Casa Grande and a suitable reference area, and report crop shape, valid/coherent pixel fractions, acquisition dates, polarisation, CRS, wavelength and correction metadata before bulk downloads. `src/coverage_check2.py` currently hardcodes HH and EPSG:32612: verify/adapt those assumptions for the replacement file. The raw HDF5 on the Windows drive is not accessible through the GitHub connector. See `docs/track_selection.md`.
 
 ## 12. HARD TIME LIMIT: 12 hours total (started ~1:40 PM Sat Nov 14 2026, Arizona time; done by ~1:40 AM)
 This section overrides the scope above. The guiding rule: **one excellent hotspot plus a working map beats three half-done ones.**
 
 **Must ship (MVP)**
-- Eloy: NISAR track-128 stack, then a rate in cm/yr ± uncertainty, then validation against ADWR. This is the core result.
+- Eloy: a NISAR stack from a coverage-verified track/frame (test 077 A first; 056 D alternative), then a rate in cm/yr ± uncertainty and comparison against an appropriately matched ADWR reference. Track 128 does not cover the Eloy core in the recorded test. This is the core result.
 - A single-page web map (Leaflet or MapLibre, static, no backend) with: a rate raster overlay (PNG + bounds), hotspot outlines, ADWR subsidence features, a small hand-compiled data-center GeoJSON, one protected/riparian layer, and a click-panel with Eloy's time-series chart and headline number.
 - A Limits section, a short How-we-measured section, and the submission package.
 
 **Ship if time allows (in this order)**
-1. Willcox and Buckeye rates. FIRST check whether track 128 frame 072 (~348 x 343 km) already covers them. If it does, they come from the same stack almost for free.
+1. Willcox and Buckeye rates. Willcox is a separate track-128 D / frame-072 candidate; it does not come from the selected Eloy stack. Buckeye may share the Eloy candidate's footprint, but usable pixels and a compatible reference still need checking before claiming a rate.
 2. Farmland overlay (USDA Cropland Data Layer).
 3. Sedona flood sidebar (one paragraph).
 
@@ -165,16 +171,16 @@ This section overrides the scope above. The guiding rule: **one excellent hotspo
 **Time plan (approximate)**
 | Hours | Work |
 |---|---|
-| 0–1 | Valid-pixel rule, ionosphere/sign check, Eloy crop. Start track-128 downloads in the background now. |
-| 1–4 | Stack track 128 at Eloy: reference to a stable area, cumulative series, linear rate, ADWR check |
-| 4–5 | Coverage check, then Willcox/Buckeye rates if they're in the frame |
+| 0–1 | Inspect one candidate 077 A / 018 Eloy file (056 D / 072 alternative), valid-pixel rule, ionosphere/sign check and reference coverage. Start only the selected track's downloads after this checkpoint. |
+| 1–4 | Stack the selected Eloy track/frame over a connected interval: stable reference, cumulative series, linear rate, ADWR comparison |
+| 4–5 | Buckeye usable-pixel check on the selected Eloy track; Willcox separate 128 D stack only if time allows |
 | 5–6 | Export: rate PNG/COG, GeoJSON overlays, time-series JSON |
 | 6–9 | Web map |
 | 9–11 | Write-up, Limits, demo video/slides, repo README, deploy (GitHub Pages) |
 | 11–12 | Buffer: fixes and submit |
 
 **Speed rules**
-- Disk: D: has ~220 GB free. Track 128 is ~16 files x ~2.4 GB (~38 GB), which is fine. The first download took ~1 minute.
+- Disk: D: has ~220 GB free according to the team. Do not use the old ~16-file track-128 estimate for the Eloy download plan. The current scene list has nine connected provisional 077 A pairs or eight 056 D pairs; select one track and check current file sizes. The first test-file download reportedly took ~1 minute.
 - Before downloading full files, check whether h5py over HTTPS (fsspec/earthaccess) can read just the Eloy window. If that's not quick to set up, just download the full files.
 - Downloads run in the background while other work continues.
 - Explain the "why" briefly at each step, but don't stop and wait unless there's a decision, a surprise, or a download/cost gate.
@@ -192,7 +198,7 @@ The three tracks run **in parallel from hour 0**. They connect only through the 
 (Swap roles if skills fit differently; keep the contracts.)
 
 **File contracts (all in `data/processed/`, committed to the repo, small files only)**
-- `rate_<hotspot>.png` + `rate_<hotspot>.json`: color-mapped rate image; JSON = `{"bounds": [[south, west], [north, east]], "units": "cm/yr", "vmin": .., "vmax": .., "colormap": "..", "track": "128D", "dates": ["YYYY-MM-DD", ".."]}` (lat/lon, EPSG:4326)
+- `rate_<hotspot>.png` + `rate_<hotspot>.json`: color-mapped rate image; JSON = `{"bounds": [[south, west], [north, east]], "units": "cm/yr", "vmin": .., "vmax": .., "colormap": "..", "track": "<actual track and direction>", "dates": ["YYYY-MM-DD", ".."]}` (lat/lon, EPSG:4326)
 - `timeseries_<hotspot>.json`: `{"hotspot": "eloy", "units": "cm", "reference": "<stable area>", "dates": [...], "displacement": [...], "rate_cm_yr": .., "rate_sigma": .., "adwr_rate_cm_yr": .. | null}`
 - `hotspots.geojson`: polygons with `name`, `slug`, `story`
 - `datacenters.geojson`: points with `name`, `operator`, `status` (operating/planned/under construction), `mw` | null, `water_use` | null, `source_url`
@@ -206,6 +212,15 @@ The three tracks run **in parallel from hour 0**. They connect only through the 
 
 
 ## 14. Status log (newest first)
+
+### Nov 14: catalogue audit and updated Eloy next step
+- Coverage figures below are Reshma's recorded test-file findings, not a second raw-file measurement by this audit.
+- `scene_list.json`: track 128 has 29 records but **25 unique acquisition-date pairs**; four extra records are processing-version duplicates. Some baselines are **24 days**, so not every pair is 12 days.
+- Track 077 A / 018: **nine connected provisional pairs, June 19–October 17, 2026**. Three older pairs form a separate November 3–December 21, 2025 segment. No listed pair connects those segments.
+- Track 056 D / 072: **eight connected pairs, June 30–October 16, 2026**. Its July 24–August 17 pair bridges a 24-day interval.
+- Test 077 A over Eloy first; 056 D is the alternative. Neither is selected on footprint alone. Validate per-pixel coverage, reference area, correction conventions and quality before downloading the full stack.
+- Keep 128 D for Willcox; do not assume all hotspots share one stack. Use the actual selected track and supported dates in the web exports.
+- Detailed provenance and checks: `docs/track_selection.md`.
 
 ### Nov 14, ~3:30 PM AZ: first findings (measured on the test file, track 128 D frame 072, Oct 9 to Oct 21 2026)
 - **Valid-pixel rule:** valid = finite phase AND connectedComponents > 0 AND phase != 0. The 53.7% vs 49.7% gap was 4.1% of pixels that are in a component but have phase exactly 0.0 (mean coherence 0.53 vs 0.68 elsewhere, scattered across the frame, so unwrapping fill, not real zero motion). Dropped.
