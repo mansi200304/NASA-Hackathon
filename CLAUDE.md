@@ -85,7 +85,7 @@ A single-page web app that opens on a full-screen map of central Arizona.
 
 ## 6. Status (Nov 14 2026)
 - Earthdata account working; "Alaska Satellite Facility Data Access" approved.
-- Vertex, Eloy box, NISAR GUNW, production: **49 scenes** across **3 tracks**: 128 descending (frame 072), 056 descending (frame 072), 077 ascending (frame 018). ~16 per track. Every product is a consecutive **12-day pair**.
+- Vertex, Eloy box, NISAR GUNW, production: **49 scenes** across **3 tracks**: 128 descending (frame 072), 056 descending (frame 072), 077 ascending (frame 018). **Corrected Nov 14 evening:** scenes per track in the Eloy search are 128 D = 29, 056 D = 8, 077 A = 12 (not ~16 each). Every product is a 12-day pair, but there are gaps in the record.
 - Downloaded one test file into this folder (2,378,170,368 bytes, valid HDF5):
   `NISAR_L2_PR_GUNW_032_128_D_072_033_4000_SH_20261009T020749_20261009T020824_20261021T020749_20261021T020824_P05023_N_F_J_001.h5`
   Name: L2 / PR (production) / GUNW / ref cycle 032 / track 128 / D (descending) / frame 072 / secondary cycle 033 / SH (single pol, HH confirmed) / Oct 9 → Oct 21 2026 / CRID P05023 / Provisional.
@@ -203,3 +203,16 @@ The three tracks run **in parallel from hour 0**. They connect only through the 
 - Never commit `.h5` or raw data. `.gitignore`: `data/raw/`, `*.h5`, `*.tif` over 5 MB.
 - Each person works on their own branch (`radar`, `web`, `overlays`) and merges into `main` at checkpoints.
 - **Sync checkpoints:** hour 4 (Eloy number + mock-free map shell), hour 8 (all real data in the map), hour 11 (freeze, submit).
+
+
+## 14. Status log (newest first)
+
+### Nov 14, ~3:30 PM AZ: first findings (measured on the test file, track 128 D frame 072, Oct 9 to Oct 21 2026)
+- **Valid-pixel rule:** valid = finite phase AND connectedComponents > 0 AND phase != 0. The 53.7% vs 49.7% gap was 4.1% of pixels that are in a component but have phase exactly 0.0 (mean coherence 0.53 vs 0.68 elsewhere, scattered across the frame, so unwrapping fill, not real zero motion). Dropped.
+- **Ionosphere:** unwrappedPhase still contains the ionosphere. corr(phase, ionospherePhaseScreen) = 0.983; std 7.47 rad falls to 1.38 rad after subtracting the screen. The file's `*CorrectionApplied = True` flags are in `processingInformation/parameters/geocoding` and are NOT evidence the phase is corrected (unverified reading: they describe geolocation). Subtract the screen. Caveat: the screen was filled by nearest-neighbour over a large area (mask bit 24 set on ~49% of pixels); its uncertainty layer must be carried into the error budget.
+- **Troposphere / solid-earth tides:** separate screens exist in `metadata/radarGrid` (hydrostatic, wet, solid-earth-tide). Whether to subtract them is still to be tested.
+- **Wavelength:** 24.20 cm (1.2390 GHz). 1 rad = 19.25 mm LOS. Sign convention: still to be checked against the NISAR product spec before any rate is published.
+- **COVERAGE PROBLEM:** track 128 D frame 072 covers only 20.5% of the Eloy box (mean coherence 0.45) and 0% around Eloy town and Casa Grande. It covers Willcox well (93.9% of the box valid, coherence 0.57). It does not reach Buckeye at all.
+- By footprint (ASF search): 077 A frame 018 and 056 D frame 072 both contain Eloy town, Casa Grande, Stanfield, Buckeye and Goodyear. Buckeye is also in 157 D frame 071 (12 scenes). Willcox also in 149 A frame 018 (9 scenes).
+- Scene dates: 077 A = Nov 3, Nov 15, Dec 9 2025, then Jun 19, Jul 1, Jul 13, Jul 25, Aug 18, Aug 30, Sep 11, Sep 23, Oct 5 2026. 056 D = Jun 30 to Oct 4 2026 (8 scenes). 128 D = 29 scenes Oct 26 2025 to Oct 9 2026 with gaps.
+- Scene list saved in `data/processed/scene_list.json`. Scripts in `src/`.

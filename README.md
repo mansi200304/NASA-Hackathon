@@ -25,6 +25,7 @@ Arizona's aquifers are being pumped faster than they refill, and the ground is s
 ## Progress
 
 - [x] Stage 1: opened a test GUNW file (track 128, descending, Oct 9 → Oct 21 2026). Grid: EPSG:32612, 80 m pixels, wavelength 24.2 cm (1 rad ≈ 19.25 mm of line-of-sight motion), mean coherence 0.68 over valid pixels.
+- [x] Stage 1b: valid-pixel rule, ionosphere check (phase still contains it, correlation 0.98), coverage check (track 128 misses Eloy core; covers Willcox).
 - [ ] Stage 2: one-pair displacement over Eloy
 - [ ] Stage 3: track-128 stack
 - [ ] Stage 4: rate and validation against ADWR
