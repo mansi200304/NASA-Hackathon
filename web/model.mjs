@@ -1,0 +1,51 @@
+// Data contracts are intentionally strict: null and missing values never become zero.
+export const isNumber = value => typeof value === 'number' && Number.isFinite(value);
+export function validDate(value) {
+  return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) &&
+    Number.isFinite(Date.parse(value)) && new Date(value).toISOString().slice(0, 10) === value;
+}
+export function normalizeSeries(raw, slug) {
+  if (!raw || raw.hotspot !== slug || raw.units !== 'cm') throw new Error('Expected the matching hotspot and displacement units cm.');
+  const dates = raw.dates, values = raw.displacement;
+  if (!Array.isArray(dates) || !Array.isArray(values) || dates.length !== values.length) throw new Error('Dates and displacement must have equal lengths.');
+  if (dates.some((v, i) => !validDate(v) || (i > 0 && v <= dates[i - 1]))) throw new Error('Dates must be unique, valid and increasing.');
+  if (values.some(v => v !== null && !isNumber(v))) throw new Error('Displacement must be finite numbers or null gaps.');
+  for (const key of ['rate_cm_yr', 'rate_sigma', 'adwr_rate_cm_yr']) {
+    if (raw[key] != null && !isNumber(raw[key])) throw new Error(`${key} must be a finite number or null.`);
+  }
+  if (isNumber(raw.rate_sigma) && raw.rate_sigma < 0) throw new Error('Uncertainty cannot be negative.');
+  const points = dates.map((date, i) => ({ date, value: values[i] }));
+  const hasData = values.some(isNumber);
+  if ((hasData || isNumber(raw.rate_cm_yr)) && !(typeof raw.reference === 'string' && raw.reference.trim())) throw new Error('A stable reference description is required for measured values.');
+  if (isNumber(raw.rate_cm_yr) && !hasData) throw new Error('A reported rate needs a nonempty supporting time series.');
+  return { ...raw, points, hasData, rate_cm_yr: raw.rate_cm_yr ?? null, rate_sigma: raw.rate_sigma ?? null, adwr_rate_cm_yr: raw.adwr_rate_cm_yr ?? null };
+}
+export function normalizeRate(raw) {
+  const b = raw?.bounds;
+  if (!Array.isArray(b) || b.length !== 2 || b.some(p => !Array.isArray(p) || p.length !== 2 || !p.every(isNumber))) throw new Error('Raster bounds must be [[south, west], [north, east]].');
+  const [[s, w], [n, e]] = b;
+  if (!(s < n && w < e && s >= -90 && n <= 90 && w >= -180 && e <= 180)) throw new Error('Invalid WGS84 raster bounds.');
+  if (raw.units !== 'cm/yr' || !isNumber(raw.vmin) || !isNumber(raw.vmax) || raw.vmin >= raw.vmax) throw new Error('Expected cm/yr and a finite, increasing display range.');
+  if (raw.crs && !['EPSG:4326', '4326'].includes(raw.crs)) throw new Error('Reproject the image bounds to EPSG:4326.');
+  if (!Array.isArray(raw.dates) || raw.dates.length < 2 || !raw.dates.every(validDate) || raw.dates[0] >= raw.dates.at(-1)) throw new Error('Raster metadata needs a valid date range.');
+  return raw;
+}
+export function validateGeoJSON(raw) {
+  if (raw?.type !== 'FeatureCollection' || !Array.isArray(raw.features)) throw new Error('Expected a GeoJSON FeatureCollection.');
+  const allowed = new Set(['Polygon', 'MultiPolygon', 'LineString', 'MultiLineString', 'Point', 'MultiPoint']);
+  for (const feature of raw.features) {
+    if (feature?.type !== 'Feature' || !allowed.has(feature.geometry?.type)) throw new Error('Unsupported or missing GeoJSON geometry.');
+    const visit = coords => {
+      if (!Array.isArray(coords) || !coords.length) throw new Error('Empty coordinates.');
+      if (typeof coords[0] === 'number') {
+        if (coords.length < 2 || !coords.every(isNumber) || Math.abs(coords[0]) > 180 || Math.abs(coords[1]) > 90) throw new Error('Expected longitude/latitude coordinates in WGS84.');
+      } else coords.forEach(visit);
+    };
+    visit(feature.geometry.coordinates);
+  }
+  return raw;
+}
+export function safeSourceURL(value) {
+  try { const url = new URL(value); return ['https:', 'http:'].includes(url.protocol) ? url.href : null; } catch { return null; }
+}
+export function formatNumber(value) { return isNumber(value) ? new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }).format(value) : 'Pending'; }

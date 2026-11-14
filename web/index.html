@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#F4EFE6">
+  <meta name="description" content="An Arizona field atlas linking satellite ground-motion measurements with land, water and habitat.">
+  <title>Arizona is sinking — Field atlas</title>
+  <link rel="stylesheet" href="./vendor/leaflet.css">
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./vendor/leaflet.js" defer></script>
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#details">Skip to study details</a>
+  <header class="masthead">
+    <a class="wordmark" href="./" aria-label="Arizona is sinking, home"><svg viewBox="0 0 38 38" aria-hidden="true"><path d="M3 9h10l5 6h17M3 18h8l6 6h18M3 27h7l5 6h20"/></svg><span>Arizona is sinking<span class="title-stop">.</span></span></a>
+    <span class="project-label">A groundwater field atlas</span>
+    <nav aria-label="About the project">
+      <button type="button" data-dialog="method">How we measured</button>
+      <button type="button" data-dialog="limits">Limits</button>
+      <button type="button" data-dialog="sources">Sources <span class="out-arrow" aria-hidden="true"></span></button>
+    </nav>
+  </header>
+
+  <main class="workspace">
+    <aside class="sidebar" aria-label="Study areas and map layers">
+      <div class="sidebar-intro"><span class="eyebrow">Arizona / Ground & water</span><p>Three places.<br>One shared resource.</p></div>
+      <section class="study-section" aria-labelledby="study-heading">
+        <h2 id="study-heading">Study areas <span>03</span></h2>
+        <div id="hotspot-list" class="hotspot-list"></div>
+        <button id="show-all" class="text-action" type="button">View all study areas <span class="out-arrow" aria-hidden="true"></span></button>
+        <button id="toggle-layers" class="mobile-layer-toggle" type="button" aria-controls="layer-section" aria-expanded="false">Layers</button>
+      </section>
+      <section id="layer-section" class="layer-section" aria-labelledby="layers-heading">
+        <h2 id="layers-heading">Map layers</h2>
+        <div id="layer-list"></div>
+        <p class="layer-note">Pending layers appear when their source files are available.</p>
+      </section>
+      <div class="sidebar-footer"><span class="status-dot"></span><span id="data-status">Loading project files…</span><button id="reload-data" type="button">Refresh data</button></div>
+    </aside>
+
+    <section class="map-column" aria-label="Interactive study map">
+      <div class="map-toolbar"><div class="basemap-options" role="group" aria-label="Basemap"><button type="button" data-basemap="terrain" aria-pressed="true">Terrain</button><button type="button" data-basemap="satellite" aria-pressed="false">Satellite</button></div><button id="fit-study" type="button" title="Fit selected study area">Fit study</button></div>
+      <div id="map" role="region" aria-label="Arizona map. Use arrow keys to pan and plus or minus to zoom."></div>
+      <div id="map-error" class="map-message" role="status" hidden>Basemap tiles could not load. Study outlines are still available. Try the other basemap.</div>
+      <div class="map-caption"><span id="map-location">Eloy / Casa Grande</span><span>Outlines mark study extents, not sinking zones.</span></div>
+      <div id="rate-legend" class="rate-legend" hidden></div>
+    </section>
+
+    <aside id="details" class="details-panel" tabindex="-1" aria-label="Selected study details">
+      <div id="detail-content" aria-live="polite"></div>
+    </aside>
+  </main>
+  <footer class="page-footer"><span>NASA Space Apps 2026 <span class="footer-separator">/</span> Dancing with the SARs</span><span>Independent team project · Preliminary research</span></footer>
+
+  <dialog id="about-dialog" aria-labelledby="dialog-title">
+    <div class="dialog-top"><span class="eyebrow">Arizona is sinking</span><button id="close-dialog" type="button" aria-label="Close information">Close ×</button></div>
+    <h2 id="dialog-title"></h2><div id="dialog-body"></div>
+  </dialog>
+  <noscript><p class="noscript-message">Enable JavaScript to use the map. The source data and project notes are available in the <a href="https://github.com/mansi200304/NASA-Hackathon">GitHub repository</a>.</p></noscript>
+</body>
+</html>
