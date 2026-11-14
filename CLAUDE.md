@@ -1,7 +1,5 @@
 # Arizona Is Sinking — NASA Space Apps 2026, "Dancing with the SARs" (NISAR)
 
-Solo entry by Reshma Panibhate (Earthdata user: raypanibhate). Locked in Nov 14 2026.
-
 ---
 
 ## 1. One-line pitch
