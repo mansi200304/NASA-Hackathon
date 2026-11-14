@@ -246,3 +246,10 @@ The three tracks run **in parallel from hour 0**. They connect only through the 
 - West Valley towns are FLAT (median within 3 km, cm/yr): Buckeye -0.03, Goodyear 0.00, Surprise -0.12, Sun City -0.22, Glendale -0.03, Phoenix -0.07. No detectable long-term sinking above about 0.5 cm/yr there in 2016-2026 Sentinel-1. The Buckeye/Goodyear story must be reframed (what is being built vs no detectable sinking yet).
 - Southeast frame 34478: Willcox basin 457 km2 median -2.74, fastest -10.4 cm/yr; (32.213, -109.168) 191 km2 median -2.09; (32.310, -109.419) 140 km2 median -2.57; (31.727, -109.698) 103 km2 median -3.01. Place names for these coordinates NOT yet checked.
 - Candidate files: data/processed/hotspot_candidates_central.json and _southeast.json; map: docs/central_az_sentinel1_rate_map.png.
+
+### Nov 14, night: team decisions
+- DROPPED: the Buckeye/Goodyear hotspot (Sentinel-1 shows no detectable sinking above about 0.5 cm/yr there; a short note on the map can say so). ADDED: southeast areas around Willcox (Sulphur Springs Valley), pending place-name check.
+- Layers: NISAR on top (2025-2026, short record, labelled), Sentinel-1 OPERA below (2016-2026 trend, 6-month steps).
+- HyP3 on-demand Sentinel-1 InSAR cost (from hyp3-docs.asf.alaska.edu/using/credits/): free allowance 8,000 credits per user per month; InSAR 80 m = 10 credits per pair, 40 m = 15. About 10 pairs for Jun-Oct 2026 at Eloy = about 100 credits (1.3% of the monthly allowance). Over the allowance, HyP3+ credits cost $0.05 each (derived from the table). Nothing submitted yet.
+- Cleanup: deleted 3 unusable NISAR 077 A pairs (Nov-Dec 2025, isolated chain) and 1 extra OPERA granule; results unchanged.
+- More Sentinel-1 frames downloading: 7092 D (Tucson/Avra Valley/Sahuarita), 34477 D (Safford), 5125 A (ascending, Tucson to Willcox, cross-check), 26691 D (Yuma/Wellton/Gila Bend).
