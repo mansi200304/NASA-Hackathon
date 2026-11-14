@@ -253,3 +253,15 @@ The three tracks run **in parallel from hour 0**. They connect only through the 
 - HyP3 on-demand Sentinel-1 InSAR cost (from hyp3-docs.asf.alaska.edu/using/credits/): free allowance 8,000 credits per user per month; InSAR 80 m = 10 credits per pair, 40 m = 15. About 10 pairs for Jun-Oct 2026 at Eloy = about 100 credits (1.3% of the monthly allowance). Over the allowance, HyP3+ credits cost $0.05 each (derived from the table). Nothing submitted yet.
 - Cleanup: deleted 3 unusable NISAR 077 A pairs (Nov-Dec 2025, isolated chain) and 1 extra OPERA granule; results unchanged.
 - More Sentinel-1 frames downloading: 7092 D (Tucson/Avra Valley/Sahuarita), 34477 D (Safford), 5125 A (ascending, Tucson to Willcox, cross-check), 26691 D (Yuma/Wellton/Gila Bend).
+
+### Nov 14, night: four more Sentinel-1 frames scanned; both-direction check; OSM land-use check
+- Frames: 7092 D (Tucson/Avra Valley/Sahuarita), 34477 D (Safford), 5125 A (ascending, Tucson to Willcox), 26691 D (Yuma/Wellton/Gila Bend). All LOS cm/yr over 2016-2026, referenced to each frame's median, negative = sinking, clusters >= 2 km2. Lists in data/processed/hotspot_candidates_*.json.
+- CONFIRMED IN BOTH LOOK DIRECTIONS (descending and ascending agree):
+  - Willcox basin core (about 32.10, -109.78): D 457 km2 median -2.74; A 130 km2 median -2.92. Farmland all around (24 OSM polygons), no mines within 3 km.
+  - North of Willcox (about 32.40-32.52, -109.93 to -110.01, Graham County): D medians -2.3 to -6.8 (fastest -9.8); A 86 km2 median -3.63. Land use unchecked (Overpass failed).
+  - South, Elfrida/McNeal area? (31.73, -109.70, Cochise County): D 103 km2 median -3.01; A 68 km2 median -2.91. Farmland (19 polygons), no mines.
+  - Eloy-Picacho (32.65, -111.59): D -1.2 to -1.4; A -1.56. Farmland (60 polygons), no mines.
+- ONE DIRECTION ONLY: East basin (32.21, -109.17) D 191 km2 median -2.09 and (32.31, -109.42) D 140 km2 median -2.57; ascending frame does not reach them. Little farmland nearby (2 and 0 polygons), cause unclear. (33.16, -112.66) near Buckeye: two descending tracks, 4-7 km2, about -1.3 to -1.7.
+- NOT GROUNDWATER (per OpenStreetMap): Sahuarita A = Sierrita Mine, Sahuarita B = Mission Complex, (33.15, -110.97) = Ray Mine, (33.13, -109.35) geocodes to Morenci (mining town; mine features not retrieved). OUT OF ARIZONA: (32.41, -115.26) is Cerro Prieto geothermal field, Mexicali; (31.14, -112.89) is Caborca, Sonora.
+- FLAT (no cluster above 1 cm/yr): Tucson, Avra Valley, Marana, Yuma, Phoenix valley, West Valley.
+- Caveat for all: single-sensor LOS rates, frame-median reference (a few mm/yr bias possible), tropospheric/topographic artefacts not corrected, not validated against ADWR.
