@@ -1,6 +1,6 @@
 # Arizona Is Sinking — NASA Space Apps 2026, "Dancing with the SARs" (NISAR)
 
-Team of three: Reshma Panibhate, Mansi, Rhythm. Repo: github.com/mansi200304/NASA-Hackathon. Locked in Nov 14 2026.
+Team of three: Reshma Panibhate, Mansi, Ritam. Repo: github.com/mansi200304/NASA-Hackathon. Locked in Nov 14 2026.
 
 ---
 
@@ -187,7 +187,7 @@ The three tracks run **in parallel from hour 0**. They connect only through the 
 |---|---|---|
 | **Reshma** | Radar processing | NISAR downloads, valid-pixel rule, ionosphere, Eloy stack, rate ± uncertainty, ADWR validation, Willcox/Buckeye if in frame, export of rate raster + time series |
 | **Mansi** | Web map | Static map app (MapLibre or Leaflet), layer panel, hotspot click-panel with time-series chart, How-we-measured + Limits pages, deploy on GitHub Pages |
-| **Rhythm** | Overlays + story | ADWR subsidence features + AMA boundaries, hand-compiled data-center GeoJSON (with sources), protected/riparian layer, hotspot outline GeoJSON, ADWR validation rates for Eloy/Willcox, write-up, demo video/slides, submission form |
+| **Ritam** | Overlays + story | ADWR subsidence features + AMA boundaries, hand-compiled data-center GeoJSON (with sources), protected/riparian layer, hotspot outline GeoJSON, ADWR validation rates for Eloy/Willcox, write-up, demo video/slides, submission form |
 
 (Swap roles if skills fit differently; keep the contracts.)
 
@@ -216,3 +216,7 @@ The three tracks run **in parallel from hour 0**. They connect only through the 
 - By footprint (ASF search): 077 A frame 018 and 056 D frame 072 both contain Eloy town, Casa Grande, Stanfield, Buckeye and Goodyear. Buckeye is also in 157 D frame 071 (12 scenes). Willcox also in 149 A frame 018 (9 scenes).
 - Scene dates: 077 A = Nov 3, Nov 15, Dec 9 2025, then Jun 19, Jul 1, Jul 13, Jul 25, Aug 18, Aug 30, Sep 11, Sep 23, Oct 5 2026. 056 D = Jun 30 to Oct 4 2026 (8 scenes). 128 D = 29 scenes Oct 26 2025 to Oct 9 2026 with gaps.
 - Scene list saved in `data/processed/scene_list.json`. Scripts in `src/`.
+
+### Nov 14, evening: why so few scenes, and West Valley coverage (footprint-level, pixel check pending)
+- Few scenes is real, not a search artifact: RSLC acquisition dates over Eloy match the GUNW dates. 077 A has no acquisitions Dec 21 2025 to Jun 19 2026; 056 D starts Jun 30 2026; 128 D has the full year with skipped cycles. Newest acquisitions (Oct 16 to Nov 14) have no GUNW yet; re-search later. Check `temporalBaseline` per file, some pairs may be 24 days.
+- West Valley (Buckeye/Goodyear box, and an approximate Sun City/Surprise/Peoria/Glendale area, unverified box): 056 D frame 72 covers ~100% (8 dates, Jun 30 to Oct 4 2026); 077 A frame 18 covers 98% / 95% (12 dates, gap Dec 2025 to Jun 2026). Full-year tracks cover little: 157 D frame 71 covers 46% of the Buckeye box (13 dates), 5 A frame 18 covers 0% (26 dates). Footprints are frame outlines; real valid pixels will be smaller (track 128 lost most of the Eloy box this way).
