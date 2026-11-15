@@ -54,6 +54,13 @@ Optional metadata displayed when provided: track (include frame in the string if
 
 The chart uses actual acquisition dates on the horizontal axis and breaks at null gaps. It does not add synthetic observations, fit rates or draw uncertainty that the pipeline has not exported.
 
+The reported uncertainty uses `rate_sigma` unchanged, including the pipeline's
+systematic component. Its `rate_sigma_note` appears beside the rate so a
+conservative proxy is distinguished from a measured cross-direction check.
+Each study displays exported `caveats`, provisional NISAR `status_note` (without
+presenting its unreliable rate as a result), and `land_use_note` when supplied.
+These explanations are rendered as text; absent optional notes add no claims.
+
 The ADWR value is contextual only. The interface does not subtract it from a LOS rate or claim validation until direction, reference, period and spatial footprint are comparable.
 
 ### Rate image

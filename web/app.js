@@ -111,7 +111,7 @@ function renderDetails() {
   if (hasRate) value.append(el('small', '', (isNumber(series.rate_sigma) ? '± ' + formatNumber(series.rate_sigma) + ' ' : '') + 'cm/yr'));
   metric.append(value);
   metric.append(note(hasRate
-    ? (isNumber(series.rate_sigma) ? 'Uncertainty supplied by the processing pipeline.' : 'Uncertainty has not been supplied.')
+    ? (isNumber(series.rate_sigma) ? (series.rate_sigma_note || 'Uncertainty supplied by the processing pipeline.') : 'Uncertainty has not been supplied.')
     : dataError(result, 'Awaiting a referenced time series and fitted rate.')));
   if (hasRate) metric.append(note(series.sign_convention || 'Sign convention not supplied. This value is not labelled as vertical sinking.'));
   root.append(metric);
@@ -133,6 +133,17 @@ function renderDetails() {
     ['Data release', series?.data_release || meta?.data_release || 'Not supplied']
   ]));
   root.append(record);
+  const caveats = Array.isArray(series?.caveats) ? series.caveats.filter(text => typeof text === 'string' && text.trim()) : [];
+  if (caveats.length) {
+    const limits = section('Study measurement limits');
+    caveats.forEach(text => limits.append(el('p', 'validation-note', text)));
+    root.append(limits);
+  }
+  if (typeof series?.nisar?.status_note === 'string' && series.nisar.status_note.trim()) {
+    const provisional = section('NISAR status');
+    provisional.append(el('p', 'validation-note', series.nisar.status_note));
+    root.append(provisional);
+  }
   const validation = section('ADWR comparison');
   if (series && isNumber(series.adwr_rate_cm_yr)) {
     validation.append(el('p', 'detail-copy', 'ADWR contextual rate: ' + formatNumber(series.adwr_rate_cm_yr) + ' cm/yr.'));
@@ -144,6 +155,7 @@ function renderDetails() {
   root.append(validation);
   const story = section('Why this place');
   story.append(el('p', 'detail-copy', p.story));
+  if (typeof p.land_use_note === 'string' && p.land_use_note.trim()) story.append(note(p.land_use_note));
   root.append(story);
   const bottom = el('div', 'detail-bottom');
   bottom.append(el('div', '', 'Radar measures motion along the satellite’s line of sight. A vertical rate requires a justified conversion.'));
