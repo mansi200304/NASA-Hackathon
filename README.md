@@ -34,7 +34,7 @@ See [Track selection and next checkpoint](docs/track_selection.md). Some pairs s
 - [x] Stage 1b: valid-pixel rule, ionosphere check (phase still contains it, correlation 0.98), coverage check (track 128 misses Eloy core; covers Willcox).
 - [x] Stage 2: one-pair displacement; ionosphere correction cuts the spread about 3x
 - [x] Stage 3: NISAR stacks built after the coverage checks (Willcox: track 128 D, 25 pairs; Eloy: track 077 A, 9 pairs; 056 D not used). Rates are not yet reliable (noise, short record)
-- [ ] Stage 4: rate and validation against ADWR
+- [x] Stage 4: rates compared with ADWR's own InSAR products (strong in the southeast, weak at Eloy); see `docs/adwr_validation.md`
 - [ ] Stage 5: other hotspots
 - [ ] Stage 6: overlays
 - [x] Stage 7 (v0): data contract for the front end in `data/processed/` (see `docs/UI_DATA_CONTRACT.md`); working prototype map in `web/map-v0/`

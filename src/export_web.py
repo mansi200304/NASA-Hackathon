@@ -53,6 +53,14 @@ def mosaic(names, fname, bounds=AZ):
     b = dict(bounds=[[float(lats[r1 - 1] - RES / 2), float(lons[c0] - RES / 2)], [float(lats[r0] + RES / 2), float(lons[c1 - 1] + RES / 2)]], frames=used)
     json.dump(b, open(f"{OUT}/{fname}.json", "w")); return b
 
+def _adwr_for(slug):
+    p = f"{ROOT}/data/processed/adwr_validation.json"
+    if not os.path.exists(p): return None
+    j = json.load(open(p)); r = j.get("hotspots", {}).get(slug)
+    if not r: return None
+    feats = {k: v for k, v in j.get("feature_overlap", {}).get(slug, {}).items() if k != "outside_any_feature" and v >= 50}
+    return dict(s1=r.get("adwr_s1_median"), rs2=r.get("adwr_rs2_median"), corr_s1=r.get("corr_s1"), corr_rs2=r.get("corr_rs2"), features=feats)
+
 def ols(t, y):
     A = np.c_[t, np.ones_like(t)]; c, *_ = np.linalg.lstsq(A, y, rcond=None); r = y - A @ c
     se = np.sqrt((r ** 2).sum() / max(len(t) - 2, 1) / ((t - t.mean()) ** 2).sum()); return float(c[0] / 10), float(se / 10)   # cm/yr
@@ -61,18 +69,18 @@ HOTSPOTS = [
     dict(id="eloy", name="Eloy – Picacho", D="central", A="f5125", bbox=(-111.70, 32.55, -111.40, 32.82), nisar="eloy",
          place="Pinal County", land="Farmland all around (60 OpenStreetMap polygons within 3 km of the core); no mines nearby.",
          story="A long-known farm-pumping subsidence area. The sinking belt is real but modest in this record."),
-    dict(id="willcox", name="Willcox basin", D="southeast", A="f5125", bbox=(-110.10, 31.90, -109.60, 32.34), nisar="willcox",
+    dict(id="willcox", name="Willcox basin (ADWR: Kansas Settlement)", D="southeast", A="f5125", bbox=(-110.10, 31.90, -109.60, 32.34), nisar="willcox",
          place="Cochise County (Sulphur Springs Valley)", land="Farmland all around (24 OpenStreetMap polygons within 3 km); no mines nearby.",
          story="The largest sinking area we found, in a valley with heavy irrigation pumping and the Willcox Playa crane habitat."),
-    dict(id="north_willcox", name="North of Willcox", D="southeast", A="f5125", bbox=(-110.15, 32.36, -109.85, 32.60), nisar=None,
-         place="Graham County", land="Not checked (map-service lookup failed).",
-         story="A fast-sinking patch north of the Willcox basin, seen by three different satellite tracks."),
-    dict(id="south", name="South of Willcox (Elfrida / McNeal area?)", D="southeast", A="f5125", bbox=(-109.85, 31.55, -109.55, 31.90), nisar=None,
-         place="Cochise County", land="Farmland all around (19 OpenStreetMap polygons within 3 km); no mines nearby. The place name is a guess.",
-         story="A second sinking area in the same valley system, confirmed from two look directions."),
-    dict(id="east", name="East of Willcox", D="southeast", A=None, bbox=(-109.55, 32.10, -109.05, 32.45), nisar=None,
+    dict(id="north_willcox", name="Fort Grant Road, north of Willcox", D="southeast", A="f5125", bbox=(-110.15, 32.36, -109.85, 32.60), nisar=None,
+         place="Graham County", land="Not checked (map-service lookup failed). ADWR maps this as its Fort Grant Rd feature.",
+         story="The fastest-sinking area we measured, north of the Willcox basin. ADWR maps it as the Fort Grant Rd subsidence feature."),
+    dict(id="south", name="Elfrida area, south of Willcox", D="southeast", A="f5125", bbox=(-109.85, 31.55, -109.55, 31.90), nisar=None,
+         place="Cochise County", land="Farmland all around (19 OpenStreetMap polygons within 3 km); no mines nearby.",
+         story="A second sinking area in the same valley system, mapped by ADWR as the Elfrida subsidence feature."),
+    dict(id="east", name="Bowie - San Simon, east of Willcox", D="southeast", A=None, bbox=(-109.55, 32.10, -109.05, 32.45), nisar=None,
          place="Cochise County", land="Little farmland nearby (0 to 2 polygons); the cause is unclear.",
-         story="Large sinking area seen from one look direction only, so it is shown as unconfirmed."),
+         story="A large sinking area that ADWR maps as the Bowie-San Simon feature. We saw it from one satellite look direction only."),
 ]
 
 def hotspot_stats(h, cache):
@@ -130,7 +138,7 @@ if __name__ == "__main__":
         if st is None: print("skip", h["id"]); continue
         hs.append(dict(id=h["id"], name=h["name"], place=h["place"], land=h["land"], story=h["story"], bbox=h["bbox"], s1=st, nisar=nisar_block(h["nisar"]),
                        confirmed=("both look directions" if st.get("ascending") and st["ascending"]["median_rate"] <= THR else ("single look direction" if not st.get("ascending") else "weak in second direction")),
-                       adwr=None))
+                       adwr=_adwr_for(h['id'])))
         print(f"{h['id']:14s} {st['area_km2']:7.1f} km2 | median {st['median_rate']:5.2f} p5 {st['p5_rate']:5.2f} | series {st['series_rate']:5.2f}+/-{st['series_sigma']:.2f} | asc {st.get('ascending')}")
     json.dump(hs, open(f"{OUT}/hotspots.json", "w"), indent=1)
     print("NISAR Willcox raster:", nisar_raster("willcox_128D", (-110.1, 31.9, -109.6, 32.4), f"{ROOT}/data/raw/NISAR_L2_*_128_D_072_*.h5", "nisar_willcox", (-109.98, 31.95), 5.0))

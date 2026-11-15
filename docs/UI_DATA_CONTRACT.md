@@ -23,7 +23,7 @@ The files below already pass the validators in `web/model.mjs` on the `ui/sonora
 | `mines_excluded.geojson` | Points where the signal is probably mining, not groundwater (`name`, `reason`, `source`) |
 | `checked_flat.geojson` | Points we checked and found no sinking (`name`, `median_rate_cm_yr`, `p5_rate_cm_yr`) |
 
-Not provided yet, so the UI should keep its existing "Pending" state: `adwr_subsidence.geojson`, `datacenters.geojson`, `habitat.geojson`, and `adwr_rate_cm_yr` (all null or absent, never 0).
+Now provided: `adwr_subsidence.geojson` (the 32 official ADWR subsidence-area polygons, May 2026; the existing ADWR layer picks it up) and `adwr_rate_cm_yr` in each time series (ADWR's own Sentinel-1 deformation raster averaged over our sinking pixels). Also in each series: `adwr_rs2_rate_cm_yr` (ADWR RADARSAT-2, independent sensor), `adwr_feature`, `adwr_comparison`, `adwr_note`. Still not provided, so keep the "Pending" state: `datacenters.geojson`, `habitat.geojson`.
 
 ## 3. Sign and units
 
@@ -47,7 +47,7 @@ Not provided yet, so the UI should keep its existing "Pending" state: `adwr_subs
 - Show `stable_ground_displacement` as a second line in the chart when present: it shows the measurement noise.
 - Do not invent numbers. `null` means unknown. The ADWR comparison reads "not yet compared".
 - Mines and out-of-state areas are marked; do not label them as groundwater subsidence.
-- The `name` of `south` contains "Elfrida / McNeal area?" on purpose, because the place name is a guess; keep the question mark.
+- Study-area names use ADWR's official feature names (verified: every area's sinking pixels lie inside the matching ADWR feature).
 
 ## 6. Regenerating
 
@@ -64,3 +64,9 @@ The current app validates all files but only shows `rate_cm_yr`, `rate_sigma`, `
 - `stable_ground_displacement`: second chart line, to show measurement noise.
 - `land_use_note` (in `hotspots.geojson`): what is nearby, with its source.
 - Layers: `rate_sentinel1_descending`, `rate_sentinel1_ascending` (cross-check), `rate_nisar_*` (off by default), `mines_excluded.geojson`, `checked_flat.geojson`.
+
+## 8. ADWR comparison: how to word it
+
+- `adwr_rate_cm_yr` comes from the same satellite (Sentinel-1) as our rate, processed separately by ADWR. It is a **consistency check, not independent validation**. `adwr_rs2_rate_cm_yr` is an independent sensor over a longer period (2010 to 2026).
+- ADWR does not document its raster units. We inferred metres from a regression against our own data (see `docs/adwr_validation.md`); say "inferred" wherever units matter.
+- Eloy (Picacho) agrees only weakly: do not claim it is validated. See the table in `docs/adwr_validation.md`.

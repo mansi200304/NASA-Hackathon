@@ -5,6 +5,7 @@ Usage: python export_contract.py   (run export_web.py first is not required; thi
 import json, os, numpy as np
 from PIL import Image
 import export_web as ew
+ADWRJ = json.load(open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data/processed/adwr_validation.json"))) if os.path.exists(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data/processed/adwr_validation.json")) else {}
 
 ROOT = ew.ROOT; OUT = f"{ROOT}/data/processed"
 TAG = {  # tagline, county (all text is plain, factual, and matches docs/UI_DATA_CONTRACT.md)
@@ -36,8 +37,11 @@ def main():
     for h in ew.HOTSPOTS:
         st0 = ew.hotspot_stats(h, cache) if h["D"] in cache else None
         if st0 is not None: pre[h["id"]] = st0
-    sdiff = {k: abs(v["median_rate"] - v["ascending"]["median_rate"]) / 2 for k, v in pre.items() if v.get("ascending")}
-    s_proxy = max(sdiff.values()) if sdiff else 0.0
+    sda = {k: abs(v["median_rate"] - v["ascending"]["median_rate"]) / 2 for k, v in pre.items() if v.get("ascending")}   # cross-direction term (areas with an ascending check)
+    # measured reference offset: our median minus ADWR's own Sentinel-1 median over the same pixels (reference choice differs)
+    adw = ADWRJ.get("hotspots", {})
+    sadwr = {k: abs(v["diff_s1"]) for k, v in adw.items() if "diff_s1" in v}
+    s_proxy = max(sda.values()) if sda else 0.0     # conservative stand-in for areas with no ascending check
     for h in ew.HOTSPOTS:
         st = ew.hotspot_stats(h, cache) if h["D"] in cache else None
         if st is None: print("skip", h["id"]); continue
@@ -46,8 +50,9 @@ def main():
         status = "both look directions" if both else ("single look direction" if not st.get("ascending") else "weak in second direction")
         feats.append({"type": "Feature", "geometry": {"type": "Polygon", "coordinates": [[[w, s], [e, s], [e, n], [w, n], [w, s]]]},
                       "properties": {"slug": slug, "name": h["name"], "tagline": tagline, "county": county, "story": h["story"], "confirmation": status,
-                                     "land_use_note": h["land"], "source_note": "Sentinel-1 OPERA DISP-S1, 2016 to 2026; outline is the study box, not the sinking area"}})
-        sys_term = sdiff.get(h["id"], s_proxy)
+                                     "land_use_note": h["land"], "source_note": "Sentinel-1 OPERA DISP-S1, 2016 to 2026; outline is the study box, not the sinking area",
+                                     "adwr_feature": ", ".join(k for k, v in ADWRJ.get("feature_overlap", {}).get(slug, {}).items() if k != "outside_any_feature" and v >= 50)}})
+        sys_term = max(sda.get(h["id"], s_proxy), sadwr.get(h["id"], 0.0))
         D = cache[h["D"]]; stable = st.get("stable_series_mm")
         nis = ew.nisar_block(h["nisar"])
         nisar = None if nis is None else {"track": nis["track"], "dates": nis["dates"], "displacement": [round(v / 10, 2) for v in nis["series_mm"]],
@@ -55,9 +60,11 @@ def main():
                                           "scope": nis["scope"], "status_note": "Provisional NISAR data; short record; rate not yet reliable."}
         ts = {"hotspot": slug, "units": "cm", "reference": REF_TEXT[h["D"]], "track": TRACK[h["D"]],
               "dates": st["dates"], "displacement": [round(v / 10, 2) for v in st["series_mm"]],
-              "rate_cm_yr": st["series_rate"], "rate_sigma": round(float(np.hypot(st["series_sigma"], sys_term)), 2), "adwr_rate_cm_yr": None,
+              "rate_cm_yr": st["series_rate"], "rate_sigma": round(float(np.hypot(st["series_sigma"], sys_term)), 2), "adwr_rate_cm_yr": adw.get(h["id"], {}).get("adwr_s1_median"), "adwr_rs2_rate_cm_yr": adw.get(h["id"], {}).get("adwr_rs2_median"),
+              "adwr_feature": ADWRJ.get("feature_overlap", {}).get(h["id"]), "adwr_comparison": adw.get(h["id"]),
+              "adwr_note": "ADWR value is its own published InSAR deformation raster (units inferred as metres) averaged over the same pixels. Sentinel-1 2017-2026 is the same satellite as ours (a consistency check); RADARSAT-2 2010-2026 is an independent sensor over a longer period.",
               "rate_sigma_fit_only": st["series_sigma"], "rate_sigma_systematic": round(float(sys_term), 2),
-              "rate_sigma_note": ("Combines the straight-line fit error with half the difference between the descending and ascending satellite medians." if h["id"] in sdiff else
+              "rate_sigma_note": ("Combines the straight-line fit error with the larger of: half the descending-vs-ascending difference, or our difference from ADWR's own Sentinel-1 rate over the same pixels (reference choice)." if h["id"] in sda else
                                   "No ascending check here, so the systematic part is the largest seen at the other study areas (a conservative proxy, not a measurement)."),
               "median_rate_cm_yr": st["median_rate"], "p5_rate_cm_yr": st["p5_rate"], "fastest_rate_cm_yr": st["fastest"], "area_km2": st["area_km2"],
               "sinking_threshold_cm_yr": ew.THR, "ascending_check": st.get("ascending"), "confirmation": status,

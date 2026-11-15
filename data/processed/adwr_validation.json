@@ -1,0 +1,274 @@
+{
+ "unit_cm_per_value": 100.0,
+ "unit_note": "INFERRED from regression against our line-of-sight displacement; ADWR does not document the raster units",
+ "s1_years": 9.2,
+ "rs2_years": 15.98,
+ "hotspots": {
+  "eloy": {
+   "n_px": 945,
+   "ours_median": -1.23,
+   "adwr_s1_median": -1.57,
+   "adwr_s1_n": 945,
+   "corr_s1": 0.587,
+   "diff_s1": 0.34,
+   "adwr_rs2_median": -1.09,
+   "adwr_rs2_n": 945,
+   "corr_rs2": 0.182
+  },
+  "willcox": {
+   "n_px": 4292,
+   "ours_median": -2.38,
+   "adwr_s1_median": -2.39,
+   "adwr_s1_n": 4292,
+   "corr_s1": 0.983,
+   "diff_s1": 0.01,
+   "adwr_rs2_median": -2.31,
+   "adwr_rs2_n": 4291,
+   "corr_rs2": 0.967
+  },
+  "north_willcox": {
+   "n_px": 1292,
+   "ours_median": -4.66,
+   "adwr_s1_median": -4.61,
+   "adwr_s1_n": 1292,
+   "corr_s1": 0.989,
+   "diff_s1": -0.05,
+   "adwr_rs2_median": -4.24,
+   "adwr_rs2_n": 1275,
+   "corr_rs2": 0.977
+  },
+  "south": {
+   "n_px": 1415,
+   "ours_median": -2.86,
+   "adwr_s1_median": -2.83,
+   "adwr_s1_n": 1415,
+   "corr_s1": 0.984,
+   "diff_s1": -0.03,
+   "adwr_rs2_median": -3.31,
+   "adwr_rs2_n": 1340,
+   "corr_rs2": 0.966
+  },
+  "east": {
+   "n_px": 3741,
+   "ours_median": -2.17,
+   "adwr_s1_median": -2.28,
+   "adwr_s1_n": 3741,
+   "corr_s1": 0.988,
+   "diff_s1": 0.11,
+   "adwr_rs2_median": -2.3,
+   "adwr_rs2_n": 3741,
+   "corr_rs2": 0.945
+  }
+ },
+ "extent": {
+  "central": {
+   "our_sinking_px": 1524,
+   "pct_inside_adwr": 82.7,
+   "adwr_px_with_data": 48361,
+   "pct_of_adwr_area_we_flag": 2.6,
+   "features": {
+    "Avra Valley": {
+     "px": 1344,
+     "median_rate": 0.17,
+     "pct_sinking": 0.7,
+     "adwr_s1_median": -0.23,
+     "adwr_rs2_median": -0.12
+    },
+    "East Valley": {
+     "px": 3888,
+     "median_rate": 0.03,
+     "pct_sinking": 0.5,
+     "adwr_s1_median": -0.1,
+     "adwr_rs2_median": -0.04
+    },
+    "GIla Bend": {
+     "px": 9337,
+     "median_rate": -0.13,
+     "pct_sinking": 1.0,
+     "adwr_s1_median": -0.16,
+     "adwr_rs2_median": -0.13
+    },
+    "Harquahala Valley": {
+     "px": 5166,
+     "median_rate": 0.06,
+     "pct_sinking": 0.0,
+     "adwr_s1_median": -0.3,
+     "adwr_rs2_median": -0.2
+    },
+    "Hawk Rock": {
+     "px": 2970,
+     "median_rate": -0.03,
+     "pct_sinking": 0.4,
+     "adwr_s1_median": -0.29,
+     "adwr_rs2_median": -0.14
+    },
+    "Lower Gila": {
+     "px": 3000,
+     "median_rate": 0.1,
+     "pct_sinking": 0.0,
+     "adwr_s1_median": -0.41,
+     "adwr_rs2_median": null
+    },
+    "Maricopa Stanfield": {
+     "px": 6132,
+     "median_rate": -0.26,
+     "pct_sinking": 3.3,
+     "adwr_s1_median": -0.47,
+     "adwr_rs2_median": -0.13
+    },
+    "Picacho": {
+     "px": 17902,
+     "median_rate": -0.3,
+     "pct_sinking": 7.6,
+     "adwr_s1_median": -0.47,
+     "adwr_rs2_median": -0.29
+    },
+    "Rainbow Valley": {
+     "px": 2019,
+     "median_rate": -0.02,
+     "pct_sinking": 0.0,
+     "adwr_s1_median": -0.08,
+     "adwr_rs2_median": -0.07
+    },
+    "Scottsdale": {
+     "px": 928,
+     "median_rate": -0.19,
+     "pct_sinking": 0.1,
+     "adwr_s1_median": -0.18,
+     "adwr_rs2_median": -0.1
+    },
+    "Tucson": {
+     "px": 1062,
+     "median_rate": 0.33,
+     "pct_sinking": 0.0,
+     "adwr_s1_median": null,
+     "adwr_rs2_median": -0.03
+    },
+    "West Valley": {
+     "px": 15524,
+     "median_rate": -0.07,
+     "pct_sinking": 0.2,
+     "adwr_s1_median": -0.25,
+     "adwr_rs2_median": -0.11
+    }
+   }
+  },
+  "southeast": {
+   "our_sinking_px": 11543,
+   "pct_inside_adwr": 95.4,
+   "adwr_px_with_data": 27264,
+   "pct_of_adwr_area_we_flag": 40.4,
+   "features": {
+    "Avra Valley": {
+     "px": 1339,
+     "median_rate": 0.26,
+     "pct_sinking": 0.4,
+     "adwr_s1_median": -0.13,
+     "adwr_rs2_median": -0.12
+    },
+    "Bowie-San Simon": {
+     "px": 13055,
+     "median_rate": -0.37,
+     "pct_sinking": 30.1,
+     "adwr_s1_median": -0.84,
+     "adwr_rs2_median": -0.68
+    },
+    "Elfrida": {
+     "px": 3830,
+     "median_rate": -0.9,
+     "pct_sinking": 46.8,
+     "adwr_s1_median": -0.95,
+     "adwr_rs2_median": -2.09
+    },
+    "Fort Grant Rd": {
+     "px": 4212,
+     "median_rate": -1.72,
+     "pct_sinking": 64.6,
+     "adwr_s1_median": -1.72,
+     "adwr_rs2_median": -1.55
+    },
+    "Green Valley": {
+     "px": 242,
+     "median_rate": 0.26,
+     "pct_sinking": 0.0,
+     "adwr_s1_median": -0.35,
+     "adwr_rs2_median": -0.12
+    },
+    "Kansas Settlement": {
+     "px": 8656,
+     "median_rate": -1.2,
+     "pct_sinking": 55.1,
+     "adwr_s1_median": -1.38,
+     "adwr_rs2_median": -1.15
+    },
+    "Tucson": {
+     "px": 1075,
+     "median_rate": 0.2,
+     "pct_sinking": 0.0,
+     "adwr_s1_median": -0.04,
+     "adwr_rs2_median": -0.12
+    }
+   }
+  }
+ },
+ "feature_overlap": {
+  "eloy": {
+   "outside_any_feature": 0.0,
+   "Picacho": 100.0
+  },
+  "willcox": {
+   "outside_any_feature": 0.0,
+   "Fort Grant Rd": 11.6,
+   "Kansas Settlement": 88.4
+  },
+  "north_willcox": {
+   "outside_any_feature": 0.0,
+   "Fort Grant Rd": 100.0
+  },
+  "south": {
+   "outside_any_feature": 0.0,
+   "Elfrida": 100.0
+  },
+  "east": {
+   "outside_any_feature": 0.0,
+   "Bowie-San Simon": 100.0
+  }
+ },
+ "all_pixels": {
+  "central": {
+   "n": 47258,
+   "corr_s1": 0.714,
+   "rmse_s1_cm_yr": 0.346,
+   "median_abs_diff_s1": 0.184,
+   "corr_rs2": 0.802,
+   "corr_rs2_on_sinking": 0.002
+  },
+  "southeast": {
+   "n": 27774,
+   "corr_s1": 0.991,
+   "rmse_s1_cm_yr": 0.263,
+   "median_abs_diff_s1": 0.157,
+   "corr_rs2": 0.977,
+   "corr_rs2_on_sinking": 0.958
+  }
+ },
+ "mines": {
+  "Sierrita Mine area": {
+   "adwr_s1_median_3km": null,
+   "adwr_features_within_1p5km": []
+  },
+  "Mission Complex area": {
+   "adwr_s1_median_3km": null,
+   "adwr_features_within_1p5km": []
+  },
+  "Ray Mine area": {
+   "adwr_s1_median_3km": null,
+   "adwr_features_within_1p5km": []
+  },
+  "Morenci area": {
+   "adwr_s1_median_3km": null,
+   "adwr_features_within_1p5km": []
+  }
+ },
+ "unit_slope": 0.0093
+}

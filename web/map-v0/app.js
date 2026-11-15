@@ -93,7 +93,7 @@
       <div class="section-title">What is on top</div>
       <p class="note">${esc(h.land)} Source: OpenStreetMap.</p>
       <div class="section-title">Check against official numbers</div>
-      <p class="note">Not compared with Arizona Department of Water Resources values yet.</p>
+      ${h.adwr ? `<p class="note">ADWR published InSAR over the same pixels: <b>${fmt(h.adwr.s1, 1)} cm/yr</b> (Sentinel-1, 2017 to 2026; same satellite, so a consistency check) and <b>${fmt(h.adwr.rs2, 1)} cm/yr</b> (RADARSAT-2, 2010 to 2026; independent sensor). Official ADWR feature: ${esc(Object.keys(h.adwr.features).join(", ") || "none")}. Ours: ${fmt(s.median_rate, 1)}.</p>` : '<p class="note">Not compared with Arizona Department of Water Resources values.</p>'}
       <p class="note">Values are line-of-sight, referenced to the frame's median ground; a few mm/yr of bias is possible. Sinking does not by itself show who caused it.</p>`;
     $("panel").classList.remove("hidden"); $("hint").style.display = "none";
     chart1 = drawChart("c1", chart1, s.dates, [

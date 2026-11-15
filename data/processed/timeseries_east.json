@@ -49,7 +49,24 @@
  ],
  "rate_cm_yr": -2.58,
  "rate_sigma": 0.57,
- "adwr_rate_cm_yr": null,
+ "adwr_rate_cm_yr": -2.28,
+ "adwr_rs2_rate_cm_yr": -2.3,
+ "adwr_feature": {
+  "outside_any_feature": 0.0,
+  "Bowie-San Simon": 100.0
+ },
+ "adwr_comparison": {
+  "n_px": 3741,
+  "ours_median": -2.17,
+  "adwr_s1_median": -2.28,
+  "adwr_s1_n": 3741,
+  "corr_s1": 0.988,
+  "diff_s1": 0.11,
+  "adwr_rs2_median": -2.3,
+  "adwr_rs2_n": 3741,
+  "corr_rs2": 0.945
+ },
+ "adwr_note": "ADWR value is its own published InSAR deformation raster (units inferred as metres) averaged over the same pixels. Sentinel-1 2017-2026 is the same satellite as ours (a consistency check); RADARSAT-2 2010-2026 is an independent sensor over a longer period.",
  "rate_sigma_fit_only": 0.15,
  "rate_sigma_systematic": 0.56,
  "rate_sigma_note": "No ascending check here, so the systematic part is the largest seen at the other study areas (a conservative proxy, not a measurement).",

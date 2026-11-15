@@ -137,11 +137,19 @@
    "scope": "Average over the whole study box (not only the sinking area), from consecutive pairs; very noisy."
   },
   "confirmed": "both look directions",
-  "adwr": null
+  "adwr": {
+   "s1": -1.57,
+   "rs2": -1.09,
+   "corr_s1": 0.587,
+   "corr_rs2": 0.182,
+   "features": {
+    "Picacho": 100.0
+   }
+  }
  },
  {
   "id": "willcox",
-  "name": "Willcox basin",
+  "name": "Willcox basin (ADWR: Kansas Settlement)",
   "place": "Cochise County (Sulphur Springs Valley)",
   "land": "Farmland all around (24 OpenStreetMap polygons within 3 km); no mines nearby.",
   "story": "The largest sinking area we found, in a valley with heavy irrigation pumping and the Willcox Playa crane habitat.",
@@ -315,14 +323,22 @@
    "scope": "Average over the whole study box (not only the sinking area), from consecutive pairs; very noisy."
   },
   "confirmed": "both look directions",
-  "adwr": null
+  "adwr": {
+   "s1": -2.39,
+   "rs2": -2.31,
+   "corr_s1": 0.983,
+   "corr_rs2": 0.967,
+   "features": {
+    "Kansas Settlement": 88.4
+   }
+  }
  },
  {
   "id": "north_willcox",
-  "name": "North of Willcox",
+  "name": "Fort Grant Road, north of Willcox",
   "place": "Graham County",
-  "land": "Not checked (map-service lookup failed).",
-  "story": "A fast-sinking patch north of the Willcox basin, seen by three different satellite tracks.",
+  "land": "Not checked (map-service lookup failed). ADWR maps this as its Fort Grant Rd feature.",
+  "story": "The fastest-sinking area we measured, north of the Willcox basin. ADWR maps it as the Fort Grant Rd subsidence feature.",
   "bbox": [
    -110.15,
    32.36,
@@ -431,14 +447,22 @@
   },
   "nisar": null,
   "confirmed": "both look directions",
-  "adwr": null
+  "adwr": {
+   "s1": -4.61,
+   "rs2": -4.24,
+   "corr_s1": 0.989,
+   "corr_rs2": 0.977,
+   "features": {
+    "Fort Grant Rd": 100.0
+   }
+  }
  },
  {
   "id": "south",
-  "name": "South of Willcox (Elfrida / McNeal area?)",
+  "name": "Elfrida area, south of Willcox",
   "place": "Cochise County",
-  "land": "Farmland all around (19 OpenStreetMap polygons within 3 km); no mines nearby. The place name is a guess.",
-  "story": "A second sinking area in the same valley system, confirmed from two look directions.",
+  "land": "Farmland all around (19 OpenStreetMap polygons within 3 km); no mines nearby.",
+  "story": "A second sinking area in the same valley system, mapped by ADWR as the Elfrida subsidence feature.",
   "bbox": [
    -109.85,
    31.55,
@@ -547,14 +571,22 @@
   },
   "nisar": null,
   "confirmed": "both look directions",
-  "adwr": null
+  "adwr": {
+   "s1": -2.83,
+   "rs2": -3.31,
+   "corr_s1": 0.984,
+   "corr_rs2": 0.966,
+   "features": {
+    "Elfrida": 100.0
+   }
+  }
  },
  {
   "id": "east",
-  "name": "East of Willcox",
+  "name": "Bowie - San Simon, east of Willcox",
   "place": "Cochise County",
   "land": "Little farmland nearby (0 to 2 polygons); the cause is unclear.",
-  "story": "Large sinking area seen from one look direction only, so it is shown as unconfirmed.",
+  "story": "A large sinking area that ADWR maps as the Bowie-San Simon feature. We saw it from one satellite look direction only.",
   "bbox": [
    -109.55,
    32.1,
@@ -658,6 +690,14 @@
   },
   "nisar": null,
   "confirmed": "single look direction",
-  "adwr": null
+  "adwr": {
+   "s1": -2.28,
+   "rs2": -2.3,
+   "corr_s1": 0.988,
+   "corr_rs2": 0.945,
+   "features": {
+    "Bowie-San Simon": 100.0
+   }
+  }
  }
 ]

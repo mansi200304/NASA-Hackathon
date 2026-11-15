@@ -38,7 +38,8 @@
     "story": "A long-known farm-pumping subsidence area. The sinking belt is real but modest in this record.",
     "confirmation": "both look directions",
     "land_use_note": "Farmland all around (60 OpenStreetMap polygons within 3 km of the core); no mines nearby.",
-    "source_note": "Sentinel-1 OPERA DISP-S1, 2016 to 2026; outline is the study box, not the sinking area"
+    "source_note": "Sentinel-1 OPERA DISP-S1, 2016 to 2026; outline is the study box, not the sinking area",
+    "adwr_feature": "Picacho"
    }
   },
   {
@@ -72,13 +73,14 @@
    },
    "properties": {
     "slug": "willcox",
-    "name": "Willcox basin",
+    "name": "Willcox basin (ADWR: Kansas Settlement)",
     "tagline": "The largest sink",
     "county": "Cochise",
     "story": "The largest sinking area we found, in a valley with heavy irrigation pumping and the Willcox Playa crane habitat.",
     "confirmation": "both look directions",
     "land_use_note": "Farmland all around (24 OpenStreetMap polygons within 3 km); no mines nearby.",
-    "source_note": "Sentinel-1 OPERA DISP-S1, 2016 to 2026; outline is the study box, not the sinking area"
+    "source_note": "Sentinel-1 OPERA DISP-S1, 2016 to 2026; outline is the study box, not the sinking area",
+    "adwr_feature": "Kansas Settlement"
    }
   },
   {
@@ -112,13 +114,14 @@
    },
    "properties": {
     "slug": "north_willcox",
-    "name": "North of Willcox",
+    "name": "Fort Grant Road, north of Willcox",
     "tagline": "The fastest patch",
     "county": "Graham",
-    "story": "A fast-sinking patch north of the Willcox basin, seen by three different satellite tracks.",
+    "story": "The fastest-sinking area we measured, north of the Willcox basin. ADWR maps it as the Fort Grant Rd subsidence feature.",
     "confirmation": "both look directions",
-    "land_use_note": "Not checked (map-service lookup failed).",
-    "source_note": "Sentinel-1 OPERA DISP-S1, 2016 to 2026; outline is the study box, not the sinking area"
+    "land_use_note": "Not checked (map-service lookup failed). ADWR maps this as its Fort Grant Rd feature.",
+    "source_note": "Sentinel-1 OPERA DISP-S1, 2016 to 2026; outline is the study box, not the sinking area",
+    "adwr_feature": "Fort Grant Rd"
    }
   },
   {
@@ -152,13 +155,14 @@
    },
    "properties": {
     "slug": "south",
-    "name": "South of Willcox (Elfrida / McNeal area?)",
+    "name": "Elfrida area, south of Willcox",
     "tagline": "The southern sink",
     "county": "Cochise",
-    "story": "A second sinking area in the same valley system, confirmed from two look directions.",
+    "story": "A second sinking area in the same valley system, mapped by ADWR as the Elfrida subsidence feature.",
     "confirmation": "both look directions",
-    "land_use_note": "Farmland all around (19 OpenStreetMap polygons within 3 km); no mines nearby. The place name is a guess.",
-    "source_note": "Sentinel-1 OPERA DISP-S1, 2016 to 2026; outline is the study box, not the sinking area"
+    "land_use_note": "Farmland all around (19 OpenStreetMap polygons within 3 km); no mines nearby.",
+    "source_note": "Sentinel-1 OPERA DISP-S1, 2016 to 2026; outline is the study box, not the sinking area",
+    "adwr_feature": "Elfrida"
    }
   },
   {
@@ -192,13 +196,14 @@
    },
    "properties": {
     "slug": "east",
-    "name": "East of Willcox",
+    "name": "Bowie - San Simon, east of Willcox",
     "tagline": "Unconfirmed: one look direction",
     "county": "Cochise",
-    "story": "Large sinking area seen from one look direction only, so it is shown as unconfirmed.",
+    "story": "A large sinking area that ADWR maps as the Bowie-San Simon feature. We saw it from one satellite look direction only.",
     "confirmation": "single look direction",
     "land_use_note": "Little farmland nearby (0 to 2 polygons); the cause is unclear.",
-    "source_note": "Sentinel-1 OPERA DISP-S1, 2016 to 2026; outline is the study box, not the sinking area"
+    "source_note": "Sentinel-1 OPERA DISP-S1, 2016 to 2026; outline is the study box, not the sinking area",
+    "adwr_feature": "Bowie-San Simon"
    }
   }
  ]
