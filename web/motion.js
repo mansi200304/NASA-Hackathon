@@ -17,6 +17,109 @@
   let inView = false;
   let phase = 0;
 
+  const hero = visual.closest('.overview-hero');
+  const logo = visual.querySelector('.overview-rings img');
+  let dissolve = 0;
+  let logoParticles = [];
+  let logoBox = { x: 0, y: 0, w: 1, h: 1 };
+  let scrollFrame = 0;
+  const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+  // Sample the team's existing Arizona logo, rather than inventing another mark.
+  // Sampled pixels break into a fine point mesh as the real image fades on scroll.
+  function sampleLogo() {
+    if (!logo?.naturalWidth) return;
+    try {
+      const scan = document.createElement('canvas');
+      scan.width = 108; scan.height = 108;
+      const scanCtx = scan.getContext('2d', { willReadFrequently: true });
+      if (!scanCtx) return;
+      scanCtx.drawImage(logo, 0, 0, 108, 108);
+      const data = scanCtx.getImageData(0, 0, 108, 108).data;
+      const bg = [data[0], data[1], data[2], data[3]];
+      const bgIsTransparent = bg[3] < 80;
+      const points = [];
+      for (let y = 3; y < 108; y += 5) {
+        for (let x = 3; x < 108; x += 5) {
+          const i = (y * 108 + x) * 4;
+          const alpha = data[i + 3];
+          const delta = Math.abs(data[i] - bg[0]) +
+            Math.abs(data[i + 1] - bg[1]) + Math.abs(data[i + 2] - bg[2]);
+          if (alpha < 90 || (!bgIsTransparent && delta < 88)) continue;
+          points.push({
+            u: x / 108, v: y / 108,
+            tint: (data[i] * 2 + data[i + 1] + data[i + 2]) / 4,
+            seed: Math.sin(x * 83.29 + y * 17.41),
+          });
+        }
+      }
+      logoParticles = points;
+      updateLogoBox();
+    } catch {
+      // Non-critical artwork: if pixels cannot be read, the CSS fade still works.
+      logoParticles = [];
+    }
+  }
+
+  function updateLogoBox() {
+    if (!logo) return;
+    const art = logo.getBoundingClientRect();
+    const box = visual.getBoundingClientRect();
+    logoBox = { x: art.left - box.left, y: art.top - box.top, w: art.width, h: art.height };
+  }
+
+  function syncScroll() {
+    scrollFrame = 0;
+    if (!hero || reduced.matches) {
+      dissolve = 0;
+    } else {
+      const rect = hero.getBoundingClientRect();
+      dissolve = clamp((-rect.top - 14) / Math.max(220, rect.height * 0.62), 0, 1);
+    }
+    const logoFade = clamp(1 - Math.max(0, dissolve - 0.06) / 0.64, 0, 1);
+    visual.style.setProperty('--logo-opacity', logoFade.toFixed(3));
+    visual.style.setProperty('--logo-blur', (7 * dissolve).toFixed(2) + 'px');
+    visual.style.setProperty('--logo-scale', (1 + dissolve * 0.07).toFixed(3));
+    visual.style.setProperty('--rings-opacity', (1 - dissolve * 0.42).toFixed(3));
+    visual.style.setProperty('--label-opacity', clamp(1 - dissolve * 1.5, 0, 1).toFixed(3));
+    updateLogoBox();
+  }
+
+  function scheduleScroll() {
+    if (!scrollFrame) scrollFrame = requestAnimationFrame(syncScroll);
+  }
+
+  function drawLogoMesh() {
+    if (dissolve <= 0.08 || dissolve >= 0.99 || !logoParticles.length) return;
+    const emergence = clamp((dissolve - 0.08) * 4, 0, 1);
+    const disappearance = clamp((0.99 - dissolve) * 3.4, 0, 1);
+    const strength = emergence * disappearance;
+    const cx = logoBox.x + logoBox.w / 2;
+    const cy = logoBox.y + logoBox.h / 2;
+    const drift = dissolve * 0.15 * Math.min(width, height);
+    ctx.save();
+    ctx.lineWidth = 0.7;
+    for (const p of logoParticles) {
+      const baseX = logoBox.x + p.u * logoBox.w;
+      const baseY = logoBox.y + p.v * logoBox.h;
+      const dx = (baseX - cx) / Math.max(1, logoBox.w / 2);
+      const dy = (baseY - cy) / Math.max(1, logoBox.h / 2);
+      const flow = Math.sin(phase * 0.9 + p.u * 9 + p.v * 7);
+      const x = baseX + (dx * 0.8 + flow * 0.35) * drift;
+      const y = baseY + (dy * 0.7 - flow * 0.55) * drift;
+      ctx.fillStyle = p.tint < 125
+        ? 'rgba(82,102,75,' + (strength * 0.7).toFixed(3) + ')'
+        : 'rgba(166,75,42,' + (strength * 0.58).toFixed(3) + ')';
+      ctx.fillRect(x, y, 1.2, 1.2);
+      if (dissolve > 0.28 && p.seed > 0.72) {
+        ctx.strokeStyle = 'rgba(82,102,75,' + (strength * 0.23).toFixed(3) + ')';
+        ctx.beginPath(); ctx.moveTo(x, y);
+        ctx.lineTo(x + 6 + flow * 4, y + 7 - flow * 4); ctx.stroke();
+      }
+    }
+    ctx.restore();
+  }
+
   function resize() {
     const bounds = visual.getBoundingClientRect();
     width = Math.max(1, bounds.width);
@@ -27,6 +130,7 @@
     ctx.setTransform(scale, 0, 0, scale, 0, 0);
     pointer.x = pointer.targetX = width / 2;
     pointer.y = pointer.targetY = height / 2;
+    updateLogoBox();
   }
 
   function draw(time) {
@@ -83,6 +187,7 @@
       ctx.arc(pointer.x, pointer.y, r, 0, TWO_PI);
       ctx.fill();
     }
+    drawLogoMesh();
   }
 
   function stop() {
@@ -130,6 +235,11 @@
   if ('ResizeObserver' in window) new ResizeObserver(resize).observe(visual);
   else window.addEventListener('resize', resize, { passive: true });
   resize();
+  if (logo?.complete && logo.naturalWidth) sampleLogo();
+  else logo?.addEventListener('load', sampleLogo, { once: true });
+  window.addEventListener('scroll', scheduleScroll, { passive: true });
+  window.addEventListener('resize', scheduleScroll, { passive: true });
+  syncScroll();
 
   if ('IntersectionObserver' in window) {
     new IntersectionObserver(entries => {
@@ -146,6 +256,7 @@
   if (reduced.addEventListener) reduced.addEventListener('change', () => {
     if (reduced.matches) { stop(); ctx.clearRect(0, 0, width, height); }
     else start();
+    syncScroll();
   });
 
   // The same restrained pace carries into the editorial sections on scroll.
