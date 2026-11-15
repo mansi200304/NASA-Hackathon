@@ -34,6 +34,43 @@ def crop_png(frame_names, bbox, slug):
     Image.fromarray(ew.ramp(rate), "RGBA").save(f"{OUT}/rate_{slug}.png", optimize=True)
     return float(np.isfinite(rate).mean() * 100)
 
+CUM_VMIN, CUM_VMAX = -60, 10     # cm; one scale for every study so areas can be compared
+CUM_STOPS = [(-60, (103, 0, 13, 235)), (-30, (203, 24, 29, 225)), (-15, (252, 146, 114, 205)), (-5, (254, 224, 210, 110)),
+             (0, (255, 255, 255, 0)), (5, (158, 202, 225, 90)), (10, (66, 146, 198, 170))]
+
+def ramp_cum(cm):
+    """Total change since the first date (cm) -> RGBA. Sinking (negative) red, unchanged transparent, rising light blue."""
+    xs = [q[0] for q in CUM_STOPS]; out = np.zeros(cm.shape + (4,), "uint8"); r = np.clip(np.nan_to_num(cm, nan=0), xs[0], xs[-1])
+    for c in range(4): out[..., c] = np.interp(r, xs, [q[1][c] for q in CUM_STOPS]).astype("uint8")
+    out[~np.isfinite(cm), 3] = 0; return out
+
+def export_cumulative(h, D, slug, st):
+    """One map picture per satellite date (total change since the first date), plus pictures of the pixels behind each chart line.
+    Pixels shown are those measured at every date (same rule as the rate map), so the pictures and the chart use identical data."""
+    w, s_, e, n = h["bbox"]; lons = np.arange(w, e, ew.RES) + ew.RES / 2; lats = np.arange(n, s_, -ew.RES) - ew.RES / 2
+    LO, LA = np.meshgrid(lons, lats); lo, la = ew.lonlat_grid(D)
+    inbox = (lo >= w) & (lo <= e) & (la >= s_) & (la <= n) & D["ok"]
+    sink = inbox & (D["rate"] <= ew.THR); stable = inbox & (np.abs(D["rate"]) <= 0.15)
+    os.makedirs(f"{OUT}/cumulative", exist_ok=True); frames = []
+    for t in range(D["cum"].shape[0]):
+        v = ew.sample(dict(D, rate=np.where(D["ok"], D["cum"][t] / 10.0, np.nan)), LO, LA)
+        name = f"cumulative/cum_{slug}_{t:02d}.png"
+        Image.fromarray(ramp_cum(v), "RGBA").quantize(colors=48, method=Image.Quantize.FASTOCTREE).save(f"{OUT}/{name}", optimize=True); frames.append(name)
+    masks = {}
+    for kind, m, rgba in (("sinking", sink, (166, 75, 42, 150)), ("stable", stable, (98, 109, 118, 150))):
+        v = ew.sample(dict(D, rate=np.where(m, 1.0, 0.0).astype("float32")), LO, LA); a = np.zeros(v.shape + (4,), "uint8"); a[np.nan_to_num(v) > 0.5] = rgba
+        name = f"cumulative/mask_{kind}_{slug}.png"; Image.fromarray(a, "RGBA").quantize(colors=4, method=Image.Quantize.FASTOCTREE).save(f"{OUT}/{name}", optimize=True); masks[kind] = name
+    # the chart line must equal the average of the pixels the map shows: prove it
+    chart = [np.nanmean(D["cum"][t][sink]) / 10.0 for t in range(D["cum"].shape[0])]
+    drift = max(abs(a - b) for a, b in zip(chart, [round(v / 10, 2) for v in st["series_mm"]]))
+    assert drift < 0.011, f"{slug}: map frames and chart disagree by {drift} cm"
+    json.dump({"hotspot": slug, "units": "cm", "bounds": [[s_, w], [n, e]], "vmin": CUM_VMIN, "vmax": CUM_VMAX, "crs": "EPSG:4326",
+               "colormap": "custom: red = ground lower than at the first date, transparent = unchanged, blue = higher",
+               "dates": st["dates"], "frames": frames, "masks": masks, "reference": REF_TEXT[h["D"]],
+               "note": "Each picture is the total change since the first date, only where the radar measured at every date. Blank means not measured, not zero."},
+              open(f"{OUT}/cumulative_{slug}.json", "w"), indent=1)
+    return len(frames), drift
+
 def main():
     cache = {n: ew.load(n) for n in ["central", "southeast", "f5125"]}; cache = {k: v for k, v in cache.items() if v is not None}
     feats = []; report = []
@@ -84,6 +121,7 @@ def main():
         json.dump({"bounds": [[s, w], [n, e]], "units": "cm/yr", "vmin": -6, "vmax": 2, "colormap": "custom: red = sinking (away from satellite), transparent = stable, blue = rising",
                    "track": TRACK[h["D"]], "dates": [st["dates"][0], st["dates"][-1]], "crs": "EPSG:4326", "valid_pct_of_box": round(pct, 1),
                    "sign_convention": SIGN_S1, "data_release": rel_s1(st["dates"][0], st["dates"][-1])}, open(f"{OUT}/rate_{slug}.json", "w"), indent=1)
+        nfr, drift = export_cumulative(h, D, slug, st); print(f"  {slug}: {nfr} dated map pictures + 2 masks; chart-vs-map difference {drift:.4f} cm")
         report.append((slug, len(st["dates"]), st["series_rate"], status))
     json.dump({"type": "FeatureCollection", "features": feats}, open(f"{OUT}/hotspots.geojson", "w"), indent=1)
     # extra, region-wide layers: copy the mosaics with UI-friendly metadata

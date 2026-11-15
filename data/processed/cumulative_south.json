@@ -1,0 +1,68 @@
+{
+ "hotspot": "south",
+ "units": "cm",
+ "bounds": [
+  [
+   31.55,
+   -109.85
+  ],
+  [
+   31.9,
+   -109.55
+  ]
+ ],
+ "vmin": -60,
+ "vmax": 10,
+ "crs": "EPSG:4326",
+ "colormap": "custom: red = ground lower than at the first date, transparent = unchanged, blue = higher",
+ "dates": [
+  "2016-07-23",
+  "2017-04-13",
+  "2017-10-10",
+  "2018-04-08",
+  "2018-10-05",
+  "2019-04-03",
+  "2019-09-30",
+  "2020-03-28",
+  "2020-09-24",
+  "2021-03-23",
+  "2021-09-19",
+  "2022-04-11",
+  "2022-10-08",
+  "2023-04-06",
+  "2023-10-03",
+  "2024-03-31",
+  "2024-09-27",
+  "2025-03-26",
+  "2025-10-04",
+  "2026-04-14"
+ ],
+ "frames": [
+  "cumulative/cum_south_00.png",
+  "cumulative/cum_south_01.png",
+  "cumulative/cum_south_02.png",
+  "cumulative/cum_south_03.png",
+  "cumulative/cum_south_04.png",
+  "cumulative/cum_south_05.png",
+  "cumulative/cum_south_06.png",
+  "cumulative/cum_south_07.png",
+  "cumulative/cum_south_08.png",
+  "cumulative/cum_south_09.png",
+  "cumulative/cum_south_10.png",
+  "cumulative/cum_south_11.png",
+  "cumulative/cum_south_12.png",
+  "cumulative/cum_south_13.png",
+  "cumulative/cum_south_14.png",
+  "cumulative/cum_south_15.png",
+  "cumulative/cum_south_16.png",
+  "cumulative/cum_south_17.png",
+  "cumulative/cum_south_18.png",
+  "cumulative/cum_south_19.png"
+ ],
+ "masks": {
+  "sinking": "cumulative/mask_sinking_south.png",
+  "stable": "cumulative/mask_stable_south.png"
+ },
+ "reference": "median ground of the whole Sentinel-1 frame 34478 (descending, track 129); not a hand-picked site",
+ "note": "Each picture is the total change since the first date, only where the radar measured at every date. Blank means not measured, not zero."
+}

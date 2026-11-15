@@ -1,0 +1,68 @@
+{
+ "hotspot": "north_willcox",
+ "units": "cm",
+ "bounds": [
+  [
+   32.36,
+   -110.15
+  ],
+  [
+   32.6,
+   -109.85
+  ]
+ ],
+ "vmin": -60,
+ "vmax": 10,
+ "crs": "EPSG:4326",
+ "colormap": "custom: red = ground lower than at the first date, transparent = unchanged, blue = higher",
+ "dates": [
+  "2016-07-23",
+  "2017-04-13",
+  "2017-10-10",
+  "2018-04-08",
+  "2018-10-05",
+  "2019-04-03",
+  "2019-09-30",
+  "2020-03-28",
+  "2020-09-24",
+  "2021-03-23",
+  "2021-09-19",
+  "2022-04-11",
+  "2022-10-08",
+  "2023-04-06",
+  "2023-10-03",
+  "2024-03-31",
+  "2024-09-27",
+  "2025-03-26",
+  "2025-10-04",
+  "2026-04-14"
+ ],
+ "frames": [
+  "cumulative/cum_north_willcox_00.png",
+  "cumulative/cum_north_willcox_01.png",
+  "cumulative/cum_north_willcox_02.png",
+  "cumulative/cum_north_willcox_03.png",
+  "cumulative/cum_north_willcox_04.png",
+  "cumulative/cum_north_willcox_05.png",
+  "cumulative/cum_north_willcox_06.png",
+  "cumulative/cum_north_willcox_07.png",
+  "cumulative/cum_north_willcox_08.png",
+  "cumulative/cum_north_willcox_09.png",
+  "cumulative/cum_north_willcox_10.png",
+  "cumulative/cum_north_willcox_11.png",
+  "cumulative/cum_north_willcox_12.png",
+  "cumulative/cum_north_willcox_13.png",
+  "cumulative/cum_north_willcox_14.png",
+  "cumulative/cum_north_willcox_15.png",
+  "cumulative/cum_north_willcox_16.png",
+  "cumulative/cum_north_willcox_17.png",
+  "cumulative/cum_north_willcox_18.png",
+  "cumulative/cum_north_willcox_19.png"
+ ],
+ "masks": {
+  "sinking": "cumulative/mask_sinking_north_willcox.png",
+  "stable": "cumulative/mask_stable_north_willcox.png"
+ },
+ "reference": "median ground of the whole Sentinel-1 frame 34478 (descending, track 129); not a hand-picked site",
+ "note": "Each picture is the total change since the first date, only where the radar measured at every date. Blank means not measured, not zero."
+}
