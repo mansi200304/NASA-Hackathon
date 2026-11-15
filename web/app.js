@@ -1,10 +1,9 @@
-import { normalizeSeries, normalizeRate, validateGeoJSON, safeSourceURL, formatNumber, isNumber } from './model.mjs';
+import { normalizeSeries, normalizeRate, normalizeHotspots, validateGeoJSON, safeSourceURL, formatNumber, isNumber } from './model.mjs';
 
 const $ = selector => document.querySelector(selector);
 const DATA = new URL('../data/processed/', import.meta.url);
-const SLUGS = ['eloy', 'buckeye', 'willcox'];
 const COLORS = { rust: '#A64B2A', ink: '#2D2A25', olive: '#52664B', sand: '#E4D9C9' };
-const state = { selected: 'eloy', series: new Map(), rates: new Map(), layers: new Map(), outlines: new Map(), base: 'terrain' };
+const state = { selected: null, slugs: [], series: new Map(), rates: new Map(), layers: new Map(), outlines: new Map(), base: 'satellite' };
 let map, outlineGroup;
 const el = (tag, className, text) => {
   const node = document.createElement(tag);
@@ -103,7 +102,7 @@ function renderDetails() {
   const root = $('#detail-content');
   root.replaceChildren();
   const kicker = el('div', 'detail-kicker');
-  kicker.append(el('span', '', (p.county || 'Arizona') + ', Arizona'), el('span', '', 'Study ' + String(SLUGS.indexOf(state.selected) + 1).padStart(2, '0')));
+  kicker.append(el('span', '', (p.county || 'Arizona') + ', Arizona'), el('span', '', 'Study ' + String(state.slugs.indexOf(state.selected) + 1).padStart(2, '0')));
   root.append(kicker, el('h1', '', p.name), el('p', 'story-name', p.tagline));
   const hasRate = series && isNumber(series.rate_cm_yr);
   const metric = el('section', 'metric' + (hasRate ? '' : ' pending'));
@@ -127,7 +126,7 @@ function renderDetails() {
   root.append(chartSection);
   const record = section('Measurement record');
   record.append(factList([
-    ['Satellite', 'NISAR'],
+    ['Satellite / product', series?.source || meta?.track || 'Not supplied'],
     ['Track / frame', series?.track || meta?.track || 'Coverage check pending'],
     ['Record', series?.dates.length ? series.dates[0] + ' — ' + series.dates.at(-1) : 'Pending'],
     ['Reference', series?.reference || 'Stable reference pending'],
@@ -170,41 +169,48 @@ function renderHotspots() {
 function selectHotspot(slug, fit = true) {
   state.selected = slug;
   document.querySelectorAll('.hotspot-button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.slug === slug)));
-  state.outlines.forEach((layer, key) => layer.setStyle({ color: key === slug ? COLORS.rust : COLORS.ink, weight: key === slug ? 2 : 1, fillOpacity: key === slug ? 0.06 : 0.015, dashArray: key === slug ? undefined : '5 5' }));
+  state.outlines.forEach((layer, key) => layer.setStyle({ color: key === slug ? '#F4EFE6' : '#9CA5A9', weight: key === slug ? 1.8 : 1, fillOpacity: 0, dashArray: key === slug ? null : '5 5' }));
   $('#map-location').textContent = state.hotspots.features.find(f => f.properties.slug === slug).properties.name;
   renderDetails(); updateRateLayer();
   if (fit && map) fitSelected();
 }
 function fitSelected() {
   const layer = state.outlines.get(state.selected);
-  if (map && layer) map.fitBounds(layer.getBounds(), { padding: [50, 75], animate: !matchMedia('(prefers-reduced-motion: reduce)').matches, maxZoom: 10 });
+  if (map && layer) {
+    map.stop();
+    map.fitBounds(layer.getBounds(), { padding: [50, 75], animate: false, maxZoom: 11 });
+  }
 }
-function showAll() { if (map && outlineGroup) map.fitBounds(outlineGroup.getBounds(), { padding: [45, 65], maxZoom: 9 }); }
+function showAll() { if (map && outlineGroup) { map.stop(); map.fitBounds(outlineGroup.getBounds(), { padding: [45, 65], animate: false, maxZoom: 9 }); } }
 function initMap() {
   if (!window.L) {
     $('#map-error').textContent = 'The map library could not load. Study details remain available.';
     $('#map-error').hidden = false; return;
   }
   map = L.map('map', { zoomControl: false, minZoom: 5, maxZoom: 18, zoomSnap: 0.25, attributionControl: true }).setView([32.8, -111.65], 9);
-  L.control.zoom({ position: 'bottomright' }).addTo(map);
+  map.createPane('measurements'); map.getPane('measurements').style.zIndex = 330;
+  L.control.zoom({ position: 'topright' }).addTo(map);
   L.control.scale({ imperial: false, position: 'bottomleft' }).addTo(map);
   const tileSources = {
+    dark: { url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', attribution: 'Tiles &copy; Esri, HERE, Garmin, OpenStreetMap contributors', maxNativeZoom: 16 },
     terrain: { url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', attribution: 'Tiles &copy; Esri &mdash; Esri, HERE, Garmin, USGS, NGA, EPA, USDA, NPS' },
     satellite: { url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', attribution: 'Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community' }
   };
   state.basemaps = {};
   Object.entries(tileSources).forEach(([key, config]) => {
-    const layer = L.tileLayer(config.url, { attribution: config.attribution, maxNativeZoom: 18, maxZoom: 18 });
+    const layer = L.tileLayer(config.url, { attribution: config.attribution, maxNativeZoom: config.maxNativeZoom || 18, maxZoom: 18 });
     let errors = 0;
     layer.on('tileerror', () => { if (state.base === key && ++errors >= 3) $('#map-error').hidden = false; });
     layer.on('tileload', () => { if (state.base === key) { errors = 0; $('#map-error').hidden = true; } });
     state.basemaps[key] = layer;
   });
-  state.basemaps.terrain.addTo(map);
+  state.basemaps[state.base].addTo(map);
   outlineGroup = L.featureGroup().addTo(map);
   state.hotspots.features.forEach(f => {
-    const layer = L.geoJSON(f, { bubblingMouseEvents: false, style: { color: COLORS.ink, weight: 1, fillOpacity: 0.015 } });
-    layer.bindTooltip(f.properties.name, { permanent: true, direction: 'center', className: 'study-label' });
+    const layer = L.geoJSON(f, { bubblingMouseEvents: false, style: { color: '#9CA5A9', weight: 1, fillOpacity: 0 } });
+    const tooltip = el('div', '', f.properties.name);
+    if (f.properties.confirmation) tooltip.append(el('small', '', f.properties.confirmation));
+    layer.bindTooltip(tooltip, { sticky: true, className: 'study-label' });
     layer.on('click', () => selectHotspot(f.properties.slug));
     layer.addTo(outlineGroup); state.outlines.set(f.properties.slug, layer);
   });
@@ -259,7 +265,7 @@ function updateRateLayer() {
     const slug = state.selected;
     const imageName = 'rate_' + slug + '.png';
     const imageURL = window.ATLAS_PREVIEW_IMAGES?.[imageName] || new URL(imageName, DATA).href;
-    const image = L.imageOverlay(imageURL, meta.bounds, { opacity: config.opacity, interactive: false });
+    const image = L.imageOverlay(imageURL, meta.bounds, { pane: 'measurements', opacity: config.opacity, interactive: false });
     state.rateImage = image;
     image.on('error', () => {
       if (state.rateImage !== image) return;
@@ -270,12 +276,23 @@ function updateRateLayer() {
     image.on('load', () => {
       if (state.rateImage !== image) return;
       legend.hidden = false;
-      legend.append(el('strong', '', 'Reported displacement rate'));
+      legend.append(el('strong', '', 'Ground motion · line of sight'));
       legend.append(el('div', '', formatNumber(meta.vmin) + ' to ' + formatNumber(meta.vmax) + ' cm/yr'));
       if (Array.isArray(meta.colors) && meta.colors.length >= 2 && meta.colors.every(c => /^#[0-9a-f]{6}$/i.test(c))) {
         const strip = el('div', 'legend-colors'); strip.style.background = 'linear-gradient(to right,' + meta.colors.join(',') + ')'; legend.append(strip);
       }
-      legend.append(el('small', '', meta.sign_convention || 'Sign convention not supplied'));
+      // The team's documented custom ramp is not a linear colour scale. Describe
+      // it categorically rather than manufacture a numeric gradient from it.
+      if (typeof meta.colormap === 'string' && meta.colormap.startsWith('custom: red = sinking')) {
+        const key = el('div', 'map-color-key');
+        for (const [cls, text] of [['sinking', 'Red: sinking'], ['stable', 'Transparent: stable'], ['rising', 'Blue: rising']]) {
+          const item = el('span', '', text); item.prepend(el('i', cls)); key.append(item);
+        }
+        legend.append(key);
+      }
+      legend.append(el('small', '', meta.track || 'Track not supplied'));
+      legend.append(el('small', '', meta.dates[0] + ' — ' + meta.dates.at(-1)));
+      if (meta.sign_convention) legend.append(el('small', '', meta.sign_convention));
       legend.append(el('small', '', meta.data_release || 'Release status not supplied'));
     });
     image.addTo(map);
@@ -341,12 +358,7 @@ document.querySelectorAll('[data-basemap]').forEach(button => button.addEventLis
 }));
 
 async function start() {
-  const hotspots = await loadJSON('hotspots.geojson', raw => {
-    validateGeoJSON(raw);
-    if (raw.features.length !== 3 || SLUGS.some(slug => raw.features.filter(f => f.properties?.slug === slug).length !== 1)) throw new Error('Expected the three unique project hotspot slugs.');
-    raw.features.forEach(f => { if (f.geometry.type !== 'Polygon' || !f.properties.name || !f.properties.story) throw new Error('Hotspots require polygons, names and stories.'); });
-    return { ...raw, features: SLUGS.map(slug => raw.features.find(f => f.properties.slug === slug)) };
-  });
+  const hotspots = await loadJSON('hotspots.geojson', normalizeHotspots);
   if (hotspots.status !== 'ready') {
     setStatus('Study file needs review');
     $('#detail-content').append(el('h1', '', 'Study outlines unavailable'), note(dataError(hotspots, 'Serve the repository root and include data/processed/hotspots.geojson.')));
@@ -354,15 +366,18 @@ async function start() {
     $('#map-error').hidden = false; return;
   }
   state.hotspots = hotspots.value;
+  state.slugs = state.hotspots.features.map(f => f.properties.slug);
+  state.selected = state.slugs[0];
+  $('#study-count').textContent = String(state.slugs.length).padStart(2, '0');
   state.layers.set('hotspots', { name: 'Study outlines', status: 'ready', visible: true, opacity: 1 });
   state.layers.set('rate', { name: 'Ground motion', status: 'loading', visible: true, opacity: 0.75 });
   for (const [key, name] of [['adwr_subsidence', 'ADWR subsidence'], ['datacenters', 'Data centers'], ['habitat', 'Habitat']]) state.layers.set(key, { name, status: 'loading', visible: false, opacity: 0.8 });
   renderHotspots(); initMap();
   state.layers.get('hotspots').layer = outlineGroup;
-  renderDetails(); renderLayerControls(); selectHotspot('eloy');
+  renderDetails(); renderLayerControls(); selectHotspot(state.selected);
   const tasks = [
-    ...SLUGS.map(async slug => state.series.set(slug, await loadJSON('timeseries_' + slug + '.json', raw => normalizeSeries(raw, slug)))),
-    ...SLUGS.map(async slug => state.rates.set(slug, await loadJSON('rate_' + slug + '.json', normalizeRate))),
+    ...state.slugs.map(async slug => state.series.set(slug, await loadJSON('timeseries_' + slug + '.json', raw => normalizeSeries(raw, slug)))),
+    ...state.slugs.map(async slug => state.rates.set(slug, await loadJSON('rate_' + slug + '.json', normalizeRate))),
     ...['adwr_subsidence', 'datacenters', 'habitat'].map(async key => {
       const result = await loadJSON(key + '.geojson', validateGeoJSON);
       const config = state.layers.get(key); config.status = result.status; config.error = result.error;

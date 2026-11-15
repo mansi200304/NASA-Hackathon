@@ -1,0 +1,17 @@
+/* Map-only treatment. The Sonoran Sand application layout and typography are unchanged. */
+.map-column #map{background:#303333}
+.map-column .basemap-options,.map-column #fit-study{box-shadow:0 1px 5px #0002}
+.map-column .basemap-options button{min-height:34px}
+.map-column .leaflet-control-zoom{margin:66px 18px 0 0!important}
+.map-column .study-label{max-width:245px;white-space:normal;border-left:2px solid var(--rust);font-size:12px;line-height:1.4;padding:7px 9px;box-shadow:0 2px 7px #0002}
+.map-column .study-label small{display:block;color:var(--muted);font-size:10px;margin-top:3px}
+.map-column .leaflet-image-layer{image-rendering:auto}
+.map-column .leaflet-overlay-pane .leaflet-interactive{filter:drop-shadow(0 1px 1px #2D2A25)}
+.map-column .rate-legend{max-width:220px;padding:11px 12px;border:1px solid var(--rule);box-shadow:0 2px 7px #0002}
+.map-column .rate-legend strong{font-size:11px;font-weight:600}
+.map-column .rate-legend small{font-size:10px;line-height:1.5;margin-top:4px}
+.map-color-key{display:grid;gap:3px;font-size:10px;margin:8px 0;border-top:1px solid var(--rule);padding-top:7px}
+.map-color-key span{display:flex;align-items:center;gap:7px}
+.map-color-key i{display:inline-block;width:16px;height:7px;border:1px solid #7777}
+.map-color-key .sinking{background:#ed442b}.map-color-key .stable{background:repeating-conic-gradient(#c9c0b2 0% 25%,transparent 0% 50%) 0 0/6px 6px}.map-color-key .rising{background:#548ede}
+@media(max-width:800px){.map-column .rate-legend{right:10px;bottom:100px;max-width:190px}.map-column .basemap-options button{padding:8px 10px}.map-column .map-caption span:first-child{font-size:14px;max-width:calc(100% - 75px)}}

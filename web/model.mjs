@@ -45,6 +45,23 @@ export function validateGeoJSON(raw) {
   }
   return raw;
 }
+// Study identity and order belong to the pipeline, not to the interface.
+export function normalizeHotspots(raw) {
+  validateGeoJSON(raw);
+  if (!raw.features.length) throw new Error('The study file contains no areas.');
+  const slugs = new Set();
+  for (const feature of raw.features) {
+    const p = feature.properties || {};
+    if (!['Polygon', 'MultiPolygon'].includes(feature.geometry.type) ||
+        typeof p.slug !== 'string' || !/^[a-z0-9]+(?:[_-][a-z0-9]+)*$/.test(p.slug) ||
+        slugs.has(p.slug) || typeof p.name !== 'string' || !p.name.trim() ||
+        typeof p.story !== 'string' || !p.story.trim()) {
+      throw new Error('Studies require polygons, unique file-safe slugs, names and stories.');
+    }
+    slugs.add(p.slug);
+  }
+  return raw;
+}
 export function safeSourceURL(value) {
   try { const url = new URL(value); return ['https:', 'http:'].includes(url.protocol) ? url.href : null; } catch { return null; }
 }
