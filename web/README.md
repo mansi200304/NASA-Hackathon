@@ -1,6 +1,6 @@
 # Sinkronized — web map
 
-A buildless, map-first field atlas using Sonoran Sand. The map and study selection work immediately. Measurements and context overlays stay pending until real exports are available.
+A buildless, map-first field atlas using Sonoran Sand, with a plain-language Overview introducing subsidence, the evidence and its limitations. The map and study selection work immediately. Measurements and context overlays stay pending until real exports are available.
 
 ## Run it
 
@@ -23,9 +23,11 @@ The original app in index.html remains the source of truth. No fabricated measur
 ## What works
 
 - Select any area supplied in `hotspots.geojson`; names, order, study numbers, file paths and outlines come from that file. There is no fixed location list or required count.
-- View all study areas, fit the selected area, pan and zoom, or switch satellite/terrain/dark basemaps. Satellite imagery is the default.
+- View all study areas, fit the selected area, pan and zoom, or switch satellite/terrain basemaps. Satellite imagery is the default. The dark basemap was removed from the interface.
 - Toggle available overlays and adjust their opacity. On phones, Layers opens the controls while leaving room for the map.
-- Read a fitted rate, uncertainty, observation chart, accessible observation table and reference metadata when supplied.
+- Read a fitted rate, uncertainty, interactive observation chart (hover, focus, tap or click a measured point), accessible observation table and reference metadata when supplied.
+- Scroll from the Overview into the full atlas, or jump directly to it with the header navigation. The Overview explains ascending and descending satellite passes in an expandable scientific note.
+- Tap study areas, context features or the map background to open a bottom field note, and use Explain actions beside measurements, charts and comparisons. Coordinate clicks never invent pixel values.
 - Open How we measured, Limits and Sources dialogs. Dialogs support Escape; controls have visible keyboard focus.
 - Inspect a map coordinate. Pixel-level rate/coherence sampling is explicitly unavailable: a coloured PNG is not a numeric raster.
 
@@ -120,7 +122,7 @@ The map update was browser-checked against all current study selections, real
 rate PNGs, basemap switching and the portable preview. A 390px phone review
 confirmed study selection, Layers disclosure and no horizontal overflow.
 
-The three-column layout and typography remain intact. Sonoran Sand has distinct
+The atlas remains a three-column data-driven layout with a widened study panel and more readable study-details typography. A responsive introductory section appears above the atlas. Sonoran Sand has distinct
 roles: ivory canvas, sand sidebar, ink masthead/footer, rust selection and reported
 rate, olive study count/status and slate metadata headers. Small light text uses
 the darker slate variant for contrast. Scientific raster colours are independent
@@ -134,3 +136,9 @@ dataset provenance. No agency affiliation is implied.
 
 This is the first UI for team review. It does not deploy GitHub Pages or change the radar processing pipeline. For eventual Pages hosting, publish an artifact containing web/ and data/processed/ together so relative paths remain valid. Keep raw HDF5 and large rasters out of Git.
 
+
+## Interface continuation (November 14–15, 2026)
+
+The Overview, bottom field notes and interactive chart points are all presentation-layer changes; they do not alter measured values, map rasters, study geometries or scientific assumptions. The number, names and order of studies still come from `hotspots.geojson`. No fabricated observations or per-pixel measurements are added.
+
+To test: open `/web/` from a repository-root server, select every available study, inspect a point in each chart, open and close a field note, toggle satellite/terrain imagery, and review the layout at desktop and phone widths. `node web/build-preview.mjs` recreates the distributable data-snapshot page after later pipeline changes.
