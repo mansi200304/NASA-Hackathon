@@ -1,4 +1,4 @@
-import { normalizeSeries, normalizeRate, normalizeHotspots, validateGeoJSON, safeSourceURL, formatNumber, isNumber, cleanInsights, normalizeCumulative, cleanTeam } from './model.mjs';
+import { normalizeSeries, normalizeRate, normalizeHotspots, validateGeoJSON, safeSourceURL, formatNumber, isNumber, cleanInsights, normalizeCumulative, cleanTeam, cleanNisar } from './model.mjs';
 
 const $ = selector => document.querySelector(selector);
 const DATA = new URL('../data/processed/', import.meta.url);
@@ -622,11 +622,11 @@ function makeOverlay(raw, key) {
 const dialogCopy = {
   method: {
     title: 'How we measure ground motion',
-    body: '<p>A satellite sends a radar pulse down and times the echo, so it knows how far away the ground is. Flying over the same spot again and again, it can tell when the ground has moved closer or farther by a few millimetres.</p><ol><li><strong>Compare two passes.</strong> If the ground moved between two passes, the radar waves return slightly out of step. That shift tells us how far it moved.</li><li><strong>Add up many pairs.</strong> One pair is noisy, because moisture in the air and the upper atmosphere also change the signal. Chaining many pairs over years lets steady sinking add up while random noise does not.</li><li><strong>Two satellites.</strong> Sentinel-1 has flown since 2016, so it gives a ten-year trend. NASA-ISRO NISAR started in late 2025, so its record is still short. We show the Sentinel-1 trend and mark NISAR as preliminary.</li><li><strong>Two viewing directions.</strong> Satellites look at the ground from the east or from the west. When both agree, the sinking is much more likely to be real.</li><li><strong>Check against the official record.</strong> We compare our numbers with the radar results the Arizona Department of Water Resources publishes itself.</li></ol><p>We removed the effects of the Earth\u2019s tides and of the upper atmosphere. We did not remove water vapour in the lower atmosphere, which is a main source of the remaining noise. Numbers are measured along the satellite\u2019s slanted view, not straight down.</p>'
+    body: '<p>A satellite sends a radar pulse down and times the echo, so it knows how far away the ground is. Flying over the same spot again and again, it can tell when the ground has moved closer or farther by a few millimetres. Moist air and the ionosphere also delay the signal, so we subtract the corrections NISAR provides for both before measuring any movement.</p><ol><li><strong>Compare two passes.</strong> If the ground moved between two passes, the radar waves return slightly out of step. That shift tells us how far it moved.</li><li><strong>Add up many pairs.</strong> One pair is noisy, because moisture in the air and the upper atmosphere also change the signal. Chaining many pairs over years lets steady sinking add up while random noise does not.</li><li><strong>Two satellites.</strong> Sentinel-1 has flown since 2016, so it gives a ten-year trend. NASA-ISRO NISAR started in late 2025, so its record is still short. We show the Sentinel-1 trend and mark NISAR as preliminary.</li><li><strong>Two viewing directions.</strong> Satellites look at the ground from the east or from the west. When both agree, the sinking is much more likely to be real.</li><li><strong>Check against the official record.</strong> We compare our numbers with the radar results the Arizona Department of Water Resources publishes itself.</li></ol><p>We removed the effects of the Earth\u2019s tides and of the upper atmosphere. We did not remove water vapour in the lower atmosphere, which is a main source of the remaining noise. Numbers are measured along the satellite\u2019s slanted view, not straight down.</p>'
   },
   limits: {
     title: 'Read the map with its limits',
-    body: '<ul><li><strong>Pending is not zero.</strong> Empty results mean that a file is missing or has not passed the interface checks.</li><li><strong>Radar measures line-of-sight motion.</strong> A vertical sinking rate needs a justified conversion. A positive or negative value is not interpreted without its sign convention.</li><li><strong>Short records need care.</strong> Seasonal movement, atmospheric errors and the stable reference can influence a fitted rate.</li><li><strong>Data quality varies.</strong> Farming and construction can reduce coherence. Product corrections and release status must be checked.</li><li><strong>Location does not establish cause.</strong> A nearby farm or city does not prove responsibility for ground movement.</li><li><strong>Radar does not observe wildlife.</strong> Any mention of habitat comes from outside sources, not from this measurement.</li><li><strong>Mines move too.</strong> Open-pit mines and their waste piles shift for reasons unrelated to groundwater. We mark the ones we found.</li><li><strong>Blue patches are probably not real uplift.</strong> Rising values, such as on the Willcox Playa floor, most likely come from wet or swelling soil changing the radar signal. We have not verified this.</li><li><strong>Gaps are not zeros.</strong> Where the map is empty, the radar could not measure reliably (over plowed fields, for example). That does not mean the ground is stable.</li><li><strong>A study box is not a sinking zone.</strong> Outlines show the areas the team chose to investigate.</li></ul>'
+    body: '<ul><li><strong>Pending is not zero.</strong> Empty results mean that a file is missing or has not passed the interface checks.</li><li><strong>Radar measures line-of-sight motion.</strong> A vertical sinking rate needs a justified conversion. A positive or negative value is not interpreted without its sign convention.</li><li><strong>Short records need care.</strong> Seasonal movement, atmospheric errors and the stable reference can influence a fitted rate. NISAR\u2019s record is about a year at Willcox and under four months at Eloy, so we do not publish a NISAR speed; one bad acquisition date can move a one-year fit by a centimetre or more.</li><li><strong>Data quality varies.</strong> Farming and construction can reduce coherence. Product corrections and release status must be checked.</li><li><strong>Location does not establish cause.</strong> A nearby farm or city does not prove responsibility for ground movement.</li><li><strong>Radar does not observe wildlife.</strong> Any mention of habitat comes from outside sources, not from this measurement.</li><li><strong>Mines move too.</strong> Open-pit mines and their waste piles shift for reasons unrelated to groundwater. We mark the ones we found.</li><li><strong>Blue patches are probably not real uplift.</strong> Rising values, such as on the Willcox Playa floor, most likely come from wet or swelling soil changing the radar signal. We have not verified this.</li><li><strong>Gaps are not zeros.</strong> Where the map is empty, the radar could not measure reliably (over plowed fields, for example). That does not mean the ground is stable.</li><li><strong>A study box is not a sinking zone.</strong> Outlines show the areas the team chose to investigate.</li></ul>'
   },
   sources: {
     title: 'Resources · research, data and code',
@@ -645,6 +645,9 @@ const dialogCopy = {
       <li><a href="https://github.com/mansi200304/NASA-Hackathon/blob/main/docs/overview_evidence.md" target="_blank" rel="noopener noreferrer">Evidence-to-claim notes, citations and limitations</a></li>
       <li><a href="https://github.com/mansi200304/NASA-Hackathon" target="_blank" rel="noopener noreferrer">Sinkronized · code and pipeline outputs</a></li>
       <li><a href="https://nisar.jpl.nasa.gov/" target="_blank" rel="noopener noreferrer">NASA-ISRO NISAR mission information</a></li>
+      <li><a href="https://doi.org/10.5067/NIL2GUNW-P1" target="_blank" rel="noopener noreferrer">NISAR L2 Geocoded Unwrapped Interferogram (GUNW), Provisional · ASF DAAC</a> — DOI 10.5067/NIL2GUNW-P1; the NISAR data processed here.</li>
+      <li><a href="https://www.jpl.nasa.gov/go/opera/" target="_blank" rel="noopener noreferrer">NASA JPL OPERA · DISP-S1 Sentinel-1 displacement</a> — the ten-year record, built from Copernicus Sentinel-1 data (ESA).</li>
+      <li><a href="https://registry.opendata.aws/copernicus-dem/" target="_blank" rel="noopener noreferrer">Copernicus 30 m DEM</a> — ground heights used to apply NISAR’s troposphere correction.</li>
       <li><a href="https://search.asf.alaska.edu/" target="_blank" rel="noopener noreferrer">Alaska Satellite Facility · SAR data discovery</a></li>
       <li><a href="https://www.azwater.gov/hydrology/field-services/land-subsidence-arizona" target="_blank" rel="noopener noreferrer">ADWR · Arizona land-subsidence monitoring</a></li>
       <li><a href="https://www.azwater.gov/gis" target="_blank" rel="noopener noreferrer">ADWR GIS · official subsidence areas and radar products</a></li>
@@ -824,3 +827,32 @@ function renderAbout(team) {
   });
 }
 loadTeam().then(renderAbout);
+
+// NISAR section in the Overview: filled only from validated data (data/processed/nisar_summary.json); hidden if anything is missing or malformed.
+async function loadNisar() {
+  try {
+    if (window.ATLAS_PREVIEW_DATA && 'nisar_summary.json' in window.ATLAS_PREVIEW_DATA) return cleanNisar(window.ATLAS_PREVIEW_DATA['nisar_summary.json']);
+    const response = await fetch(new URL('nisar_summary.json', DATA), { cache: 'no-cache' });
+    return response.ok ? cleanNisar(await response.json()) : null;
+  } catch { return null; }
+}
+function renderNisar(n) {
+  const section = $('#overview-nisar');
+  if (!section) return;
+  if (!n) { section.hidden = true; return; }
+  const month = iso => new Date(iso + 'T12:00:00Z').toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+  const one = x => (Math.round(x * 10) / 10).toFixed(1), two = x => (Math.round(x * 100) / 100).toFixed(2);
+  const sign = x => (x < 0 ? '\u2212' : '') + one(Math.abs(x));
+  const values = {
+    r: two(n.pattern.r), blocks: new Intl.NumberFormat('en-US').format(n.pattern.blocks), percent: String(Math.round(n.weather.percent)),
+    before: String(Math.round(n.weather.before)), after: String(Math.round(n.weather.after)),
+    'willcox-date': month(n.willcox.date), 'willcox-rate': one(n.willcox.s1), 'willcox-years': one(n.willcox.years), 'willcox-chance': String(Math.round(n.willcox.chance * 100)),
+    'eloy-rate': one(n.eloy.s1), 'eloy-date': month(n.eloy.date), overlap: (n.overlap.r < 0 ? '−' : '') + two(Math.abs(n.overlap.r)),
+    's-nisar': sign(n.sinking.nisar), 's-s1': sign(n.sinking.s1), net: sign(n.playa.net), trend: sign(n.playa.trend)
+  };
+  section.querySelectorAll('[data-nisar]').forEach(node => { node.textContent = values[node.dataset.nisar] ?? ''; });
+  const img = $('#nisar-figure-img');
+  if (img) img.src = window.ATLAS_PREVIEW_IMAGES?.[n.figure] || new URL(n.figure, DATA).href;
+  section.hidden = false;
+}
+loadNisar().then(renderNisar);

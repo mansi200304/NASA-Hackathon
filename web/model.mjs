@@ -129,3 +129,25 @@ export function cleanTeam(raw) {
   }
   return members.length ? { intro: teamText(raw.intro, 400), members } : null;
 }
+// NISAR results shown in the Overview (data/processed/nisar_summary.json, written by src/export_nisar.py). Strict: any bad field hides the whole section.
+const nz = (v, lo, hi) => isNumber(v) && v >= lo && v <= hi ? v : null;
+const nisarArea = a => {
+  if (!a || typeof a !== 'object') return null;
+  const area = { name: teamText(a.name, 60), s1: nz(a.s1_rate_cm_yr, 0, 50), years: nz(a.years, 0, 50), date: validDate(a.date) ? a.date : null, chance: nz(a.chance_at_one_year, 0, 1) };
+  return Object.values(area).every(v => v !== null) ? area : null;
+};
+export function cleanNisar(raw) {
+  if (!raw || typeof raw !== 'object') return null;
+  const p = raw.pattern || {}, w = raw.weather_fix || {}, s = raw.sinking || {}, y = raw.playa || {}, o = raw.overlap || {}, c = raw.confirm || {};
+  const out = {
+    pattern: { r: nz(p.r, -1, 1), blocks: nz(p.n_blocks, 1, 1e7) },
+    weather: { before: nz(w.residual_before_mm, 0, 1000), after: nz(w.residual_after_mm, 0, 1000), percent: nz(w.percent, -100, 100) },
+    sinking: { nisar: nz(s.nisar_cm_yr, -100, 100), s1: nz(s.s1_cm_yr, -100, 100), blocks: nz(s.n_blocks, 1, 1e7) },
+    playa: { net: nz(y.net_cm, -100, 100), years: nz(y.years, 0, 20), trend: nz(y.s1_trend_cm_yr, -100, 100), last3: nz(y.s1_last3y_cm_yr, -100, 100) },
+    overlap: { r: nz(o.r, -1, 1) },
+    willcox: nisarArea(c.willcox), eloy: nisarArea(c.eloy),
+    figure: typeof raw.figure === 'string' && /^[A-Za-z0-9_.-]+\.png$/.test(raw.figure) ? raw.figure : null
+  };
+  const ok = [out.pattern, out.weather, out.sinking, out.playa, out.overlap].every(g => Object.values(g).every(v => v !== null)) && out.willcox && out.eloy && out.figure;
+  return ok ? out : null;
+}
