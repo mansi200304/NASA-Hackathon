@@ -1043,6 +1043,26 @@ dialog p{color:var(--slate-deep)}
  .overview-primary,.overview-story-link,.overview-narrative-grid a{transition:none}
  .motion-active .motion-reveal{opacity:1!important;transform:none!important;transition:none!important}
 }
+
+/* Sonoran landscape is decorative and washed out behind the copy. */
+.overview-hero{position:relative;isolation:isolate}
+.overview-desert-art{position:absolute;left:-5vw;bottom:-29px;width:calc(100% + 10vw);height:calc(100% + 42px);z-index:0;pointer-events:none;opacity:.64;filter:saturate(.76);-webkit-mask-image:linear-gradient(to bottom,transparent 0%,#000 23%,#000 85%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0%,#000 23%,#000 85%,transparent 100%)}
+.overview-copy,.overview-visual{position:relative;z-index:1}
+.overview-copy{text-shadow:0 1px 0 rgba(244,239,230,.33)}
+.overview-primary{border-radius:14px;box-shadow:0 8px 18px rgba(166,75,42,.12)}
+.overview-primary:focus-visible{border-radius:14px}
+.overview-rings img{opacity:var(--logo-opacity,1);transform:scale(var(--logo-scale,1));filter:blur(var(--logo-blur,0px)) drop-shadow(0 10px 18px #2d2a2520);will-change:opacity,transform,filter}
+.overview-rings{opacity:var(--rings-opacity,1)}
+.overview-fluid{z-index:2}
+.overview-visual-label{z-index:3;opacity:var(--label-opacity,1)}
+@media(max-width:800px){
+ .overview-desert-art{left:-18%;width:136%;height:430px;bottom:2px;opacity:.44}
+ .overview-primary{border-radius:13px}
+}
+@media(prefers-reduced-motion:reduce){
+ .overview-rings img{opacity:1!important;transform:none!important;filter:drop-shadow(0 10px 18px #2d2a2520)!important;will-change:auto}
+ .overview-rings,.overview-visual-label{opacity:1!important}
+}
 </style>
   <style>/* Map-only treatment. The Sonoran Sand application layout and typography are unchanged. */
 .map-column #map{background:#303333}
@@ -1119,6 +1139,109 @@ dialog p{color:var(--slate-deep)}
   let inView = false;
   let phase = 0;
 
+  const hero = visual.closest('.overview-hero');
+  const logo = visual.querySelector('.overview-rings img');
+  let dissolve = 0;
+  let logoParticles = [];
+  let logoBox = { x: 0, y: 0, w: 1, h: 1 };
+  let scrollFrame = 0;
+  const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+  // Sample the team's existing Arizona logo, rather than inventing another mark.
+  // Sampled pixels break into a fine point mesh as the real image fades on scroll.
+  function sampleLogo() {
+    if (!logo?.naturalWidth) return;
+    try {
+      const scan = document.createElement('canvas');
+      scan.width = 108; scan.height = 108;
+      const scanCtx = scan.getContext('2d', { willReadFrequently: true });
+      if (!scanCtx) return;
+      scanCtx.drawImage(logo, 0, 0, 108, 108);
+      const data = scanCtx.getImageData(0, 0, 108, 108).data;
+      const bg = [data[0], data[1], data[2], data[3]];
+      const bgIsTransparent = bg[3] < 80;
+      const points = [];
+      for (let y = 3; y < 108; y += 5) {
+        for (let x = 3; x < 108; x += 5) {
+          const i = (y * 108 + x) * 4;
+          const alpha = data[i + 3];
+          const delta = Math.abs(data[i] - bg[0]) +
+            Math.abs(data[i + 1] - bg[1]) + Math.abs(data[i + 2] - bg[2]);
+          if (alpha < 90 || (!bgIsTransparent && delta < 88)) continue;
+          points.push({
+            u: x / 108, v: y / 108,
+            tint: (data[i] * 2 + data[i + 1] + data[i + 2]) / 4,
+            seed: Math.sin(x * 83.29 + y * 17.41),
+          });
+        }
+      }
+      logoParticles = points;
+      updateLogoBox();
+    } catch {
+      // Non-critical artwork: if pixels cannot be read, the CSS fade still works.
+      logoParticles = [];
+    }
+  }
+
+  function updateLogoBox() {
+    if (!logo) return;
+    const art = logo.getBoundingClientRect();
+    const box = visual.getBoundingClientRect();
+    logoBox = { x: art.left - box.left, y: art.top - box.top, w: art.width, h: art.height };
+  }
+
+  function syncScroll() {
+    scrollFrame = 0;
+    if (!hero || reduced.matches) {
+      dissolve = 0;
+    } else {
+      const rect = hero.getBoundingClientRect();
+      dissolve = clamp((-rect.top - 14) / Math.max(220, rect.height * 0.62), 0, 1);
+    }
+    const logoFade = clamp(1 - Math.max(0, dissolve - 0.06) / 0.64, 0, 1);
+    visual.style.setProperty('--logo-opacity', logoFade.toFixed(3));
+    visual.style.setProperty('--logo-blur', (7 * dissolve).toFixed(2) + 'px');
+    visual.style.setProperty('--logo-scale', (1 + dissolve * 0.07).toFixed(3));
+    visual.style.setProperty('--rings-opacity', (1 - dissolve * 0.42).toFixed(3));
+    visual.style.setProperty('--label-opacity', clamp(1 - dissolve * 1.5, 0, 1).toFixed(3));
+    updateLogoBox();
+  }
+
+  function scheduleScroll() {
+    if (!scrollFrame) scrollFrame = requestAnimationFrame(syncScroll);
+  }
+
+  function drawLogoMesh() {
+    if (dissolve <= 0.08 || dissolve >= 0.99 || !logoParticles.length) return;
+    const emergence = clamp((dissolve - 0.08) * 4, 0, 1);
+    const disappearance = clamp((0.99 - dissolve) * 3.4, 0, 1);
+    const strength = emergence * disappearance;
+    const cx = logoBox.x + logoBox.w / 2;
+    const cy = logoBox.y + logoBox.h / 2;
+    const drift = dissolve * 0.15 * Math.min(width, height);
+    ctx.save();
+    ctx.lineWidth = 0.7;
+    for (const p of logoParticles) {
+      const baseX = logoBox.x + p.u * logoBox.w;
+      const baseY = logoBox.y + p.v * logoBox.h;
+      const dx = (baseX - cx) / Math.max(1, logoBox.w / 2);
+      const dy = (baseY - cy) / Math.max(1, logoBox.h / 2);
+      const flow = Math.sin(phase * 0.9 + p.u * 9 + p.v * 7);
+      const x = baseX + (dx * 0.8 + flow * 0.35) * drift;
+      const y = baseY + (dy * 0.7 - flow * 0.55) * drift;
+      ctx.fillStyle = p.tint < 125
+        ? 'rgba(82,102,75,' + (strength * 0.7).toFixed(3) + ')'
+        : 'rgba(166,75,42,' + (strength * 0.58).toFixed(3) + ')';
+      ctx.fillRect(x, y, 1.2, 1.2);
+      if (dissolve > 0.28 && p.seed > 0.72) {
+        ctx.strokeStyle = 'rgba(82,102,75,' + (strength * 0.23).toFixed(3) + ')';
+        ctx.beginPath(); ctx.moveTo(x, y);
+        ctx.lineTo(x + 6 + flow * 4, y + 7 - flow * 4); ctx.stroke();
+      }
+    }
+    ctx.restore();
+  }
+
   function resize() {
     const bounds = visual.getBoundingClientRect();
     width = Math.max(1, bounds.width);
@@ -1129,6 +1252,7 @@ dialog p{color:var(--slate-deep)}
     ctx.setTransform(scale, 0, 0, scale, 0, 0);
     pointer.x = pointer.targetX = width / 2;
     pointer.y = pointer.targetY = height / 2;
+    updateLogoBox();
   }
 
   function draw(time) {
@@ -1185,6 +1309,7 @@ dialog p{color:var(--slate-deep)}
       ctx.arc(pointer.x, pointer.y, r, 0, TWO_PI);
       ctx.fill();
     }
+    drawLogoMesh();
   }
 
   function stop() {
@@ -1232,6 +1357,11 @@ dialog p{color:var(--slate-deep)}
   if ('ResizeObserver' in window) new ResizeObserver(resize).observe(visual);
   else window.addEventListener('resize', resize, { passive: true });
   resize();
+  if (logo?.complete && logo.naturalWidth) sampleLogo();
+  else logo?.addEventListener('load', sampleLogo, { once: true });
+  window.addEventListener('scroll', scheduleScroll, { passive: true });
+  window.addEventListener('resize', scheduleScroll, { passive: true });
+  syncScroll();
 
   if ('IntersectionObserver' in window) {
     new IntersectionObserver(entries => {
@@ -1248,6 +1378,7 @@ dialog p{color:var(--slate-deep)}
   if (reduced.addEventListener) reduced.addEventListener('change', () => {
     if (reduced.matches) { stop(); ctx.clearRect(0, 0, width, height); }
     else start();
+    syncScroll();
   });
 
   // The same restrained pace carries into the editorial sections on scroll.
@@ -2143,6 +2274,48 @@ start().catch(error => {
   <section id="overview" class="overview" aria-labelledby="overview-title">
     <div class="overview-topline"><span>ARIZONA / EARTH OBSERVATION</span><span>AN INDEPENDENT FIELD ATLAS &nbsp;·&nbsp; 2026</span></div>
     <div class="overview-hero">
+      <svg class="overview-desert-art" viewBox="0 0 1520 670" preserveAspectRatio="xMidYMid slice" focusable="false" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="sonoran-sky" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#F0E5D3"/><stop offset=".66" stop-color="#E7D9C2"/><stop offset="1" stop-color="#D8C2A6"/>
+          </linearGradient>
+          <radialGradient id="sonoran-sun"><stop offset="0" stop-color="#F8E6BF" stop-opacity=".65"/><stop offset="1" stop-color="#F8E6BF" stop-opacity="0"/></radialGradient>
+          <linearGradient id="sonoran-far" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A99B8A"/><stop offset="1" stop-color="#C4A995"/></linearGradient>
+          <linearGradient id="sonoran-mid" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A98B7C"/><stop offset="1" stop-color="#C4A18A"/></linearGradient>
+          <linearGradient id="sonoran-land" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C4A58D"/><stop offset="1" stop-color="#E2CDB5"/></linearGradient>
+          <linearGradient id="sonoran-reading" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#F4EFE6" stop-opacity=".96"/><stop offset=".36" stop-color="#F4EFE6" stop-opacity=".8"/><stop offset=".73" stop-color="#F4EFE6" stop-opacity=".14"/><stop offset="1" stop-color="#F4EFE6" stop-opacity=".1"/></linearGradient>
+        </defs>
+        <rect width="1520" height="670" fill="url(#sonoran-sky)"/>
+        <circle cx="1100" cy="210" r="230" fill="url(#sonoran-sun)"/>
+        <circle cx="1125" cy="195" r="54" fill="#F6E4BE" opacity=".3"/>
+        <path d="M0 470 L110 445 178 453 273 399 346 429 426 380 487 411 569 363 623 391 701 352 759 380 857 313 925 363 1014 300 1073 332 1142 286 1202 330 1298 294 1387 352 1460 319 1520 352 V670 H0Z" fill="url(#sonoran-far)" opacity=".67"/>
+        <path d="M0 521 L95 499 173 513 232 477 297 498 372 446 430 470 519 426 584 451 669 403 722 436 808 395 877 412 955 359 1037 398 1104 355 1190 378 1275 344 1338 377 1429 342 1520 380 V670 H0Z" fill="url(#sonoran-mid)" opacity=".76"/>
+        <path d="M0 553 Q220 518 388 537 T773 509 Q969 489 1134 509 T1520 478 V670 H0Z" fill="#CDAA8C" opacity=".62"/>
+        <path d="M0 588 C220 540 368 581 560 565 S961 533 1157 560 1370 525 1520 533 V670 H0Z" fill="url(#sonoran-land)"/>
+        <g stroke="#8C796B" stroke-width="1.5" opacity=".31" fill="none">
+          <path d="M700 485 Q832 454 970 481 T1270 442"/>
+          <path d="M570 515 Q792 480 980 511 T1462 457"/>
+          <path d="M440 556 Q772 519 1050 550 T1520 507"/>
+          <path d="M0 608 Q350 559 650 602 T1520 564"/>
+          <path d="M0 632 Q400 589 780 627 T1520 594"/>
+          <path d="M0 656 Q414 620 829 654 T1520 628"/>
+        </g>
+        <g fill="none" stroke="#5C6950" stroke-linecap="round" stroke-linejoin="round" opacity=".43">
+          <path d="M1332 576 V406 Q1332 385 1319 385 Q1308 385 1308 409 V528" stroke-width="19"/>
+          <path d="M1332 495 Q1380 496 1380 445 V430" stroke-width="17"/>
+          <path d="M1332 518 Q1287 518 1287 478 V456" stroke-width="15"/>
+          <path d="M1463 575 V481 Q1463 470 1454 470 Q1445 470 1445 484 V544" stroke-width="13"/>
+          <path d="M1463 532 Q1492 531 1492 502" stroke-width="11"/>
+          <path d="M1210 578 Q1200 556 1214 541 M1208 557 Q1194 546 1180 557 M1208 562 Q1224 549 1237 556" stroke-width="5"/>
+          <path d="M1070 582 Q1060 565 1078 543 M1072 561 Q1049 544 1035 556 M1072 560 Q1088 546 1102 552" stroke-width="4"/>
+        </g>
+        <g stroke="#A08470" fill="none" stroke-width="1.4" opacity=".35">
+          <path d="M800 640 Q925 607 1050 638 T1335 610"/>
+          <path d="M891 657 Q1040 627 1205 652"/>
+          <path d="M1170 646 Q1330 606 1520 620"/>
+        </g>
+        <rect width="1520" height="670" fill="url(#sonoran-reading)"/>
+      </svg>
       <div class="overview-copy">
         <p class="overview-kicker"><span class="status-dot" aria-hidden="true"></span> ARIZONA / GROUND MOTION OBSERVATORY</p>
         <h1 id="overview-title"><span>Arizona is our home.</span><em>What happens beneath it matters.</em></h1>
