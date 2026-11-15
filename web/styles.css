@@ -391,3 +391,122 @@ dialog p{color:var(--slate-deep)}
  .overview-rings img{opacity:1!important;transform:none!important;filter:drop-shadow(0 10px 18px #2d2a2520)!important;will-change:auto}
  .overview-rings,.overview-visual-label{opacity:1!important}
 }
+
+/* Map-first study reading. Change layout only; scientific maps and timestamps remain source-led. */
+.workspace{height:auto;min-height:0;display:grid;grid-template-columns:minmax(240px,285px) minmax(0,1fr);grid-template-rows:auto minmax(570px,72dvh) auto;grid-template-areas:"atlas-heading atlas-heading" "regions region-map" "report report";align-items:stretch;background:var(--canvas)}
+.atlas-heading{grid-area:atlas-heading;padding:46px clamp(24px,5vw,76px) 32px;background:var(--canvas);border-top:1px solid var(--rule)}
+.atlas-heading .eyebrow{font:700 11px/1.5 var(--sans);letter-spacing:.1em;color:var(--olive)}
+.atlas-heading h2{font:400 clamp(37px,4.25vw,60px)/1.12 var(--serif);letter-spacing:-.035em;margin:10px 0 14px}
+.atlas-heading p{max-width:800px;font:16px/1.68 var(--sans);color:var(--slate-deep);margin:0}
+.workspace>.sidebar{grid-area:regions;min-height:0;height:100%;overflow:auto;background:var(--surface);padding:22px 20px 19px;border-right:1px solid var(--rule)}
+.workspace .sidebar-intro{display:block}
+.workspace .sidebar-intro .eyebrow{font-size:11px;color:var(--olive);letter-spacing:.1em}
+.workspace .sidebar-intro p{font-size:26px;margin:9px 0 23px}
+.workspace .sidebar h2{font-size:13px;line-height:1.4;align-items:center}
+.workspace .hotspot-button{grid-template-columns:25px 1fr;padding:13px 8px}
+.workspace .hotspot-button .place{font-size:18px}
+.workspace .hotspot-button .tagline{font-size:12px}
+.workspace .text-action{font-size:13px;color:var(--rust)}
+.workspace .mobile-layer-toggle{display:inline-block;margin-top:15px;padding:10px 0;color:var(--rust);font:600 13px/1.4 var(--sans);text-decoration:underline;text-underline-offset:4px}
+.workspace .layer-section{display:none;margin:15px 0 0}
+.workspace .sidebar.layers-open .layer-section{display:block}
+.workspace .layer-section .layer-row label{font-size:13px}
+.workspace .sidebar-footer{font-size:11px}
+.workspace>.map-column{grid-area:region-map;height:100%;min-height:0;position:relative;overflow:hidden}
+.workspace #map{height:100%;width:100%}
+.workspace .map-toolbar{left:18px;right:18px;top:18px}
+.workspace .map-toolbar button{font-size:12px}
+.workspace .map-caption{left:18px;right:18px;bottom:42px;max-width:360px}
+.workspace .map-caption span:first-child{font-size:18px}
+.workspace .map-caption span:last-child{font-size:11px;line-height:1.5}
+.workspace .map-chart{position:absolute;z-index:700;right:20px;top:75px;width:min(395px,calc(100% - 40px));max-height:calc(100% - 116px);overflow:auto;scrollbar-width:thin;background:rgba(244,239,230,.97);border:1px solid rgba(45,42,37,.2);border-top:3px solid var(--rust);box-shadow:0 14px 42px rgba(45,42,37,.16);padding:19px 20px 17px;backdrop-filter:blur(11px)}
+.workspace .map-chart .detail-section{margin:0}
+.workspace .map-chart .detail-section h2{font:600 15px/1.35 var(--sans);margin:0 0 15px}
+.workspace .map-chart .chart svg{width:100%;max-height:none;display:block;overflow:visible}
+.workspace .map-chart .chart .metric-note{font-size:12px}
+.workspace .map-chart .chart-readout{font-size:13px;min-height:45px}
+.workspace .map-chart .time-controls{margin-top:11px}
+.workspace .map-chart .time-row{display:flex;gap:7px;flex-wrap:wrap}
+.workspace .map-chart .time-btn{font-size:11.5px;line-height:1.32;padding:9px 10px}
+.workspace .map-chart .time-status{font-size:12px;line-height:1.6;margin-top:10px}
+.workspace .map-chart .metric-note{font-size:12px;line-height:1.5}
+.workspace .map-chart-details{display:inline-flex;padding:12px 0 2px;text-decoration:none;border-bottom:1px solid var(--rust);font:700 13px/1.45 var(--sans);color:var(--rust)}
+.workspace .rate-legend{z-index:620;right:20px;bottom:54px;max-width:250px}
+.workspace .leaflet-control-zoom{margin:0 18px 180px 0!important}
+.workspace>.details-panel{grid-area:report;min-width:0;overflow:visible;background:var(--canvas);padding:46px clamp(24px,6vw,90px) 75px;border-top:2px solid var(--rust);border-left:0;max-width:none;margin:0}
+.workspace .study-details-head{display:flex;justify-content:space-between;align-items:center;gap:20px;border-bottom:1px solid var(--rule);padding-bottom:17px;margin-bottom:31px}
+.workspace .study-details-head .eyebrow{font:700 11px/1.4 var(--sans);letter-spacing:.12em;color:var(--olive)}
+.workspace .study-details-head a{font:600 13px/1.5 var(--sans);color:var(--rust)}
+.workspace #detail-content{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:clamp(28px,5vw,86px);row-gap:18px;max-width:1320px;margin:0 auto}
+.workspace #detail-content>*{min-width:0;grid-column:span 1}
+.workspace #detail-content>.detail-kicker,.workspace #detail-content>h1,.workspace #detail-content>.story-name,.workspace #detail-content>.study-context,.workspace #detail-content>.confirmation-chip,.workspace #detail-content>.insights,.workspace #detail-content>.metric,.workspace #detail-content>.detail-bottom,.workspace #detail-content>.study-empty{grid-column:1/-1}
+.workspace .details-panel h1{background:transparent;color:var(--ink);border:0;padding:0;margin:0;font:400 clamp(38px,4vw,55px)/1.13 var(--serif);letter-spacing:-.035em}
+.workspace .details-panel .story-name{background:transparent;color:var(--slate-deep);border:0;padding:0;margin:0 0 18px;font:italic 21px/1.45 var(--serif)}
+.workspace .detail-kicker{font:600 12px/1.6 var(--sans);color:var(--olive);margin:0}
+.workspace .study-context{margin:-8px 0 8px}
+.workspace .details-panel .metric{background:var(--faint);padding:20px 24px;border:1px solid var(--rule);margin:0 0 7px}
+.workspace .details-panel .metric-value{font-size:42px}
+.workspace .details-panel .metric-label,.workspace .details-panel .detail-section h2{font-size:14px}
+.workspace .details-panel .detail-section{margin:0;padding:19px 0;border-top:1px solid var(--rule)}
+.workspace .details-panel .detail-section p,.workspace .details-panel .detail-copy{font-size:15.5px;line-height:1.77}
+.workspace .details-panel .validation-note,.workspace .details-panel .metric-note{font-size:13.5px;line-height:1.75}
+.workspace .details-panel .detail-facts{font-size:14px}
+.workspace .details-panel .detail-facts div{grid-template-columns:minmax(110px,.33fr) 1fr}
+.workspace .details-panel .insights{padding:25px 0 18px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.workspace .details-panel .insight-point p{font-size:15px;line-height:1.75}
+.workspace .details-panel .insights-summary{font-size:17px;line-height:1.7}
+.workspace .details-panel .detail-bottom{font-size:13px;line-height:1.65;margin-top:16px}
+.workspace .details-panel .chart{display:none}
+.workspace .study-empty{padding:35px 0 65px;max-width:790px}
+.workspace .study-empty h2{font:400 clamp(27px,3vw,40px)/1.2 var(--serif);margin:0 0 18px}
+.workspace .study-empty p{font:16px/1.75 var(--sans);color:var(--slate-deep);margin:0}
+.workspace .map-chart .chart-wait{height:auto;min-height:130px}
+@media(min-width:1600px){
+ .workspace{grid-template-columns:300px minmax(0,1fr)}
+ .workspace .map-chart{width:440px}
+}
+@media(min-width:801px) and (max-width:1130px){
+ .workspace{grid-template-columns:242px minmax(0,1fr);grid-template-rows:auto minmax(550px,75dvh) auto}
+ .workspace .map-chart{width:min(350px,calc(100% - 30px));right:15px;top:69px;padding:15px 16px}
+ .workspace .map-toolbar{left:12px;right:12px}
+ .workspace .rate-legend{right:15px}
+ .workspace>.sidebar{padding:18px 14px}
+ .workspace .hotspot-button .place{font-size:17px}
+}
+@media(max-width:800px){
+ .workspace{display:flex;flex-direction:column;min-height:0;height:auto}
+ .workspace>.atlas-heading{padding:28px 18px 22px}
+ .workspace .atlas-heading h2{font-size:39px}
+ .workspace .atlas-heading p{font-size:15.5px}
+ .workspace>.sidebar{height:auto;overflow:visible;padding:17px 18px 18px;border-right:0;border-bottom:1px solid var(--rule)}
+ .workspace .sidebar-intro{display:none}
+ .workspace .hotspot-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px 10px}
+ .workspace .hotspot-button{padding:11px 8px;grid-template-columns:1fr}
+ .workspace .hotspot-button .place{font-size:17px}
+ .workspace .layer-section #layer-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .workspace .sidebar-footer{padding:9px;margin-top:12px}
+ .workspace>.map-column{height:auto;min-height:0;display:flex;flex-direction:column;overflow:visible}
+ .workspace #map{height:56dvh;min-height:390px;max-height:690px;flex:none}
+ .workspace .map-chart{position:relative;top:auto;right:auto;width:100%;max-height:none;overflow:visible;box-shadow:none;border-left:0;border-right:0;border-bottom:1px solid var(--rule);padding:20px 18px 22px;background:var(--canvas);backdrop-filter:none}
+ .workspace .map-chart .chart svg{max-width:550px}
+ .workspace .map-toolbar{left:12px;right:12px;top:12px}
+ .workspace .map-caption{top:calc(clamp(390px,56dvh,690px) - 70px);bottom:auto;left:12px;max-width:260px}
+ .workspace .rate-legend{top:calc(clamp(390px,56dvh,690px) - 160px);bottom:auto;right:12px;max-width:170px}
+ .workspace .leaflet-control-zoom{margin:0 12px 85px 0!important}
+ .workspace>.details-panel{padding:32px 20px 45px}
+ .workspace #detail-content{grid-template-columns:1fr;gap:15px}
+ .workspace #detail-content>*{grid-column:1/-1}
+ .workspace .study-details-head{margin-bottom:23px}
+ .workspace .details-panel h1{font-size:40px}
+ .workspace .details-panel .story-name{font-size:19px}
+}
+@media(max-width:420px){
+ .workspace .atlas-heading h2{font-size:34px}
+ .workspace .hotspot-list{grid-template-columns:1fr 1fr;gap:3px 7px}
+ .workspace .hotspot-button .place{font-size:15px}
+ .workspace .map-caption span:first-child{font-size:15px}
+ .workspace .map-chart .time-row{gap:6px}
+ .workspace .map-chart .time-btn{font-size:11px}
+ .workspace .study-details-head{align-items:flex-start}
+ .workspace .study-details-head a{white-space:nowrap}
+}
