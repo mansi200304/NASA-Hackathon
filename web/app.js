@@ -271,24 +271,37 @@ function makeTimeControls() {
 function renderInsights(root, series) {
   const ins = cleanInsights(series?.insights);
   if (!ins) return;
-  const box = el('section', 'insights'), heading = el('div', 'detail-section-heading');
-  heading.append(el('h2', 'insights-title', 'In plain terms'), explainButton('confidence'));
-  box.append(heading, el('p', 'insights-summary', ins.summary));
+  const box = el('section', 'insights report-highlights');
+  const header = el('div', 'insights-header'), heading = el('div', 'insights-heading');
+  heading.append(el('span', 'report-eyebrow', 'AT A GLANCE'), el('h2', 'insights-title', 'What the satellites show'));
+  const help = explainButton('confidence'); help.textContent = 'Explain confidence ↗';
+  header.append(heading, help); box.append(header);
+  const lead = el('div', 'insights-lead');
+  lead.append(el('p', 'insights-summary', ins.summary));
   if (ins.confidence) {
-    const row = el('div', 'confidence-row');
+    const confidence = el('div', 'confidence-row');
     [[ins.confidence.where_label, ins.confidence.where], [ins.confidence.how_fast_label, ins.confidence.how_fast]].forEach(([label, level]) => {
       const pill = el('span', 'confidence-pill level-' + level);
       pill.append(el('small', '', label), el('strong', '', 'Confidence: ' + level));
-      row.append(pill);
+      confidence.append(pill);
     });
-    box.append(row);
+    lead.append(confidence);
   }
-  ins.points.forEach(point => {
-    const item = el('div', 'insight-point');
-    item.append(el('h3', '', point.heading), el('p', '', point.text));
-    box.append(item);
+  box.append(lead);
+  const grid = el('div', 'insight-grid');
+  ins.points.forEach((point, index) => {
+    const item = el('article', 'insight-point');
+    item.append(el('span', 'insight-number', String(index + 1).padStart(2, '0')), el('h3', '', point.heading));
+    const preview = point.text.match(/^.*?[.!?](?=\s|$)/)?.[0] || point.text;
+    item.append(el('p', '', preview));
+    if (preview !== point.text) {
+      const more = el('details', 'insight-expansion');
+      more.append(el('summary', '', 'Read full explanation'), el('p', '', point.text));
+      item.append(more);
+    }
+    grid.append(item);
   });
-  root.append(box);
+  box.append(grid); root.append(box);
 }
 const FIELD_NOTES = {
   confidence: ['How certain is this observation?', 'Confidence describes the strength and quality of the evidence, not how concerning a place is. Several observations, an appropriate reference and independent look directions strengthen interpretation.', 'Confidence labels are from the team’s processed export.'],
@@ -340,7 +353,8 @@ function renderDetails() {
     ? (isNumber(series.rate_sigma) ? (series.rate_sigma_note || 'Uncertainty supplied by the processing pipeline.') : 'Uncertainty has not been supplied.')
     : dataError(result, 'Awaiting a referenced time series and fitted rate.')));
   if (hasRate) metric.append(note(series.sign_convention || 'Sign convention not supplied. This value is not labelled as vertical sinking.'));
-  metric.append(explainButton('rate'));
+  const rateHelp = explainButton('rate'); rateHelp.textContent = 'Explain this rate ↗';
+  metric.append(rateHelp);
   root.append(metric);
   const chartSection = section('Displacement through time', 'chart');
   if (series?.hasData) {
@@ -362,6 +376,13 @@ function renderDetails() {
   const chartFooter = el('a', 'map-chart-details', 'Read the full ' + p.name + ' study report ↓');
   chartFooter.href = '#details';
   chartTarget.append(chartFooter);
+  const technical = el('details', 'report-technical');
+  const technicalSummary = el('summary', 'report-technical-toggle');
+  technicalSummary.append(el('span', 'report-technical-title', 'Methods, measurements & validation'),
+    el('span', 'report-technical-hint', 'Source records, observations, comparisons and limitations'));
+  technical.append(technicalSummary);
+  const technicalGrid = el('div', 'report-technical-grid');
+  technical.append(technicalGrid);
   const record = section('Measurement record', 'record');
   record.append(factList([
     ['Satellite / product', series?.source || meta?.track || 'Not supplied'],
@@ -370,25 +391,25 @@ function renderDetails() {
     ['Reference', series?.reference || 'Stable reference pending'],
     ['Data release', series?.data_release || meta?.data_release || 'Not supplied']
   ]));
-  root.append(record);
+  technicalGrid.append(record);
   // The observation table belongs with the report; the map shows the graph only.
   const table = chartSection.querySelector('.chart details');
   if (table) {
     table.remove();
     const observations = section('Observation table');
     observations.append(table);
-    root.append(observations);
+    technicalGrid.append(observations);
   }
   const caveats = Array.isArray(series?.caveats) ? series.caveats.filter(text => typeof text === 'string' && text.trim()) : [];
   if (caveats.length) {
     const limits = section('Study measurement limits');
     caveats.forEach(text => limits.append(el('p', 'validation-note', text)));
-    root.append(limits);
+    technicalGrid.append(limits);
   }
   if (typeof series?.nisar?.status_note === 'string' && series.nisar.status_note.trim()) {
     const provisional = section('NISAR status');
     provisional.append(el('p', 'validation-note', series.nisar.status_note));
-    root.append(provisional);
+    technicalGrid.append(provisional);
   }
   const validation = section('ADWR comparison', 'validation');
   if (series && (isNumber(series.adwr_rate_cm_yr) || isNumber(series.adwr_rs2_rate_cm_yr))) {
@@ -412,11 +433,12 @@ function renderDetails() {
     validation.append(el('p', 'detail-copy', 'Comparison pending'));
     validation.append(el('p', 'validation-note', 'Match the area and observation period before comparing rates.'));
   }
-  root.append(validation);
+  technicalGrid.append(validation);
   const story = section('Why this place');
   story.append(el('p', 'detail-copy', p.story));
   if (typeof p.land_use_note === 'string' && p.land_use_note.trim()) story.append(note(p.land_use_note));
-  root.append(story);
+  story.classList.add('report-why');
+  root.append(story, technical);
   const bottom = el('div', 'detail-bottom');
   bottom.append(el('div', '', 'Radar measures motion along the satellite’s line of sight. A vertical rate requires a justified conversion.'));
   const button = el('button', '', 'Read the measurement limits');
@@ -439,6 +461,8 @@ function renderHotspots() {
   });
 }
 function selectHotspot(slug, fit = true) {
+  $('#explain-drawer').hidden = true;
+  map?.closePopup();
   state.selected = slug;
   document.querySelectorAll('.hotspot-button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.slug === slug)));
   state.outlines.forEach((layer, key) => layer.setStyle({ color: key === slug ? '#F4EFE6' : '#9CA5A9', weight: key === slug ? 1.8 : 1, fillOpacity: 0, dashArray: key === slug ? null : '5 5' }));
@@ -486,12 +510,7 @@ function initMap() {
     layer.on('click', () => selectHotspot(f.properties.slug));
     layer.addTo(outlineGroup); state.outlines.set(f.properties.slug, layer);
   });
-  map.on('click', event => {
-    // A PNG contains colours, not numeric pixels. Do not invent a pixel sampler.
-    showFieldNote('Map coordinate · ' + event.latlng.lat.toFixed(4) + ', ' + event.latlng.lng.toFixed(4),
-      'This is a selected coordinate, not a verified ground-motion measurement. A colour-mapped PNG does not provide a numeric pixel value to inspect here.',
-      'Choose a study area to inspect actual exported displacement, uncertainty, reference and acquisition dates.');
-  });
+  // Background map clicks no longer open the screen-obscuring field note.
   new ResizeObserver(() => map.invalidateSize({ pan: false })).observe($('#map'));
 }
 function renderLayerControls() {
@@ -596,9 +615,7 @@ function makeOverlay(raw, key) {
       const source = safeSourceURL(p.source_url);
       if (source) { const a = el('a', '', 'Source'); a.href = source; a.target = '_blank'; a.rel = 'noopener noreferrer'; popup.append(a); }
       layer.bindPopup(popup);
-      layer.on('click', () => showFieldNote(p.name || p.NAME || 'Mapped context',
-        [p.reason, p.note, p.period, p.source].filter(v => typeof v === 'string' && v.trim()).join(' · ') || 'This mapped feature comes from the supplied context dataset, not a direct radar measurement.',
-        'Review its cited source and the applicable study measurement record before interpretation.'));
+      // Context layers retain their Leaflet source popup without a second drawer.
     }
   });
 }
