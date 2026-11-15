@@ -10,15 +10,26 @@ export function normalizeSeries(raw, slug) {
   if (!Array.isArray(dates) || !Array.isArray(values) || dates.length !== values.length) throw new Error('Dates and displacement must have equal lengths.');
   if (dates.some((v, i) => !validDate(v) || (i > 0 && v <= dates[i - 1]))) throw new Error('Dates must be unique, valid and increasing.');
   if (values.some(v => v !== null && !isNumber(v))) throw new Error('Displacement must be finite numbers or null gaps.');
-  for (const key of ['rate_cm_yr', 'rate_sigma', 'adwr_rate_cm_yr']) {
+  for (const key of ['rate_cm_yr', 'rate_sigma', 'adwr_rate_cm_yr', 'adwr_rs2_rate_cm_yr', 'median_rate_cm_yr']) {
     if (raw[key] != null && !isNumber(raw[key])) throw new Error(`${key} must be a finite number or null.`);
   }
   if (isNumber(raw.rate_sigma) && raw.rate_sigma < 0) throw new Error('Uncertainty cannot be negative.');
   const points = dates.map((date, i) => ({ date, value: values[i] }));
+  const stable = raw.stable_ground_displacement;
+  if (stable != null && (!Array.isArray(stable) || stable.length !== dates.length || stable.some(v => v !== null && !isNumber(v)))) throw new Error('Stable-ground observations must align with dates and contain finite numbers or null gaps.');
+  const stablePoints = Array.isArray(stable) ? dates.map((date, i) => ({ date, value: stable[i] })) : [];
+  const comparison = raw.adwr_comparison;
+  if (comparison != null) {
+    if (typeof comparison !== 'object' || Array.isArray(comparison)) throw new Error('Expected an ADWR comparison record.');
+    for (const key of ['ours_median', 'adwr_s1_median', 'adwr_rs2_median', 'diff_s1', 'corr_s1', 'corr_rs2']) {
+      if (comparison[key] != null && !isNumber(comparison[key])) throw new Error('ADWR comparison values must be finite numbers or null.');
+    }
+    for (const key of ['corr_s1', 'corr_rs2']) if (isNumber(comparison[key]) && Math.abs(comparison[key]) > 1) throw new Error('Correlation must be between -1 and 1.');
+  }
   const hasData = values.some(isNumber);
   if ((hasData || isNumber(raw.rate_cm_yr)) && !(typeof raw.reference === 'string' && raw.reference.trim())) throw new Error('A stable reference description is required for measured values.');
   if (isNumber(raw.rate_cm_yr) && !hasData) throw new Error('A reported rate needs a nonempty supporting time series.');
-  return { ...raw, points, hasData, rate_cm_yr: raw.rate_cm_yr ?? null, rate_sigma: raw.rate_sigma ?? null, adwr_rate_cm_yr: raw.adwr_rate_cm_yr ?? null };
+  return { ...raw, points, stablePoints, hasData, rate_cm_yr: raw.rate_cm_yr ?? null, rate_sigma: raw.rate_sigma ?? null, adwr_rate_cm_yr: raw.adwr_rate_cm_yr ?? null };
 }
 export function normalizeRate(raw) {
   const b = raw?.bounds;

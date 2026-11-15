@@ -63,6 +63,20 @@ These explanations are rendered as text; absent optional notes add no claims.
 
 The ADWR value is contextual only. The interface does not subtract it from a LOS rate or claim validation until direction, reference, period and spatial footprint are comparable.
 
+The current ADWR comparison displays the pipeline's sinking-pixel median,
+ADWR Sentinel-1 and RADARSAT-2 medians, correlations and exported median
+difference. It never subtracts an ADWR median from the fitted rate. ADWR's
+units are labelled inferred; Sentinel-1 is a consistency check and RADARSAT-2
+is an independent sensor over a longer period. The comparison links to the
+team's method and explicitly preserves the weak Eloy result.
+
+Official ADWR boundaries load from `adwr_subsidence.geojson`, with unfilled
+outlines and source/period popups. Data centers and habitat remain pending
+when their exports are absent. Each study's confirmation is visible, with
+single-direction results marked unconfirmed. When exported, stable-ground
+observations appear as a dashed slate chart line and a table column; null
+gaps remain gaps. The fitted rate and full pipeline uncertainty stay intact.
+
 ### Rate image
 
 Required: bounds as [[south, west], [north, east]], units cm/yr, finite vmin < vmax, and dates containing at least a start and end date. Bounds must be geographic EPSG:4326. Optional crs must be EPSG:4326 (or 4326).

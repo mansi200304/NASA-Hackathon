@@ -17,6 +17,22 @@ test('null chart gaps survive normalization', () => {
   const result = normalizeSeries(series({ dates: ['2026-01-01', '2026-01-13', '2026-01-25'], displacement: [0, null, -1] }), 'eloy');
   assert.equal(result.points[1].value, null);
 });
+test('stable-ground noise retains zero and gaps on matching acquisition dates', () => {
+  const result = normalizeSeries(series({ stable_ground_displacement: [0, null] }), 'eloy');
+  assert.deepEqual(result.stablePoints, [{ date: '2026-01-01', value: 0 }, { date: '2026-01-13', value: null }]);
+  assert.deepEqual(normalizeSeries(series({}), 'eloy').stablePoints, []);
+  for (const stable_ground_displacement of [[0], [0, '1'], 'invalid']) assert.throws(() => normalizeSeries(series({ stable_ground_displacement }), 'eloy'));
+});
+test('ADWR comparisons preserve exported median differences and unknown values', () => {
+  const raw = series({ adwr_rate_cm_yr: 0, adwr_rs2_rate_cm_yr: null, adwr_comparison: { ours_median: -1.23, adwr_s1_median: -1.57, diff_s1: 0.34, corr_s1: 0.587, corr_rs2: null } });
+  const result = normalizeSeries(raw, 'eloy');
+  assert.equal(result.adwr_comparison.diff_s1, 0.34);
+  assert.notEqual(result.rate_cm_yr - result.adwr_comparison.adwr_s1_median, result.adwr_comparison.diff_s1);
+  assert.equal(result.adwr_rate_cm_yr, 0);
+  assert.equal(result.adwr_rs2_rate_cm_yr, null);
+  for (const bad of [{ corr_rs2: 2 }, { diff_s1: '0.34' }, []]) assert.throws(() => normalizeSeries(series({ adwr_comparison: bad }), 'eloy'));
+  assert.throws(() => normalizeSeries(series({ adwr_rs2_rate_cm_yr: '0' }), 'eloy'));
+});
 test('measured data requires a reference and honest units', () => {
   assert.throws(() => normalizeSeries(series({ reference: '' }), 'eloy'));
   assert.throws(() => normalizeSeries(series({ units: 'mm' }), 'eloy'));

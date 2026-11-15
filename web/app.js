@@ -2,7 +2,7 @@ import { normalizeSeries, normalizeRate, normalizeHotspots, validateGeoJSON, saf
 
 const $ = selector => document.querySelector(selector);
 const DATA = new URL('../data/processed/', import.meta.url);
-const COLORS = { rust: '#A64B2A', ink: '#2D2A25', olive: '#52664B', sand: '#E4D9C9' };
+const COLORS = { rust: '#A64B2A', ink: '#2D2A25', olive: '#52664B', sand: '#E4D9C9', slate: '#626D76' };
 const state = { selected: null, slugs: [], series: new Map(), rates: new Map(), layers: new Map(), outlines: new Map(), base: 'satellite' };
 let map, outlineGroup;
 const el = (tag, className, text) => {
@@ -61,8 +61,10 @@ function makeChart(series) {
   const wrap = el('div', 'chart');
   const svg = svgNode('svg', { viewBox: '0 0 300 170', role: 'img', 'aria-label': 'Cumulative displacement in centimetres relative to ' + series.reference });
   const valid = series.points.filter(p => isNumber(p.value));
+  const stable = series.stablePoints.filter(p => isNumber(p.value));
   const start = Date.parse(series.dates[0]), end = Date.parse(series.dates.at(-1));
-  let lo = Math.min(...valid.map(p => p.value)), hi = Math.max(...valid.map(p => p.value));
+  const extent = [...valid, ...stable].map(p => p.value);
+  let lo = Math.min(...extent), hi = Math.max(...extent);
   const pad = Math.max((hi - lo) * 0.15, 0.1);
   lo -= pad; hi += pad;
   const x = date => 42 + (Date.parse(date) - start) / (end - start || 1) * 244;
@@ -79,16 +81,26 @@ function makeChart(series) {
     next = false;
   });
   svg.append(svgNode('path', { d: path, fill: 'none', stroke: COLORS.rust, 'stroke-width': 1.8 }));
+  if (stable.length) {
+    let stablePath = '', gap = true;
+    series.stablePoints.forEach(p => {
+      if (p.value === null) { gap = true; return; }
+      stablePath += (gap ? 'M' : 'L') + x(p.date) + ',' + y(p.value) + ' '; gap = false;
+    });
+    svg.append(svgNode('path', { d: stablePath, fill: 'none', stroke: COLORS.slate, 'stroke-width': 1.5, 'stroke-dasharray': '4 3' }));
+  }
   valid.forEach(p => svg.append(svgNode('circle', { cx: x(p.date), cy: y(p.value), r: 2.5, fill: COLORS.rust })));
   svg.append(svgNode('text', { x: 42, y: 153, class: 'chart-label' }, series.dates[0]));
   if (series.dates.length > 1) svg.append(svgNode('text', { x: 286, y: 168, 'text-anchor': 'end', class: 'chart-label' }, series.dates.at(-1)));
   wrap.append(svg);
+  if (stable.length) wrap.append(note('Solid rust: sinking-pixel average · Dashed slate: stable ground (measurement noise). Both are line-of-sight displacement.'));
   const details = el('details');
   details.append(el('summary', '', 'View observations as a table'));
   const table = el('table'), head = el('thead'), header = el('tr'), body = el('tbody');
   header.append(el('th', '', 'Date'), el('th', '', 'Displacement (cm)'));
+  if (stable.length) header.append(el('th', '', 'Stable ground (cm)'));
   head.append(header);
-  series.points.forEach(p => { const tr = el('tr'); tr.append(el('td', '', p.date), el('td', '', p.value === null ? 'No observation' : formatNumber(p.value))); body.append(tr); });
+  series.points.forEach((p, i) => { const tr = el('tr'); tr.append(el('td', '', p.date), el('td', '', p.value === null ? 'No observation' : formatNumber(p.value))); if (stable.length) tr.append(el('td', '', series.stablePoints[i].value === null ? 'No observation' : formatNumber(series.stablePoints[i].value))); body.append(tr); });
   table.append(head, body); details.append(table); wrap.append(details);
   return wrap;
 }
@@ -104,9 +116,10 @@ function renderDetails() {
   const kicker = el('div', 'detail-kicker');
   kicker.append(el('span', '', (p.county || 'Arizona') + ', Arizona'), el('span', '', 'Study ' + String(state.slugs.indexOf(state.selected) + 1).padStart(2, '0')));
   root.append(kicker, el('h1', '', p.name), el('p', 'story-name', p.tagline));
+  if (p.confirmation) root.append(el('p', 'confirmation-chip' + (p.confirmation === 'single look direction' ? ' unconfirmed' : ''), p.confirmation === 'single look direction' ? 'Unconfirmed · ' + p.confirmation : p.confirmation));
   const hasRate = series && isNumber(series.rate_cm_yr);
   const metric = el('section', 'metric' + (hasRate ? '' : ' pending'));
-  metric.append(el('p', 'metric-label', 'Reported displacement rate'));
+  metric.append(el('p', 'metric-label', 'Reported displacement rate · line of sight'));
   const value = el('div', 'metric-value', hasRate ? formatNumber(series.rate_cm_yr) : 'Measurement pending');
   if (hasRate) value.append(el('small', '', (isNumber(series.rate_sigma) ? '± ' + formatNumber(series.rate_sigma) + ' ' : '') + 'cm/yr'));
   metric.append(value);
@@ -145,9 +158,23 @@ function renderDetails() {
     root.append(provisional);
   }
   const validation = section('ADWR comparison');
-  if (series && isNumber(series.adwr_rate_cm_yr)) {
-    validation.append(el('p', 'detail-copy', 'ADWR contextual rate: ' + formatNumber(series.adwr_rate_cm_yr) + ' cm/yr.'));
-    validation.append(el('p', 'validation-note', 'A validation difference is not calculated until period, footprint, direction and reference are comparable.'));
+  if (series && (isNumber(series.adwr_rate_cm_yr) || isNumber(series.adwr_rs2_rate_cm_yr))) {
+    const c = series.adwr_comparison;
+    validation.append(note('Median rates over the same sinking pixels · cm/yr, line of sight · ADWR units inferred. These medians differ from the fitted rate above.'));
+    validation.append(factList([
+      ['Our median', formatNumber(c?.ours_median ?? series.median_rate_cm_yr)],
+      ['ADWR Sentinel-1', formatNumber(series.adwr_rate_cm_yr)],
+      ['ADWR RADARSAT-2', formatNumber(series.adwr_rs2_rate_cm_yr)]
+    ]));
+    if (c) validation.append(factList([
+      ['Sentinel-1 correlation', formatNumber(c.corr_s1)],
+      ['RADARSAT-2 correlation', formatNumber(c.corr_rs2)],
+      ['Our − ADWR S1 median', isNumber(c.diff_s1) ? formatNumber(c.diff_s1) + ' cm/yr' : 'Pending']
+    ]));
+    validation.append(el('p', 'validation-note', series.adwr_note || 'ADWR provenance and comparison periods have not been supplied.'));
+    validation.append(el('p', 'validation-note', 'Sentinel-1 is a consistency check, not independent validation. RADARSAT-2 is an independent sensor over a longer period. Agreement varies; these comparisons do not establish validation of every study or of NISAR. Eloy – Picacho is not validated by this test.'));
+    const source = el('a', '', 'Comparison method, periods and limitations');
+    source.href = 'https://github.com/mansi200304/NASA-Hackathon/blob/main/docs/adwr_validation.md'; source.target = '_blank'; source.rel = 'noopener noreferrer'; validation.append(source);
   } else {
     validation.append(el('p', 'detail-copy', 'Comparison pending'));
     validation.append(el('p', 'validation-note', 'Match the area and observation period before comparing rates.'));
@@ -259,7 +286,7 @@ function renderLayerControls() {
       opacity.addEventListener('input', () => {
         config.opacity = Number(opacity.value) / 100;
         if (key === 'rate') state.rateImage?.setOpacity(config.opacity);
-        else config.layer?.setStyle({ opacity: config.opacity, fillOpacity: config.opacity * 0.15 });
+        else config.layer?.setStyle({ opacity: config.opacity, fillOpacity: key === 'adwr_subsidence' ? 0 : config.opacity * 0.15 });
       });
       opacityWrap.append(el('span', '', 'Opacity'), opacity); row.append(opacityWrap);
     }
@@ -315,12 +342,16 @@ function makeOverlay(raw, key) {
   const color = key === 'habitat' ? COLORS.olive : key === 'datacenters' ? COLORS.ink : COLORS.rust;
   return L.geoJSON(raw, {
     bubblingMouseEvents: false,
-    style: { color, weight: 1.3, fillOpacity: 0.12, opacity: 0.8 },
+    style: { color, weight: 1.3, fillOpacity: key === 'adwr_subsidence' ? 0 : 0.12, opacity: 0.8 },
     pointToLayer: (feature, latlng) => L.circleMarker(latlng, { radius: 5, color, weight: 1.5, fillColor: color, fillOpacity: feature.properties?.status === 'planned' ? 0 : 0.8 }),
     onEachFeature: (feature, layer) => {
       const p = feature.properties || {};
       const popup = el('div');
       popup.append(el('strong', '', p.name || p.NAME || 'Context feature'));
+      if (key === 'adwr_subsidence') {
+        if (p.period) popup.append(el('p', '', p.period));
+        if (p.source) popup.append(el('p', '', p.source));
+      }
       if (key === 'datacenters') {
         popup.append(el('p', '', 'Compiled public-source location. Status: ' + (p.status || 'unknown')));
         popup.append(el('p', '', 'Water use: ' + (p.water_use ?? 'Not published')));
