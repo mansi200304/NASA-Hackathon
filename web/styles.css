@@ -185,3 +185,81 @@ html{scroll-behavior:smooth;scroll-padding-top:18px}
  @keyframes rise-on-load{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+/* Human story + verifiable source cards for Arizona groundwater subsidence. */
+.overview-story{font:400 16px/1.82 var(--serif);max-width:680px;color:var(--ink);margin:0 0 18px}
+.overview-story strong{font-weight:600;color:var(--rust)}
+.overview-story a,.overview-mission a{color:var(--rust);text-decoration-thickness:1px}
+.overview-mission{max-width:690px;border-left:3px solid var(--olive);padding:17px 21px 18px;margin:28px 0;background:#ebe4d8}
+.overview-mission-label{display:block;color:var(--olive);font:700 10px/1.6 var(--sans);letter-spacing:.13em;margin-bottom:11px}
+.overview-mission p{font:14px/1.8 var(--sans);margin:0 0 12px}
+.overview-mission p:last-child{margin-bottom:0}
+.overview-story-link{font:600 12px/1.4 var(--sans);color:var(--rust);text-decoration:none;border-bottom:1px solid var(--rust);padding:12px 0}
+.overview-purpose{padding:42px 0 37px;border-top:1px solid var(--rule);max-width:1550px;margin:0 auto;scroll-margin-top:16px}
+.overview-purpose-header{display:grid;grid-template-columns:1.15fr .85fr;gap:35px;align-items:end;margin-bottom:26px}
+.overview-purpose-header h2,.overview-proof-heading h2{font:400 clamp(32px,3.7vw,50px)/1.16 var(--serif);letter-spacing:-.037em;max-width:690px;margin:0}
+.overview-purpose-header>p{font:16px/1.7 var(--serif);max-width:510px;margin:0;color:var(--slate-deep)}
+.overview-audiences{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;border:1px solid var(--rule)}
+.overview-audiences article{padding:24px 24px 26px;border-right:1px solid var(--rule);min-height:175px}
+.overview-audiences article:last-child{border-right:0}
+.overview-audiences span,.overview-proof-id{font:700 10px/1.5 var(--sans);color:var(--olive);letter-spacing:.11em}
+.overview-audiences h3{font:400 23px/1.23 var(--serif);letter-spacing:-.02em;margin:12px 0}
+.overview-audiences p{font-size:13px;color:var(--slate-deep);line-height:1.8;margin:0}
+.overview-proof{margin:20px auto 0;padding:39px 0 25px;border-top:2px solid var(--rust);max-width:1550px}
+.overview-proof-heading{display:grid;grid-template-columns:1.2fr .8fr;gap:18px 42px;align-items:end;margin-bottom:24px}
+.overview-proof-heading .overview-mission-label{grid-column:1/-1;margin:0}
+.overview-proof-heading h2{grid-column:1}
+.overview-proof-heading p{grid-column:2;align-self:end;font:14px/1.75 var(--sans);color:var(--slate-deep);margin:0}
+.overview-proof-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.overview-proof-card{display:flex;flex-direction:column;align-items:flex-start;padding:26px 24px;background:var(--surface);border-top:3px solid var(--olive);min-height:320px}
+.overview-proof-card:nth-child(2){border-top-color:var(--rust)}
+.overview-proof-card:nth-child(3){border-top-color:var(--slate-deep)}
+.overview-proof-number{font:400 clamp(28px,2.5vw,40px)/1.12 var(--serif);letter-spacing:-.037em;margin:23px 0 8px;word-break:normal}
+.overview-proof-number small{font:12px var(--sans);letter-spacing:0;white-space:nowrap}
+.overview-proof-card h3{font:400 21px/1.33 var(--serif);margin:0 0 12px}
+.overview-proof-card p{color:var(--slate-deep);font-size:13px;line-height:1.7;margin:0 0 19px}
+.overview-proof-card a{font:600 11px/1.5 var(--sans);color:var(--rust);text-decoration:underline;text-underline-offset:3px;margin-top:9px}
+.overview-proof-card a:first-of-type{margin-top:auto}
+.overview-proof-qualifier{border-left:3px solid var(--rust);padding:7px 17px;margin:20px 0 2px;background:var(--faint);font:12px/1.8 var(--sans)}
+.overview-proof-qualifier strong{color:var(--ink)}
+.overview-proof-qualifier button{display:inline;font-size:12px;font-weight:700;color:var(--rust);text-decoration:underline;text-underline-offset:3px;padding:0 4px}
+.overview-evidence{display:grid;grid-template-columns:minmax(0,1fr) minmax(270px,.7fr);gap:30px 60px;padding:50px 0;border-top:1px solid var(--rule);max-width:1550px;margin:0 auto;align-items:start}
+.overview-evidence h2{font:400 clamp(30px,3.6vw,49px)/1.18 var(--serif);letter-spacing:-.035em;margin:0 0 19px;max-width:680px}
+.overview-evidence h2 em{color:var(--rust);font-style:normal}
+.overview-evidence-copy p{font:14px/1.85 var(--sans);color:var(--slate-deep);margin:0 0 13px;max-width:700px}
+.overview-evidence .overview-science-note{margin-top:26px;padding:0 15px;border-top:2px solid var(--olive);border-bottom:1px solid var(--rule);background:var(--faint)}
+.overview-evidence .overview-science-note .overview-secondary{margin-bottom:17px}
+dialog{width:min(750px,calc(100% - 32px));overflow:auto}
+dialog .resource-list li{padding-bottom:12px;margin-bottom:12px;border-bottom:1px solid var(--rule);line-height:1.7}
+dialog .resource-list a{font-weight:700}
+dialog p{color:var(--slate-deep)}
+@media(min-width:801px) and (max-width:1199px){
+ .overview-purpose-header h2,.overview-proof-heading h2{font-size:clamp(30px,3.3vw,42px)}
+ .overview-audiences article{padding:20px 16px}
+ .overview-proof-card{padding:21px 17px}
+ .overview-proof-number{font-size:28px}
+ .overview-evidence{gap:24px}
+}
+@media(max-width:800px){
+ .overview-story{font-size:16px}
+ .overview-mission{padding:15px 17px;margin:24px 0}
+ .overview-purpose{padding:26px 0}
+ .overview-purpose-header,.overview-proof-heading,.overview-evidence{grid-template-columns:1fr;gap:12px}
+ .overview-purpose-header h2,.overview-proof-heading h2{font-size:36px}
+ .overview-purpose-header>p{font-size:15px}
+ .overview-audiences{grid-template-columns:1fr}
+ .overview-audiences article{border-right:0;border-bottom:1px solid var(--rule);padding:17px 19px;min-height:0}
+ .overview-audiences article:last-child{border-bottom:0}
+ .overview-audiences h3{margin:7px 0;font-size:21px}
+ .overview-proof{padding:26px 0 20px}
+ .overview-proof-heading .overview-mission-label,.overview-proof-heading h2,.overview-proof-heading p{grid-column:1}
+ .overview-proof-grid{grid-template-columns:1fr}
+ .overview-proof-card{padding:19px 21px;min-height:0}
+ .overview-proof-number{font-size:36px;margin:14px 0 9px}
+ .overview-proof-card h3{font-size:22px}
+ .overview-proof-card p{margin-bottom:12px}
+ .overview-proof-card a:first-of-type{margin-top:4px}
+ .overview-evidence{padding:32px 0 22px}
+ .overview-evidence h2{font-size:34px}
+ .overview-evidence .overview-science-note{margin-top:7px}
+}
