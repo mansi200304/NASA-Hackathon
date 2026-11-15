@@ -90,3 +90,24 @@ export function cleanInsights(raw) {
     .map(p => ({ heading: p.heading.trim(), text: p.text.trim() }));
   return { summary: raw.summary.trim(), confidence, points };
 }
+const safeFrame = p => typeof p === 'string' && /^cumulative\/[A-Za-z0-9_.-]+\.png$/.test(p);
+export function normalizeCumulative(raw, slug) {
+  // Dated map pictures for the time slider. Strict: matching study, cm, increasing dates, one picture per date,
+  // pictures only from the cumulative/ folder (no paths that could point elsewhere).
+  if (!raw || raw.hotspot !== slug || raw.units !== 'cm') throw new Error('Expected the matching study and units cm.');
+  const b = raw.bounds;
+  if (!Array.isArray(b) || b.length !== 2 || b.some(p => !Array.isArray(p) || p.length !== 2 || !p.every(isNumber))) throw new Error('Bounds must be [[south, west], [north, east]].');
+  const [[s, w], [n, e]] = b;
+  if (!(s < n && w < e && s >= -90 && n <= 90 && w >= -180 && e <= 180)) throw new Error('Invalid WGS84 bounds.');
+  if (!isNumber(raw.vmin) || !isNumber(raw.vmax) || raw.vmin >= raw.vmax) throw new Error('Expected a finite, increasing display range.');
+  const { dates, frames } = raw;
+  if (!Array.isArray(dates) || dates.length < 2 || !dates.every(validDate) || dates.some((d, i) => i > 0 && d <= dates[i - 1])) throw new Error('Dates must be valid, unique and increasing.');
+  if (!Array.isArray(frames) || frames.length !== dates.length || !frames.every(safeFrame)) throw new Error('Expected one safe picture per date.');
+  const masks = {};
+  for (const kind of ['sinking', 'stable']) {
+    if (raw.masks?.[kind] == null) continue;
+    if (!safeFrame(raw.masks[kind])) throw new Error('Unsafe mask path.');
+    masks[kind] = raw.masks[kind];
+  }
+  return { ...raw, masks };
+}

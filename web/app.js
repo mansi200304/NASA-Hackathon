@@ -1,4 +1,4 @@
-import { normalizeSeries, normalizeRate, normalizeHotspots, validateGeoJSON, safeSourceURL, formatNumber, isNumber, cleanInsights } from './model.mjs';
+import { normalizeSeries, normalizeRate, normalizeHotspots, validateGeoJSON, safeSourceURL, formatNumber, isNumber, cleanInsights, normalizeCumulative } from './model.mjs';
 
 const $ = selector => document.querySelector(selector);
 const DATA = new URL('../data/processed/', import.meta.url);
@@ -11,7 +11,7 @@ const REGION_LAYERS = [
   ['rate_nisar_eloy', 'NISAR, Eloy box · provisional, under 4 months', false]
 ];
 const MARKER_LAYERS = [['mines_excluded', 'Probable mines (not groundwater)'], ['checked_flat', 'Checked: no sinking found']];
-const state = { selected: null, slugs: [], series: new Map(), rates: new Map(), layers: new Map(), outlines: new Map(), base: 'satellite' };
+const state = { selected: null, slugs: [], cumulative: new Map(), time: null, series: new Map(), rates: new Map(), layers: new Map(), outlines: new Map(), base: 'satellite' };
 let map, outlineGroup;
 const el = (tag, className, text) => {
   const node = document.createElement(tag);
@@ -65,7 +65,7 @@ function svgNode(tag, attrs = {}, text) {
   if (text != null) node.textContent = text;
   return node;
 }
-function makeChart(series) {
+function makeChart(series, hooks = null) {
   const wrap = el('div', 'chart');
   const svg = svgNode('svg', { viewBox: '0 0 300 170', role: 'img', 'aria-label': 'Cumulative displacement in centimetres relative to ' + series.reference });
   const valid = series.points.filter(p => isNumber(p.value));
@@ -88,18 +88,22 @@ function makeChart(series) {
     path += (next ? 'M' : 'L') + x(p.date) + ',' + y(p.value) + ' ';
     next = false;
   });
-  svg.append(svgNode('path', { d: path, fill: 'none', stroke: COLORS.rust, 'stroke-width': 1.8 }));
+  const sinkPath = svgNode('path', { d: path, fill: 'none', stroke: COLORS.rust, 'stroke-width': 1.8 });
+  svg.append(sinkPath);
+  let stablePath = null;
   if (stable.length) {
-    let stablePath = '', gap = true;
+    let stableD = '', gap = true;
     series.stablePoints.forEach(p => {
       if (p.value === null) { gap = true; return; }
-      stablePath += (gap ? 'M' : 'L') + x(p.date) + ',' + y(p.value) + ' '; gap = false;
+      stableD += (gap ? 'M' : 'L') + x(p.date) + ',' + y(p.value) + ' '; gap = false;
     });
-    svg.append(svgNode('path', { d: stablePath, fill: 'none', stroke: COLORS.slate, 'stroke-width': 1.5, 'stroke-dasharray': '4 3' }));
+    stablePath = svgNode('path', { d: stableD, fill: 'none', stroke: COLORS.slate, 'stroke-width': 1.5, 'stroke-dasharray': '4 3' });
+    svg.append(stablePath);
   }
   valid.forEach(p => svg.append(svgNode('circle', { cx: x(p.date), cy: y(p.value), r: 2.5, fill: COLORS.rust })));
   svg.append(svgNode('text', { x: 42, y: 153, class: 'chart-label' }, series.dates[0]));
   if (series.dates.length > 1) svg.append(svgNode('text', { x: 286, y: 168, 'text-anchor': 'end', class: 'chart-label' }, series.dates.at(-1)));
+  if (hooks) addChartScrubbing(wrap, svg, series, x, y, sinkPath, stablePath, hooks);
   wrap.append(svg);
   if (stable.length) wrap.append(note('Solid rust: sinking-pixel average · Dashed slate: stable ground (measurement noise). Both are line-of-sight displacement.'));
   const details = el('details');
@@ -111,6 +115,151 @@ function makeChart(series) {
   series.points.forEach((p, i) => { const tr = el('tr'); tr.append(el('td', '', p.date), el('td', '', p.value === null ? 'No observation' : formatNumber(p.value))); if (stable.length) tr.append(el('td', '', series.stablePoints[i].value === null ? 'No observation' : formatNumber(series.stablePoints[i].value))); body.append(tr); });
   table.append(head, body); details.append(table); wrap.append(details);
   return wrap;
+}
+// Hover or touch along the chart: a cursor, a readout, and the map follows (see applyTimeFrame). Keyboard works too.
+function addChartScrubbing(wrap, svg, series, x, y, sinkPath, stablePath, hooks) {
+  const n = series.points.length;
+  const hidden = { visibility: 'hidden', 'pointer-events': 'none' };
+  const cursor = svgNode('line', { y1: 12, y2: 130, stroke: COLORS.ink, 'stroke-width': 0.8, 'stroke-dasharray': '2 2', ...hidden });
+  const dotSink = svgNode('circle', { r: 4, fill: COLORS.rust, stroke: '#F4EFE6', 'stroke-width': 1, ...hidden });
+  const dotStable = svgNode('circle', { r: 3.5, fill: COLORS.slate, stroke: '#F4EFE6', 'stroke-width': 1, ...hidden });
+  const tip = svgNode('g', hidden);
+  const tipBox = svgNode('rect', { rx: 2, fill: '#F4EFE6', stroke: '#C9C0B2', 'stroke-width': 0.7, opacity: 0.96 });
+  const tipText = svgNode('text', { class: 'chart-tip' });
+  tip.append(tipBox, tipText);
+  const hit = svgNode('rect', { x: 42, y: 8, width: 244, height: 126, fill: 'transparent', style: 'touch-action:pan-y;cursor:crosshair' });
+  svg.append(hit, cursor, dotSink, dotStable, tip);
+  svg.setAttribute('role', 'slider'); svg.setAttribute('tabindex', '0');
+  svg.setAttribute('aria-label', 'Move through time. Left and right arrow keys step through the dates; Space plays; Escape clears.');
+  svg.setAttribute('aria-valuemin', '0'); svg.setAttribute('aria-valuemax', String(n - 1)); svg.setAttribute('aria-valuenow', '0'); svg.setAttribute('aria-valuetext', 'No date selected');
+  const hide = node => node.setAttribute('visibility', 'hidden');
+  wrap.setCursor = index => {
+    if (index == null) { [cursor, dotSink, dotStable, tip].forEach(hide); svg.setAttribute('aria-valuetext', 'No date selected'); return; }
+    const p = series.points[index], px = x(p.date), lines = [p.date];
+    cursor.setAttribute('x1', px); cursor.setAttribute('x2', px); cursor.setAttribute('visibility', 'visible');
+    if (isNumber(p.value)) { dotSink.setAttribute('cx', px); dotSink.setAttribute('cy', y(p.value)); dotSink.setAttribute('visibility', 'visible'); lines.push('Sinking area  ' + formatNumber(p.value) + ' cm'); } else hide(dotSink);
+    const s = series.stablePoints[index];
+    if (s && isNumber(s.value)) { dotStable.setAttribute('cx', px); dotStable.setAttribute('cy', y(s.value)); dotStable.setAttribute('visibility', 'visible'); lines.push('Stable ground  ' + formatNumber(s.value) + ' cm'); } else hide(dotStable);
+    tipText.replaceChildren();
+    const w = Math.max(...lines.map(t => t.length)) * 4.9 + 14, h = lines.length * 11 + 7, tx = px > 160 ? px - w - 7 : px + 7;
+    lines.forEach((t, i) => tipText.append(svgNode('tspan', { x: tx + 7, y: 29 + i * 11 }, t)));
+    tipBox.setAttribute('x', tx); tipBox.setAttribute('y', 18); tipBox.setAttribute('width', w); tipBox.setAttribute('height', h);
+    tip.setAttribute('visibility', 'visible');
+    svg.setAttribute('aria-valuenow', String(index)); svg.setAttribute('aria-valuetext', lines.join(', '));
+  };
+  wrap.emphasise = kind => {
+    sinkPath.setAttribute('stroke-width', kind === 'sinking' ? 3.2 : 1.8);
+    if (stablePath) stablePath.setAttribute('stroke-width', kind === 'stable' ? 3 : 1.5);
+  };
+  const nearest = clientX => {
+    const r = svg.getBoundingClientRect(), px = (clientX - r.left) / (r.width || 300) * 300;
+    let best = 0, bestDistance = Infinity;
+    series.points.forEach((p, i) => { const d = Math.abs(x(p.date) - px); if (d < bestDistance) { bestDistance = d; best = i; } });
+    return best;
+  };
+  hit.addEventListener('pointermove', e => hooks.hover(nearest(e.clientX)));
+  hit.addEventListener('pointerleave', () => hooks.hover(null));
+  hit.addEventListener('click', e => hooks.pin(nearest(e.clientX)));
+  svg.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft') hooks.step(-1);
+    else if (e.key === 'ArrowRight') hooks.step(1);
+    else if (e.key === 'Home') hooks.jump(0);
+    else if (e.key === 'End') hooks.jump(n - 1);
+    else if (e.key === ' ' || e.key === 'Enter') hooks.play();
+    else if (e.key === 'Escape') hooks.clear();
+    else return;
+    e.preventDefault();
+  });
+}
+// ---- time view: the map shows the total change since the first date, for the date under the cursor ----
+const TIME_STEP_MS = 700;
+const timeURL = path => window.ATLAS_PREVIEW_IMAGES?.[path] || new URL(path, DATA).href;
+function resetTimeView() {
+  const t = state.time;
+  if (t) { clearInterval(t.timer); [t.image, ...Object.values(t.masks)].forEach(layer => { if (layer && map) map.removeLayer(layer); }); }
+  state.time = { meta: null, hover: null, pinned: null, shown: null, timer: null, image: null, masks: {}, chart: null, ui: null };
+}
+function applyTimeFrame() {
+  const t = state.time, meta = t.meta;
+  if (!meta || !map) return;
+  const index = t.hover ?? t.pinned;
+  t.chart?.setCursor(index);
+  if (index !== t.shown) {
+    t.shown = index;
+    if (index == null) {
+      if (t.image) { map.removeLayer(t.image); t.image = null; }
+      updateRateLayer();                       // back to the normal rate map and its legend
+    } else {
+      const url = timeURL(meta.frames[index]);
+      if (!t.image) {
+        t.image = L.imageOverlay(url, meta.bounds, { pane: 'timeframes', opacity: 0.85, interactive: false }).addTo(map);
+        if (state.rateImage) map.removeLayer(state.rateImage);
+        meta.frames.forEach(path => { const preload = new Image(); preload.src = timeURL(path); });
+      } else t.image.setUrl(url);
+      const legend = $('#rate-legend'); legend.hidden = false; legend.replaceChildren();
+      legend.append(el('strong', '', 'Total ground change since ' + meta.dates[0]), el('div', '', 'As of ' + meta.dates[index]),
+        el('div', '', formatNumber(meta.vmin) + ' to +' + formatNumber(meta.vmax) + ' cm'),
+        el('small', '', 'Red = lower than at the start. Blank = not measured.'));
+    }
+  }
+  t.ui?.sync();
+}
+function toggleMask(kind) {
+  const t = state.time;
+  if (!map || !t.meta?.masks?.[kind]) return;
+  if (t.masks[kind]) { map.removeLayer(t.masks[kind]); delete t.masks[kind]; }
+  else t.masks[kind] = L.imageOverlay(timeURL(t.meta.masks[kind]), t.meta.bounds, { pane: 'timeframes', opacity: 0.6, interactive: false }).addTo(map);
+  t.chart?.emphasise(t.masks.sinking ? 'sinking' : t.masks.stable ? 'stable' : null);
+  t.ui?.sync();
+}
+function togglePlay() {
+  const t = state.time;
+  if (!t.meta) return;
+  if (t.timer) { clearInterval(t.timer); t.timer = null; t.ui?.sync(); return; }
+  const last = t.meta.dates.length - 1;
+  let i = t.pinned != null && t.pinned < last ? t.pinned : 0;
+  t.pinned = i; applyTimeFrame();
+  t.timer = setInterval(() => {
+    i += 1;
+    if (i > last) { clearInterval(t.timer); t.timer = null; t.ui?.sync(); return; }
+    t.pinned = i; applyTimeFrame();
+  }, TIME_STEP_MS);
+  t.ui?.sync();
+}
+function timeHooks() {
+  const t = state.time;
+  const stop = () => { if (t.timer) { clearInterval(t.timer); t.timer = null; } };
+  return {
+    hover: i => { t.hover = i; applyTimeFrame(); },
+    pin: i => { stop(); t.pinned = t.pinned === i ? null : i; applyTimeFrame(); },
+    step: d => { stop(); const n = t.meta.dates.length, base = t.pinned ?? (d > 0 ? -1 : n); t.pinned = Math.max(0, Math.min(n - 1, base + d)); applyTimeFrame(); },
+    jump: i => { stop(); t.pinned = i; applyTimeFrame(); },
+    play: () => togglePlay(),
+    clear: () => { stop(); t.pinned = null; t.hover = null; applyTimeFrame(); }
+  };
+}
+function makeTimeControls() {
+  const t = state.time, node = el('div', 'time-controls'), idle = 'Move along the chart to watch the map change. Click (or tap) to hold a date.';
+  const button = (label, kind) => { const b = el('button', 'time-btn', label); b.type = 'button'; b.setAttribute('aria-pressed', 'false'); if (kind) b.dataset.kind = kind; return b; };
+  const play = button('\u25B6 Play through time'), sink = button('Show the sinking area on the map', 'sinking'), stab = button('Show the stable ground on the map', 'stable');
+  const back = button('Back to the rate map'); back.classList.add('subtle'); back.removeAttribute('aria-pressed');
+  const status = el('p', 'metric-note time-status', idle); status.setAttribute('aria-live', 'polite');
+  const row = el('div', 'time-row'); row.append(play, sink, stab, back); node.append(row, status);
+  if (!t.meta.masks.sinking) sink.hidden = true;
+  if (!t.meta.masks.stable) stab.hidden = true;
+  const ui = { node, sync() {
+    const index = t.hover ?? t.pinned, playing = Boolean(t.timer);
+    play.textContent = playing ? '\u275A\u275A Pause' : '\u25B6 Play through time'; play.setAttribute('aria-pressed', String(playing));
+    sink.setAttribute('aria-pressed', String(Boolean(t.masks.sinking))); stab.setAttribute('aria-pressed', String(Boolean(t.masks.stable)));
+    back.hidden = t.pinned == null && !playing;
+    status.textContent = index == null ? idle : 'Map: total change since ' + t.meta.dates[0] + ', as of ' + t.meta.dates[index] + (t.hover == null && t.pinned === index ? ' (held)' : '') + '.';
+  } };
+  play.addEventListener('click', togglePlay);
+  sink.addEventListener('click', () => toggleMask('sinking'));
+  stab.addEventListener('click', () => toggleMask('stable'));
+  back.addEventListener('click', () => timeHooks().clear());
+  ui.sync();
+  return ui;
 }
 function renderInsights(root, series) {
   const ins = cleanInsights(series?.insights);
@@ -134,6 +283,7 @@ function renderInsights(root, series) {
   root.append(box);
 }
 function renderDetails() {
+  resetTimeView();
   const feature = state.hotspots.features.find(f => f.properties.slug === state.selected);
   const p = feature.properties;
   const result = state.series.get(state.selected);
@@ -160,7 +310,13 @@ function renderDetails() {
   root.append(metric);
   const chartSection = section('Displacement through time');
   if (series?.hasData) {
-    chartSection.append(makeChart(series), note('Relative to: ' + series.reference));
+    const cumulative = state.cumulative.get(state.selected);
+    const timeMeta = cumulative?.status === 'ready' && map ? cumulative.value : null;
+    state.time.meta = timeMeta;
+    const chart = makeChart(series, timeMeta ? timeHooks() : null);
+    state.time.chart = chart;
+    chartSection.append(chart, note('Relative to: ' + series.reference));
+    if (timeMeta) { const ui = makeTimeControls(); state.time.ui = ui; chartSection.append(ui.node); }
   } else {
     const wait = el('div', 'chart-wait');
     wait.append(el('span', 'waiting-mark'), el('p', '', 'No observations to plot yet'), el('small', '', dataError(result, 'The chart will use the measured record. Pending does not mean zero movement.')));
@@ -258,6 +414,7 @@ function initMap() {
   }
   map = L.map('map', { zoomControl: false, minZoom: 5, maxZoom: 18, zoomSnap: 0.25, attributionControl: true }).setView([32.8, -111.65], 9);
   map.createPane('measurements'); map.getPane('measurements').style.zIndex = 330;
+  map.createPane('timeframes'); map.getPane('timeframes').style.zIndex = 335;
   L.control.zoom({ position: 'topright' }).addTo(map);
   L.control.scale({ imperial: false, position: 'bottomleft' }).addTo(map);
   const tileSources = {
@@ -452,6 +609,7 @@ async function start() {
   const tasks = [
     ...state.slugs.map(async slug => state.series.set(slug, await loadJSON('timeseries_' + slug + '.json', raw => normalizeSeries(raw, slug)))),
     ...state.slugs.map(async slug => state.rates.set(slug, await loadJSON('rate_' + slug + '.json', normalizeRate))),
+    ...state.slugs.map(async slug => state.cumulative.set(slug, await loadJSON('cumulative_' + slug + '.json', raw => normalizeCumulative(raw, slug)))),
     ...['adwr_subsidence', ...MARKER_LAYERS.map(l => l[0])].map(async key => {
       const result = await loadJSON(key + '.geojson', validateGeoJSON);
       const config = state.layers.get(key); config.status = result.status; config.error = result.error;

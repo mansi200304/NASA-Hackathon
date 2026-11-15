@@ -97,6 +97,10 @@ Use a WGS84 FeatureCollection. Marker popups read name plus reason or note. Sour
 
 `timeseries_<slug>.json` carries an `insights` block (summary, two confidence ratings, and headed paragraphs) written for readers who are not experts. The panel opens with it under "In plain terms"; `cleanInsights()` in `model.mjs` drops anything malformed. Confidence ratings follow fixed rules in `src/insights.py`. Data centers and habitat are no longer layers: there is no sourced data for them.
 
+## Interactive time chart
+
+The chart under each study follows the pointer: a cursor, a readout of both lines, and the map swaps to the total change since the first date, as of the date under the cursor. Click (or tap) holds a date; Play steps through all dates; the arrow keys, Home, End, Space and Escape work; the two buttons under the chart put the sinking-area or stable-ground pixels on the map. Data comes from `cumulative_<slug>.json` and `data/processed/cumulative/` (see `docs/UI_DATA_CONTRACT.md` section 9). Without those files the chart stays a plain chart.
+
 ## Logo and icons
 
 The original logo is `docs/brand/sinkronized-logo-original.png`. `python src/make_logo_assets.py` trims it and writes `web/assets/` (header logo, 512 px version, browser-tab icon, phone icon). To change the logo, replace the original and re-run that command. The header image is decorative (the name beside it is the accessible label).

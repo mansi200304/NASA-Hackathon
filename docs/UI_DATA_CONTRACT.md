@@ -20,6 +20,7 @@ The files below already pass the validators in `web/model.mjs` on the `ui/sonora
 | `rate_sentinel1_descending.png/.json` | region-wide Sentinel-1 rate mosaic (southern and central Arizona), same fields |
 | `rate_sentinel1_ascending.png/.json` | ascending-track cross-check, one frame, same fields |
 | `rate_nisar_willcox.png/.json`, `rate_nisar_eloy.png/.json` | NISAR rate relative to the box median. PRELIMINARY, see section 4 |
+| `cumulative_<slug>.json` + `cumulative/` folder | Time-slider data: one map picture per satellite date (total change since the first date, cm), plus two masks (the pixels behind the "sinking area" and "stable ground" chart lines). See section 9 |
 | `mines_excluded.geojson` | Points where the signal is probably mining, not groundwater (`name`, `reason`, `source`) |
 | `checked_flat.geojson` | Points we checked and found no sinking (`name`, `median_rate_cm_yr`, `p5_rate_cm_yr`) |
 
@@ -70,3 +71,12 @@ Region layers listed in the layer panel: `rate_sentinel1_descending` and `_ascen
 - `adwr_rate_cm_yr` comes from the same satellite (Sentinel-1) as our rate, processed separately by ADWR. It is a **consistency check, not independent validation**. `adwr_rs2_rate_cm_yr` is an independent sensor over a longer period (2010 to 2026).
 - ADWR does not document its raster units. We inferred metres from a regression against our own data (see `docs/adwr_validation.md`); say "inferred" wherever units matter.
 - Eloy (Picacho) agrees only weakly: do not claim it is validated. See the table in `docs/adwr_validation.md`.
+
+## 9. Interactive time chart (cumulative_<slug>.json)
+
+Fields: `hotspot`, `units` ("cm"), `bounds` [[south, west], [north, east]], `vmin` (-60) and `vmax` (10) in cm, `dates` (same dates as the chart), `frames` (one picture path per date, under `cumulative/`), `masks.sinking` and `masks.stable`, `reference`, `note`.
+
+- Each picture is the **total change since the first date**, only where the radar measured at every date. Blank means not measured, not zero. Same colour ramp for every study, so areas can be compared.
+- The chart line equals the average of the pixels the pictures show; `src/export_contract.py` asserts this (difference below 0.005 cm) on every export.
+- In the app: moving along the chart shows the readout and swaps the map to that date; clicking holds a date; Play steps through all dates; arrow keys, Home, End, Space and Escape work; the two buttons under the chart put the sinking-area or stable-ground pixels on the map. If the file is missing or invalid, the chart stays a plain chart (no broken controls).
+- Paths must match `cumulative/<name>.png`; anything else is rejected by `normalizeCumulative()`.

@@ -10,7 +10,7 @@ const [html, css, mapCSS, leafletCSS, leaflet, model, app] = await Promise.all([
 ]);
 const data = {}, images = {};
 for (const name of await readdir(new URL('../data/processed/', root))) {
-  if (/^(hotspots|adwr_subsidence|mines_excluded|checked_flat)\.geojson$/.test(name) || /^(timeseries_|rate_).*\.json$/.test(name)) {
+  if (/^(hotspots|adwr_subsidence|mines_excluded|checked_flat)\.geojson$/.test(name) || /^(timeseries_|rate_|cumulative_).*\.json$/.test(name)) {
     // A malformed optional file must not silently become a valid measurement.
     try { data[name] = JSON.parse(await read('../data/processed/' + name)); }
     catch { console.warn('Skipped malformed JSON: ' + name); }

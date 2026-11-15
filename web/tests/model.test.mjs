@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizeSeries, normalizeRate, normalizeHotspots, validateGeoJSON, safeSourceURL, formatNumber, cleanInsights } from '../model.mjs';
+import { normalizeSeries, normalizeRate, normalizeHotspots, validateGeoJSON, safeSourceURL, formatNumber, cleanInsights, normalizeCumulative } from '../model.mjs';
 import { readFile } from 'node:fs/promises';
 
 const series = extra => ({ hotspot: 'eloy', units: 'cm', reference: 'Synthetic test reference', dates: ['2026-01-01', '2026-01-13'], displacement: [0, -1], rate_cm_yr: -2, rate_sigma: 0.2, ...extra });
@@ -92,5 +92,26 @@ test('plain-language insights are optional, text-only and level-checked', async 
     const ins = cleanInsights(series.insights);
     assert.ok(ins && ins.confidence && ins.points.length >= 5, slug + ' needs insights');
     assert.ok(series.sign_convention && series.data_release, slug + ' needs sign convention and data release');
+  }
+});
+
+test('time-slider pictures are strictly validated', async () => {
+  const ok = { hotspot: 'eloy', units: 'cm', bounds: [[32, -112], [33, -111]], vmin: -60, vmax: 10, dates: ['2016-01-01', '2016-07-01'],
+    frames: ['cumulative/cum_eloy_00.png', 'cumulative/cum_eloy_01.png'], masks: { sinking: 'cumulative/mask_sinking_eloy.png' } };
+  assert.equal(normalizeCumulative(ok, 'eloy').frames.length, 2);
+  assert.throws(() => normalizeCumulative(ok, 'willcox'), /matching/);
+  assert.throws(() => normalizeCumulative({ ...ok, frames: ['cumulative/a.png'] }, 'eloy'), /one safe picture per date/);
+  assert.throws(() => normalizeCumulative({ ...ok, frames: ['../secret.png', 'cumulative/b.png'] }, 'eloy'), /safe picture/);
+  assert.throws(() => normalizeCumulative({ ...ok, frames: ['https://example.com/x.png', 'cumulative/b.png'] }, 'eloy'), /safe picture/);
+  assert.throws(() => normalizeCumulative({ ...ok, dates: ['2016-07-01', '2016-01-01'] }, 'eloy'), /increasing/);
+  assert.throws(() => normalizeCumulative({ ...ok, masks: { sinking: '../x.png' } }, 'eloy'), /Unsafe/);
+  // every exported study has a matching, complete set of pictures on disk
+  const root = new URL('../../data/processed/', import.meta.url);
+  const areas = normalizeHotspots(JSON.parse(await readFile(new URL('hotspots.geojson', root), 'utf8')));
+  for (const { properties: { slug } } of areas.features) {
+    const cum = normalizeCumulative(JSON.parse(await readFile(new URL('cumulative_' + slug + '.json', root), 'utf8')), slug);
+    const series = normalizeSeries(JSON.parse(await readFile(new URL('timeseries_' + slug + '.json', root), 'utf8')), slug);
+    assert.deepEqual(cum.dates, series.dates, slug + ': pictures and chart must use the same dates');
+    for (const file of [...cum.frames, ...Object.values(cum.masks)]) await readFile(new URL(file, root));
   }
 });
