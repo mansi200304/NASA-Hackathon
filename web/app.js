@@ -55,10 +55,10 @@ function factList(items) {
   return list;
 }
 function section(title, noteKey = null) {
-  const node = el('section', 'detail-section'), header = el('div', 'detail-section-heading');
-  header.append(el('h2', '', title));
-  if (noteKey) header.append(explainButton(noteKey));
-  node.append(header);
+  const node = el('section', 'detail-section'), heading = el('div', 'detail-section-heading');
+  heading.append(el('h2', '', title));
+  if (noteKey) heading.append(explainButton(noteKey));
+  node.append(heading);
   return node;
 }
 function svgNode(tag, attrs = {}, text) {
@@ -266,9 +266,9 @@ function makeTimeControls() {
 function renderInsights(root, series) {
   const ins = cleanInsights(series?.insights);
   if (!ins) return;
-  const box = el('section', 'insights'), header = el('div', 'detail-section-heading');
-  header.append(el('h2', 'insights-title', 'In plain terms'), explainButton('confidence'));
-  box.append(header, el('p', 'insights-summary', ins.summary));
+  const box = el('section', 'insights'), heading = el('div', 'detail-section-heading');
+  heading.append(el('h2', 'insights-title', 'In plain terms'), explainButton('confidence'));
+  box.append(heading, el('p', 'insights-summary', ins.summary));
   if (ins.confidence) {
     const row = el('div', 'confidence-row');
     [[ins.confidence.where_label, ins.confidence.where], [ins.confidence.how_fast_label, ins.confidence.how_fast]].forEach(([label, level]) => {
@@ -471,8 +471,8 @@ function initMap() {
   map.on('click', event => {
     // A PNG contains colours, not numeric pixels. Do not invent a pixel sampler.
     showFieldNote('Map coordinate · ' + event.latlng.lat.toFixed(4) + ', ' + event.latlng.lng.toFixed(4),
-      'This is a selected coordinate, not a verified ground-motion measurement. A colour-mapped PNG has no numeric value we can accurately sample here.',
-      'Select a study to inspect the actual exported observations, uncertainty and source metadata.');
+      'This is a selected coordinate, not a verified ground-motion measurement. A colour-mapped PNG does not provide a numeric pixel value to inspect here.',
+      'Choose a study area to inspect actual exported displacement, uncertainty, reference and acquisition dates.');
   });
   new ResizeObserver(() => map.invalidateSize({ pan: false })).observe($('#map'));
 }
@@ -574,8 +574,8 @@ function makeOverlay(raw, key) {
       if (source) { const a = el('a', '', 'Source'); a.href = source; a.target = '_blank'; a.rel = 'noopener noreferrer'; popup.append(a); }
       layer.bindPopup(popup);
       layer.on('click', () => showFieldNote(p.name || p.NAME || 'Mapped context',
-        [p.reason, p.note, p.period, p.source].filter(v => typeof v === 'string' && v.trim()).join(' · ') || 'This mapped feature comes from a supplied context dataset, not a direct satellite measurement.',
-        'Read the feature provenance and study record before interpreting it.'));
+        [p.reason, p.note, p.period, p.source].filter(v => typeof v === 'string' && v.trim()).join(' · ') || 'This mapped feature comes from the supplied context dataset, not a direct radar measurement.',
+        'Review its cited source and the applicable study measurement record before interpretation.'));
     }
   });
 }
@@ -589,9 +589,29 @@ const dialogCopy = {
     body: '<ul><li><strong>Pending is not zero.</strong> Empty results mean that a file is missing or has not passed the interface checks.</li><li><strong>Radar measures line-of-sight motion.</strong> A vertical sinking rate needs a justified conversion. A positive or negative value is not interpreted without its sign convention.</li><li><strong>Short records need care.</strong> Seasonal movement, atmospheric errors and the stable reference can influence a fitted rate.</li><li><strong>Data quality varies.</strong> Farming and construction can reduce coherence. Product corrections and release status must be checked.</li><li><strong>Location does not establish cause.</strong> A nearby farm or city does not prove responsibility for ground movement.</li><li><strong>Radar does not observe wildlife.</strong> Any mention of habitat comes from outside sources, not from this measurement.</li><li><strong>Mines move too.</strong> Open-pit mines and their waste piles shift for reasons unrelated to groundwater. We mark the ones we found.</li><li><strong>Blue patches are probably not real uplift.</strong> Rising values, such as on the Willcox Playa floor, most likely come from wet or swelling soil changing the radar signal. We have not verified this.</li><li><strong>Gaps are not zeros.</strong> Where the map is empty, the radar could not measure reliably (over plowed fields, for example). That does not mean the ground is stable.</li><li><strong>A study box is not a sinking zone.</strong> Outlines show the areas the team chose to investigate.</li></ul>'
   },
   sources: {
-    title: 'Data, sources & research',
-    body: "<p><strong>Project observations</strong> are derived from the team's exported Sentinel-1 and provisional NISAR products, study-area GeoJSON, and comparison files. Published research below supports the regional groundwater and agricultural context; it must not be mistaken for pixel-level cause attribution.</p>\n<h3>Study data &amp; institutional sources</h3>\n<ul>\n<li><a href=\"https://github.com/mansi200304/NASA-Hackathon\" target=\"_blank\" rel=\"noopener noreferrer\">Sinkronized project repository, exported data and analysis code</a></li>\n<li><a href=\"https://nisar.jpl.nasa.gov/\" target=\"_blank\" rel=\"noopener noreferrer\">NASA–ISRO NISAR mission documentation</a></li>\n<li><a href=\"https://search.asf.alaska.edu/\" target=\"_blank\" rel=\"noopener noreferrer\">Alaska Satellite Facility (ASF), radar product catalogue</a></li>\n<li><a href=\"https://www.azwater.gov/hydrology/field-services/land-subsidence-arizona\" target=\"_blank\" rel=\"noopener noreferrer\">Arizona Department of Water Resources (ADWR), land subsidence monitoring</a></li>\n<li><a href=\"https://www.azwater.gov/gis\" target=\"_blank\" rel=\"noopener noreferrer\">ADWR GIS data and radar comparison sources</a></li>\n</ul>\n<h3>Scientific evidence for groundwater pumping and agricultural demand</h3>\n<ol>\n<li><a href=\"https://www.usgs.gov/water-science-school/science/land-subsidence\" target=\"_blank\" rel=\"noopener noreferrer\">USGS, Land Subsidence</a> — explains aquifer compaction from groundwater withdrawal and permanent storage loss.</li>\n<li><a href=\"https://www.azwater.gov/find-info-on/how-do-i/willcox-groundwater-basin\" target=\"_blank\" rel=\"noopener noreferrer\">ADWR, Willcox Groundwater Basin</a> — official 2022 estimates: agriculture 155,805 acre-feet; industry 11,268; municipal 910. ADWR cannot attribute water-level decline to an individual user.</li>\n<li><a href=\"https://doi.org/10.3390/geosciences13060176\" target=\"_blank\" rel=\"noopener noreferrer\">Job, C., Ochoa, C. G., Jarvis, W. T., &amp; Kennedy, R. E. (2023), Geosciences, 13(6), 176</a> — Willcox groundwater records, agricultural land-cover growth and correlations (2008–2021).</li>\n<li><a href=\"https://doi.org/10.1002/hyp.14757\" target=\"_blank\" rel=\"noopener noreferrer\">Majumdar, S., Smith, R., Conway, B. D., &amp; Lakshmi, V. (2022), Hydrological Processes, 36(11), e14757</a> — statewide groundwater-withdrawal estimates and co-occurrence with subsidence, with basin-to-basin variability.</li>\n<li><a href=\"https://doi.org/10.3133/cir1182\" target=\"_blank\" rel=\"noopener noreferrer\">Galloway, D. L., Jones, D. R., &amp; Ingebritsen, S. E. (1999), USGS Circular 1182</a> — foundational report on land subsidence in the United States.</li>\n<li><a href=\"https://azgs.arizona.edu/geohazards/arizona-geohazards-resources/earth-fissures-subsidence\" target=\"_blank\" rel=\"noopener noreferrer\">Arizona Geological Survey, Earth Fissures &amp; Subsidence</a> — regional hazards and mapped fissures.</li>\n</ol>\n<h3>Map context</h3>\n<p>Satellite and terrain basemaps are served by Esri; attribution appears on the map. Mapping software is Leaflet 1.9.4 (BSD-2-Clause). Basemap images are geographic context—not measured NISAR pixels. Additional region/context layers appear only when their data exports exist. No unverified data-center or habitat causal claims are shown.</p>\n<p><strong>Evidence boundary:</strong> extensive groundwater pumping, including agricultural withdrawals, is a documented cause of subsidence in Arizona. No individual farm, water user or specific location in this map is assigned a cause without matching independent groundwater and geological evidence.</p>"
-
+    title: 'Resources · research, data and code',
+    body: `<p><strong>What supports the story?</strong> The groundwater and farming claims in the Overview come from the agency publications and research papers below. They are historical evidence, not outputs calculated from this team's satellite processing.</p>
+    <h3>Research: groundwater, agriculture and subsidence</h3>
+    <ol class="resource-list">
+      <li><a href="https://www.usgs.gov/water-science-school/science/land-subsidence" target="_blank" rel="noopener noreferrer">USGS · Land Subsidence</a> — Public scientific explanation of groundwater pumping, aquifer compaction and long-term storage loss.</li>
+      <li><a href="https://pubs.usgs.gov/publication/wri874143" target="_blank" rel="noopener noreferrer">Epstein, V. (1987) · Hydrologic and geologic factors affecting land subsidence near Eloy, Arizona</a> — USGS Water-Resources Investigations Report 87-4143; direct measurements of 1.09 m land subsidence from groundwater withdrawal in 1965–1983.</li>
+      <li><a href="https://pubs.usgs.gov/publication/wri004277" target="_blank" rel="noopener noreferrer">Pool, Carruth &amp; Meehan (2001) · Hydrogeology of Picacho Basin, south-central Arizona</a> — USGS Water-Resources Investigations Report 2000-4277; groundwater development, declining water levels, aquifer compaction and fissures.</li>
+      <li><a href="https://www.azwater.gov/find-info-on/how-do-i/willcox-groundwater-basin" target="_blank" rel="noopener noreferrer">Arizona Department of Water Resources · Willcox Groundwater Basin</a> — Official sector water-use estimates for 2022 (agricultural: 155,805 acre-feet; industrial: 11,268; municipal: 910), groundwater overdraft and the limits of assigning decline to specific users.</li>
+      <li><a href="https://www.mdpi.com/2076-3263/13/6/176" target="_blank" rel="noopener noreferrer">Geosciences (2023), 13(6), 176 · A Spatiotemporal Characterization of Water Resource Conditions and Demands in the Willcox Groundwater Basin</a> — Peer-reviewed study associating agricultural expansion, pumping pressure and groundwater declines; DOI: 10.3390/geosciences13060176.</li>
+      <li><a href="https://www.sciencedirect.com/science/article/pii/S0034425722000086" target="_blank" rel="noopener noreferrer">Remote Sensing of Environment (2022) · Mapping land subsidence and aquifer system properties of the Willcox Basin, Arizona</a> — Peer-reviewed InSAR and groundwater-level study linking historical subsidence with excessive groundwater exploitation.</li>
+    </ol>
+    <h3>Data and project methods</h3>
+    <ul>
+      <li><a href="https://github.com/mansi200304/NASA-Hackathon/blob/main/docs/overview_evidence.md" target="_blank" rel="noopener noreferrer">Evidence-to-claim notes, citations and limitations</a></li>
+      <li><a href="https://github.com/mansi200304/NASA-Hackathon" target="_blank" rel="noopener noreferrer">Sinkronized · code and pipeline outputs</a></li>
+      <li><a href="https://nisar.jpl.nasa.gov/" target="_blank" rel="noopener noreferrer">NASA-ISRO NISAR mission information</a></li>
+      <li><a href="https://search.asf.alaska.edu/" target="_blank" rel="noopener noreferrer">Alaska Satellite Facility · SAR data discovery</a></li>
+      <li><a href="https://www.azwater.gov/hydrology/field-services/land-subsidence-arizona" target="_blank" rel="noopener noreferrer">ADWR · Arizona land-subsidence monitoring</a></li>
+      <li><a href="https://www.azwater.gov/gis" target="_blank" rel="noopener noreferrer">ADWR GIS · official subsidence areas and radar products</a></li>
+      <li><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap · land-use reference notes</a></li>
+    </ul>
+    <p><strong>Interpretation:</strong> Groundwater pumping is a documented regional mechanism, and agriculture is a major groundwater-use sector in Willcox. Neither a correlation nor the Sinkronized maps alone can assign an observed pixel to a specific farm, well or other water user.</p>
+    <p>Satellite/terrain basemap imagery is served by Esri, with attribution on the map. Mapping software: Leaflet 1.9.4 (BSD-2-Clause). Basemap imagery is geographic context, not a radar measurement.</p>`
   }
 };
 function openDialog(key) {
@@ -614,7 +634,6 @@ $('#toggle-layers').addEventListener('click', () => {
 $('#show-all').addEventListener('click', showAll);
 $('#fit-study').addEventListener('click', fitSelected);
 if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-  const steps = document.querySelectorAll('.overview-steps > div');
   const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       if (!entry.isIntersecting) return;
@@ -622,7 +641,9 @@ if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-mot
       observer.unobserve(entry.target);
     });
   }, { threshold: 0.1 });
-  steps.forEach(step => { step.classList.add('overview-step-in'); observer.observe(step); });
+  document.querySelectorAll('.overview-steps > div').forEach(step => {
+    step.classList.add('overview-step-in'); observer.observe(step);
+  });
 }
 document.querySelectorAll('[data-basemap]').forEach(button => button.addEventListener('click', () => {
   if (!map) return;
