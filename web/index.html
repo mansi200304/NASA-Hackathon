@@ -32,27 +32,53 @@
     <div class="overview-topline"><span>ARIZONA / EARTH OBSERVATION</span><span>AN INDEPENDENT FIELD ATLAS &nbsp;·&nbsp; 2026</span></div>
     <div class="overview-hero">
       <div class="overview-copy">
-        <p class="overview-kicker"><span class="status-dot" aria-hidden="true"></span> UNDERSTANDING A LANDSCAPE IN MOTION</p>
-        <h1 id="overview-title">Arizona is sinking.<em>The evidence is beneath the surface.</em></h1>
-        <p class="overview-lede">When groundwater is withdrawn, underground sediments can compact and the land above can move. Satellites help reveal that movement—even when it is too slow to see on the ground.</p>
-        <p class="overview-subcopy">Sinkronized brings satellite radar observations, Arizona water-agency comparisons and uncertainty into one place. Explore what we can measure, where the evidence is still limited, and why that matters.</p>
+        <p class="overview-kicker"><span class="status-dot" aria-hidden="true"></span> OUR STORY / WHY WE BUILT SINKRONIZED</p>
+        <h1 id="overview-title">Arizona is our home.<em>What happens beneath it matters.</em></h1>
+        <p class="overview-lede">For us, Arizona is more than a place on a map. It is where we live, learn and imagine our future. Its desert landscapes, expanding cities and agricultural communities are connected by something most of us rarely see: groundwater.</p>
+        <p class="overview-story">We began with a question that felt close to home. <strong>What happens when the land itself starts to change, slowly enough that most people never notice?</strong> In some places, withdrawing groundwater can compact the sediments below, gradually lowering the ground above. Those changes can put roads, canals, wells and buildings at risk.</p>
+        <p class="overview-story">The measurements exist, but they are often buried in technical datasets, complex maps and scientific reports. People living with the consequences deserve a clearer way to understand what is happening—and what is still uncertain.</p>
+        <div class="overview-mission">
+          <span class="overview-mission-label">WHY WE CREATED THIS</span>
+          <p>We built <strong>Sinkronized</strong> to turn satellite observations into an understandable picture of Arizona’s changing ground. By combining radar measurements from Sentinel-1 and NISAR with comparisons to Arizona water-agency research, we can explore <strong>where movement is observed, how it changes over time and how much confidence we should place in the evidence.</strong></p>
+          <p>Our goal is not to blame any community, farm or development. It is to make careful science more accessible—so more people can ask better questions about the ground and water we all depend on.</p>
+        </div>
         <div class="overview-actions">
           <a class="overview-primary" href="#atlas">Explore the interactive map <span aria-hidden="true">↗</span></a>
-          <button type="button" class="overview-secondary" data-dialog="method">How does radar see sinking?</button>
+          <a class="overview-story-link" href="#overview-purpose">See who this helps <span aria-hidden="true">↓</span></a>
         </div>
-        <details class="overview-science-note">
-          <summary>Why two radar viewing directions matter <span aria-hidden="true">+</span></summary>
-          <p>Satellites make ascending (generally south-to-north) and descending (generally north-to-south) passes. Because the radar looks obliquely at the ground, each pass measures movement in a different direction. Comparing the two can strengthen confidence and help separate motion components, but it still requires careful reference and geometry checks.</p>
-        </details>
-        <p class="overview-caveat">Radar reports movement along its viewing direction; an observed rate is not automatically a vertical sinking rate or proof of its cause.</p>
+        <p class="overview-caveat">The map reports radar line-of-sight motion, not automatically vertical sinking. A nearby activity does not establish what caused an observed change.</p>
       </div>
       <div class="overview-visual" aria-hidden="true">
         <div class="overview-rings"><span class="overview-ring overview-ring-1"></span><span class="overview-ring overview-ring-2"></span><span class="overview-ring overview-ring-3"></span>
           <img src="./assets/logo-512.png" alt="" width="300" height="300">
           <span class="overview-orbit-dot"></span>
         </div>
-        <span class="overview-visual-label">SONORAN BASIN / SATELLITE OBSERVATION</span>
+        <span class="overview-visual-label">ARIZONA / ONE SHARED LANDSCAPE</span>
       </div>
+    </div>
+    <section id="overview-purpose" class="overview-purpose" aria-labelledby="purpose-title">
+      <div class="overview-purpose-header">
+        <div><span class="overview-mission-label">WHY THIS MATTERS</span><h2 id="purpose-title">A clearer view of the ground we share.</h2></div>
+        <p>Making the evidence understandable helps people see where closer investigation, monitoring and better-informed decisions may be needed.</p>
+      </div>
+      <div class="overview-audiences">
+        <article><span>01 / COMMUNITIES</span><h3>Understand your surroundings</h3><p>Residents and students can see which places have been studied, what movement the satellites detected and where measurements are incomplete.</p></article>
+        <article><span>02 / PLANNING &amp; WATER</span><h3>See patterns worth investigating</h3><p>Planners, engineers and water managers can put ground-motion evidence alongside longer-term context when thinking about infrastructure and groundwater management.</p></article>
+        <article><span>03 / RESEARCH &amp; CONSERVATION</span><h3>Ask more precise questions</h3><p>Researchers and conservation groups can explore measured trends and uncertainty while recognizing that radar cannot establish causes or directly measure habitat impacts.</p></article>
+      </div>
+    </section>
+    <div class="overview-evidence">
+      <div class="overview-evidence-copy">
+        <span class="overview-mission-label">WHAT WE ARE STUDYING</span>
+        <h2>Not just whether the land moves. <em>How confidently we can say so.</em></h2>
+        <p>We investigate ground movement in the study areas supplied by our team’s current dataset. Satellite radar reveals changes along its viewing direction; real acquisition dates, stable reference areas, data quality and comparisons with Arizona Department of Water Resources research help us interpret those signals.</p>
+        <p>We distinguish the longer Sentinel-1 record from newer, preliminary NISAR measurements. Where the evidence is weak or missing, the website says so instead of presenting a guess as a result.</p>
+      </div>
+      <details class="overview-science-note">
+        <summary>How do two satellite viewing directions help? <span aria-hidden="true">+</span></summary>
+        <p>Satellites make ascending (generally south-to-north) and descending (generally north-to-south) passes, observing the land from different slanted angles. Comparing these perspectives can strengthen confidence and help separate some components of motion, but one view alone cannot establish a unique vertical sinking rate.</p>
+        <button type="button" class="overview-secondary" data-dialog="method">Read how the measurements work</button>
+      </details>
     </div>
     <div class="overview-steps" aria-label="Explore the evidence in three steps">
       <div><span>01 / LOCATE</span><p>Choose a study area drawn from the team’s latest dataset—not a fixed list.</p></div>
