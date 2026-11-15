@@ -156,6 +156,8 @@ test('NISAR summary: the real file validates; any bad or missing field hides the
   assert.equal(bad('farmland.auc_hh_spread', 0.2), null);
   assert.equal(bad('farmland.figure', 'x/../y.png'), null);
   assert.equal(bad('farmland.rate_diff_lo', null), null);
+  assert.equal(bad('directions.asc_mm', 'x'), null);
+  assert.equal(bad('directions.span_days', null), null);
   assert.equal(cleanNisar(null), null);
   assert.equal(cleanNisar({}), null);
 });

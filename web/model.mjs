@@ -136,6 +136,13 @@ const nisarArea = a => {
   const area = { name: teamText(a.name, 60), s1: nz(a.s1_rate_cm_yr, 0, 50), years: nz(a.years, 0, 50), date: validDate(a.date) ? a.date : null, chance: nz(a.chance_at_one_year, 0, 1) };
   return Object.values(area).every(v => v !== null) ? area : null;
 };
+const cleanDirections = x => {
+  if (!x || typeof x !== 'object') return null;
+  const o = { span: nz(x.span_days, 1, 1000), asc: nz(x.asc_mm, -1000, 1000), ascLo: nz(x.asc_lo, -1000, 1000), ascHi: nz(x.asc_hi, -1000, 1000),
+    desc: nz(x.desc_mm, -1000, 1000), descLo: nz(x.desc_lo, -1000, 1000), descHi: nz(x.desc_hi, -1000, 1000), exp: nz(x.expected_mm, -1000, 1000),
+    ew: nz(x.ew_mm, -1000, 1000), ewLo: nz(x.ew_lo, -1000, 1000), ewHi: nz(x.ew_hi, -1000, 1000) };
+  return Object.values(o).every(v => v !== null) ? o : null;
+};
 const cleanFarmland = f => {
   if (!f || typeof f !== 'object') return null;
   const o = {
@@ -160,8 +167,9 @@ export function cleanNisar(raw) {
     overlap: { r: nz(o.r, -1, 1) },
     willcox: nisarArea(c.willcox), eloy: nisarArea(c.eloy),
     figure: typeof raw.figure === 'string' && /^[A-Za-z0-9_.-]+\.png$/.test(raw.figure) ? raw.figure : null,
-    farmland: cleanFarmland(raw.farmland)
+    farmland: cleanFarmland(raw.farmland),
+    directions: cleanDirections(raw.directions)
   };
-  const ok = [out.pattern, out.weather, out.sinking, out.playa, out.overlap].every(g => Object.values(g).every(v => v !== null)) && out.willcox && out.eloy && out.figure && out.farmland;
+  const ok = [out.pattern, out.weather, out.sinking, out.playa, out.overlap].every(g => Object.values(g).every(v => v !== null)) && out.willcox && out.eloy && out.figure && out.farmland && out.directions;
   return ok ? out : null;
 }

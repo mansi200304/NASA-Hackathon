@@ -855,6 +855,8 @@ function renderNisar(n) {
     's-nisar': sign(n.sinking.nisar), 's-s1': sign(n.sinking.s1), net: sign(n.playa.net), trend: sign(n.playa.trend)
   };
   const f = n.farmland, abs1 = x => one(Math.abs(x)), mn = x => (x < 0 ? '\u2212' : '') + one(Math.abs(x));
+  const dr = n.directions, dm = x => (x < 0 ? '−' : '') + one(Math.abs(x));
+  Object.assign(values, { span: String(dr.span), asc: dm(dr.asc), 'asc-lo': dm(dr.ascLo), 'asc-hi': dm(dr.ascHi), desc: dm(dr.desc), 'desc-lo': dm(dr.descLo), 'desc-hi': dm(dr.descHi), exp: dm(dr.exp), ew: dm(dr.ew), 'ew-lo': dm(dr.ewLo), 'ew-hi': dm(dr.ewHi) });
   Object.assign(values, {
     dates: String(f.dates), 'box-pct': one(f.boxPct), 'sink-pct': one(f.sinkPct), times: one(f.times), acres: new Intl.NumberFormat('en-US').format(Math.round(f.acres / 100) * 100),
     'rate-diff': abs1(f.diff), 'rate-lo': mn(f.lo), 'rate-hi': mn(f.hi), 'crop-sink': String(Math.round(f.cropSink)), 'desert-sink': String(Math.round(f.desertSink)),

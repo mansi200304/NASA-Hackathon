@@ -2,12 +2,24 @@
 Sign convention d = -(lambda/4pi)*phi is the AGENTS.md assumption and is UNVERIFIED against the product spec."""
 import h5py, numpy as np
 from pyproj import Transformer
+import contextlib
+
+
+@contextlib.contextmanager
+def _h5(path):
+    """Open `path`, or reuse an already-open h5py.File (e.g. one backed by HTTP range requests, see gcov_remote.py)."""
+    if isinstance(path, h5py.File):
+        yield path
+    else:
+        with h5py.File(path, "r") as f:
+            yield f
+
 GRID = "science/LSAR/GUNW/grids/frequencyA/"
 C = 299792458.0
 
 def read_window(path, lonlat_box, subtract_iono=True, coh_min=0.4, dem=None):
     """lonlat_box = (west, south, east, north). Returns dict with arrays on the 80 m UTM grid cropped to the box."""
-    with h5py.File(path, "r") as f:
+    with _h5(path) as f:
         g = f[GRID + "unwrappedInterferogram/HH"]
         epsg = int(g["projection"][()])
         x, y = g["xCoordinates"][:], g["yCoordinates"][:]

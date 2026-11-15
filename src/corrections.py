@@ -6,6 +6,7 @@ import os, numpy as np, h5py, rasterio
 from rasterio.windows import from_bounds
 from scipy.ndimage import map_coordinates
 from pyproj import Transformer
+from gunw import _h5
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RG = "science/LSAR/GUNW/metadata/radarGrid/"
 GEOID_OFFSET_M = -28.0
@@ -61,7 +62,7 @@ def heights_on_grid(dem, epsg, x, y):
 
 def screen_on_grid(path, which, x, y, h):
     """Phase screen (radians) for 'hydro' | 'wet' | 'tide' at pixel coordinates x (1-D), y (1-D) and heights h (2-D, ellipsoidal metres)."""
-    with h5py.File(path, "r") as f:
+    with _h5(path) as f:
         g = f[RG]
         xc, yc, hz = g["xCoordinates"][:], g["yCoordinates"][:], g["heightAboveEllipsoid"][:]
         dx, dy = xc[1] - xc[0], yc[1] - yc[0]

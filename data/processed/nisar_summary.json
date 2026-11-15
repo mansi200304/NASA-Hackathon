@@ -58,6 +58,19 @@
   }
  },
  "figure": "nisar_vs_sentinel1_willcox.png",
+ "directions": {
+  "span_days": 108,
+  "asc_mm": -4.6,
+  "asc_lo": -7.31,
+  "asc_hi": -2.19,
+  "desc_mm": -6.16,
+  "desc_lo": -13.68,
+  "desc_hi": 0.15,
+  "expected_mm": -6.56,
+  "ew_mm": 1.56,
+  "ew_lo": -5.68,
+  "ew_hi": 9.83
+ },
  "farmland": {
   "crop_share_box_pct": 2.1,
   "crop_share_sinking_pct": 7.4,

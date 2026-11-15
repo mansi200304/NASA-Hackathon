@@ -10,6 +10,7 @@ conf = json.load(open(f"{P}/nisar_confirm.json"))
 noise = json.load(open(f"{P}/cache/nisar_noise_test.json"))["variants"]
 b, a = noise["iono only"], noise["+hydro+wet"]
 gc = json.load(open(f"{P}/gcov_farmland.json"))
+td = json.load(open(f"{P}/nisar_two_directions.json"))
 wx, eloy = json.load(open(f"{P}/stack_willcox_128D.json")), json.load(open(f"{P}/stack_eloy_77A.json"))
 
 
@@ -29,6 +30,9 @@ out = dict(
     record=dict(willcox=dict(start=wx["dates"][0], end=wx["dates"][-1], dates=len(wx["dates"]), track=wx["track"]),
                 eloy=dict(start=eloy["dates"][0], end=eloy["dates"][-1], dates=len(eloy["dates"]), track=eloy["track"])),
     figure="nisar_vs_sentinel1_willcox.png",
+    directions=dict(span_days=td["span_days"], asc_mm=td["sinking_blocks"]["asc_mm"], asc_lo=td["sinking_blocks"]["asc_ci95"][0], asc_hi=td["sinking_blocks"]["asc_ci95"][1],
+                    desc_mm=td["sinking_blocks"]["desc_mm"], desc_lo=td["sinking_blocks"]["desc_ci95"][0], desc_hi=td["sinking_blocks"]["desc_ci95"][1],
+                    expected_mm=td["sinking_blocks"]["expected_from_s1_mm"], ew_mm=td["east_west_check"]["asc_minus_desc_mm"], ew_lo=td["east_west_check"]["ci95"][0], ew_hi=td["east_west_check"]["ci95"][1]),
     farmland=dict(
         crop_share_box_pct=round(gc["composition"]["cropland"]["share_box"] * 100, 1), crop_share_sinking_pct=round(gc["composition"]["cropland"]["share_sinking"] * 100, 1),
         enrichment=gc["cropland_enrichment"], crop_acres_sinking=gc["composition"]["cropland"]["acres_sinking"],
