@@ -138,3 +138,15 @@ dataset provenance. No agency affiliation is implied.
 
 This is the first UI for team review. It does not deploy GitHub Pages or change the radar processing pipeline. For eventual Pages hosting, publish an artifact containing web/ and data/processed/ together so relative paths remain valid. Keep raw HDF5 and large rasters out of Git.
 
+
+## Arizona origin story and the evidence behind it
+
+This UI opens with a short story from the Arizona-based team: why local land and groundwater matter, why satellite measurements should be understandable outside research labs, and how the atlas helps residents, planners, groundwater managers and researchers interpret mapped change. The Overview contains source-linked historical evidence cards:
+
+- USGS aquifer compaction science: groundwater withdrawal can lower the surface and diminish storage capacity in compressible aquifer systems.
+- USGS/Epstein (1987): **1.09 m** historical land subsidence at a monitored site near Eloy during **1965–1983**, attributed to groundwater withdrawal. This is **not** a new project measurement.
+- ADWR Willcox water-use estimates: **155,805 acre-feet** agricultural use in **2022**. A peer-reviewed 2023 *Geosciences* study finds an association between agricultural expansion and declining groundwater levels in Willcox. These are basin-level results, **not a claim about an individual well or map pixel**.
+
+Read `docs/overview_evidence.md` for the research bibliography, claim-to-source mapping and limitations. The on-site **Resources** dialog links to USGS, ADWR, peer-reviewed papers, SAR data and the source code.
+
+The new narrative content preserves the pipeline-driven study list and the recently added cumulative-displacement animation. The field-note drawer explains data interpretation without inventing numeric pixel measurements. The satellite and terrain basemaps remain; dark is removed from the switcher. 
