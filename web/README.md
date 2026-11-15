@@ -41,8 +41,8 @@ All paths below are relative to data/processed/. Refresh the page after adding f
 | timeseries_\<slug\>.json | Details and chart for the matching study slug. |
 | rate_\<slug\>.json + rate_\<slug\>.png | Georeferenced colour image for the matching study slug. |
 | adwr_subsidence.geojson | Optional official subsidence context. |
-| datacenters.geojson | Optional compiled public-source points. |
-| habitat.geojson | Optional habitat context. |
+| rate_sentinel1_descending / _ascending, rate_nisar_willcox / _eloy (.json + .png) | Region-wide rate images, listed as layers (NISAR ones are provisional and start hidden). |
+| mines_excluded.geojson, checked_flat.geojson | Marker layers: probable mines (not groundwater) and places checked with no sinking found. |
 
 Missing optional files are normal. They produce pending states and disabled controls. Malformed files produce Review file, not a zero result.
 
@@ -71,8 +71,7 @@ is an independent sensor over a longer period. The comparison links to the
 team's method and explicitly preserves the weak Eloy result.
 
 Official ADWR boundaries load from `adwr_subsidence.geojson`, with unfilled
-outlines and source/period popups. Data centers and habitat remain pending
-when their exports are absent. Each study's confirmation is visible, with
+outlines and source/period popups. Each study's confirmation is visible, with
 single-direction results marked unconfirmed. When exported, stable-ground
 observations appear as a dashed slate chart line and a table column; null
 gaps remain gaps. The fitted rate and full pipeline uncertainty stay intact.
@@ -92,7 +91,11 @@ Low-coherence/no-data pixels must be transparent in the exported PNG. This UI ca
 
 ### Context GeoJSON
 
-Use a WGS84 FeatureCollection. Data-center popups read name, status, water_use and source_url; a missing water-use value says Not published. Source links accept only HTTP(S). Imported text is inserted as text, never HTML. The current UI does not calculate exposure areas, counts, water use or causal responsibility.
+Use a WGS84 FeatureCollection. Marker popups read name plus reason or note. Source links accept only HTTP(S). Imported text is inserted as text, never HTML. The current UI does not calculate exposure areas, counts, water use or causal responsibility.
+
+### Plain-language insights
+
+`timeseries_<slug>.json` carries an `insights` block (summary, two confidence ratings, and headed paragraphs) written for readers who are not experts. The panel opens with it under "In plain terms"; `cleanInsights()` in `model.mjs` drops anything malformed. Confidence ratings follow fixed rules in `src/insights.py`. Data centers and habitat are no longer layers: there is no sourced data for them.
 
 ## Design
 

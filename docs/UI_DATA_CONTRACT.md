@@ -23,7 +23,7 @@ The files below already pass the validators in `web/model.mjs` on the `ui/sonora
 | `mines_excluded.geojson` | Points where the signal is probably mining, not groundwater (`name`, `reason`, `source`) |
 | `checked_flat.geojson` | Points we checked and found no sinking (`name`, `median_rate_cm_yr`, `p5_rate_cm_yr`) |
 
-Now provided: `adwr_subsidence.geojson` (the 32 official ADWR subsidence-area polygons, May 2026; the existing ADWR layer picks it up) and `adwr_rate_cm_yr` in each time series (ADWR's own Sentinel-1 deformation raster averaged over our sinking pixels). Also in each series: `adwr_rs2_rate_cm_yr` (ADWR RADARSAT-2, independent sensor), `adwr_feature`, `adwr_comparison`, `adwr_note`. Still not provided, so keep the "Pending" state: `datacenters.geojson`, `habitat.geojson`.
+Now provided: `adwr_subsidence.geojson` (the 32 official ADWR subsidence-area polygons, May 2026; the existing ADWR layer picks it up) and `adwr_rate_cm_yr` in each time series (ADWR's own Sentinel-1 deformation raster averaged over our sinking pixels). Also in each series: `adwr_rs2_rate_cm_yr` (ADWR RADARSAT-2, independent sensor), `adwr_feature`, `adwr_comparison`, `adwr_note`. Dropped from scope: data-center and habitat layers (no sourced data; the data-center story belonged to the dropped Buckeye area). The app no longer lists them.
 
 ## 3. Sign and units
 
@@ -53,17 +53,17 @@ Now provided: `adwr_subsidence.geojson` (the 32 official ADWR subsidence-area po
 
 `python src/export_contract.py` rewrites every file above from the processed cubes. Do not edit these files by hand.
 
-## 7. Fields the app does not show yet (recommended before submission)
+## 7. Plain-language insights and what the app shows
 
-The current app validates all files but only shows `rate_cm_yr`, `rate_sigma`, `reference`, `track`, the chart and `confirmation` (map tooltip). These carry the honesty of the story and are worth adding:
+Each `timeseries_<slug>.json` has an `insights` object, written for non-experts (about US grade 7), produced by `src/insights.py` from the study's own numbers:
 
-- `caveats` (list of strings): show in every study panel.
-- `nisar` (object or null, always `"reliable": false`): show with its `status_note`, or leave out. Do not show its rate as a result.
-- `median_rate_cm_yr`, `p5_rate_cm_yr`, `area_km2`: a better headline than the straight-line fit.
-- `ascending_check`: the second-direction number.
-- `stable_ground_displacement`: second chart line, to show measurement noise.
-- `land_use_note` (in `hotspots.geojson`): what is nearby, with its source.
-- Layers: `rate_sentinel1_descending`, `rate_sentinel1_ascending` (cross-check), `rate_nisar_*` (off by default), `mines_excluded.geojson`, `checked_flat.geojson`.
+- `summary`: one or two sentences (total drop over the record, in cm and inches).
+- `confidence`: `where` and `how_fast`, each `high`, `medium` or `low`, from fixed rules (see `src/insights.py`), plus labels.
+- `points`: list of `{heading, text}`: what we found, how sure are we, why is the ground sinking, why it matters, what about NASA's new satellite, good to know.
+
+The app shows `insights` first ("In plain terms"), then the technical panel. Also shown: `rate_sigma_note`, `caveats`, `nisar.status_note`, `land_use_note`, `sign_convention`, `data_release`, the stable-ground chart line, the ADWR comparison and the study `confirmation`.
+
+Region layers listed in the layer panel: `rate_sentinel1_descending` and `_ascending` (hidden by default), `rate_nisar_willcox` and `rate_nisar_eloy` (hidden by default, provisional), `mines_excluded` and `checked_flat` markers (on), plus the ADWR areas. Rate-image JSON carries `sign_convention` and `data_release`, shown as the layer's tooltip.
 
 ## 8. ADWR comparison: how to word it
 

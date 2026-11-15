@@ -26,7 +26,7 @@ See [Track selection and next checkpoint](docs/track_selection.md). Some pairs s
 4. Reference to a stable area.
 5. Deduplicate processing versions, then chain connected acquisition pairs from one track/frame using their actual dates (12- or 24-day pairs in the current catalogue). Fit a rate with uncertainty over the supported interval.
 6. Validate at Eloy against ADWR InSAR rates, then repeat for the other hotspots.
-7. Overlay farmland, data centers and protected areas, and publish an interactive web map.
+7. Overlay ADWR's official subsidence areas, probable mines and places checked with no sinking, and publish an interactive web map.
 
 ## Progress
 

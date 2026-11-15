@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizeSeries, normalizeRate, normalizeHotspots, validateGeoJSON, safeSourceURL, formatNumber } from '../model.mjs';
+import { normalizeSeries, normalizeRate, normalizeHotspots, validateGeoJSON, safeSourceURL, formatNumber, cleanInsights } from '../model.mjs';
 import { readFile } from 'node:fs/promises';
 
 const series = extra => ({ hotspot: 'eloy', units: 'cm', reference: 'Synthetic test reference', dates: ['2026-01-01', '2026-01-13'], displacement: [0, -1], rate_cm_yr: -2, rate_sigma: 0.2, ...extra });
@@ -77,3 +77,20 @@ test('every current pipeline study loads its own supported measurement and raste
   }
 });
 
+test('plain-language insights are optional, text-only and level-checked', async () => {
+  assert.equal(cleanInsights(null), null);
+  assert.equal(cleanInsights({ summary: '   ' }), null);
+  const odd = cleanInsights({ summary: ' Short. ', confidence: { where: 'certain', how_fast: 'low' }, points: [{ heading: 'A', text: 'b' }, { heading: 5, text: 'x' }, { heading: 'C' }, null] });
+  assert.equal(odd.summary, 'Short.'); assert.equal(odd.confidence, null); assert.deepEqual(odd.points, [{ heading: 'A', text: 'b' }]);
+  const ok = cleanInsights({ summary: 'S', confidence: { where: 'high', how_fast: 'low' }, points: [] });
+  assert.equal(ok.confidence.where_label, 'Where it is sinking'); assert.equal(ok.confidence.how_fast, 'low');
+  // every exported study carries usable insights
+  const root = new URL('../../data/processed/', import.meta.url);
+  const areas = normalizeHotspots(JSON.parse(await readFile(new URL('hotspots.geojson', root), 'utf8')));
+  for (const { properties: { slug } } of areas.features) {
+    const series = JSON.parse(await readFile(new URL('timeseries_' + slug + '.json', root), 'utf8'));
+    const ins = cleanInsights(series.insights);
+    assert.ok(ins && ins.confidence && ins.points.length >= 5, slug + ' needs insights');
+    assert.ok(series.sign_convention && series.data_release, slug + ' needs sign convention and data release');
+  }
+});

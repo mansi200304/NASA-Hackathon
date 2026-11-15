@@ -77,3 +77,16 @@ export function safeSourceURL(value) {
   try { const url = new URL(value); return ['https:', 'http:'].includes(url.protocol) ? url.href : null; } catch { return null; }
 }
 export function formatNumber(value) { return isNumber(value) ? new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }).format(value) : 'Pending'; }
+export function cleanInsights(raw) {
+  // Plain-language insights are optional and text-only. Anything malformed is dropped rather than shown.
+  if (!raw || typeof raw.summary !== 'string' || !raw.summary.trim()) return null;
+  const levels = new Set(['high', 'medium', 'low']), c = raw.confidence;
+  const confidence = c && levels.has(c.where) && levels.has(c.how_fast)
+    ? { where: c.where, how_fast: c.how_fast,
+        where_label: typeof c.where_label === 'string' && c.where_label.trim() ? c.where_label : 'Where it is sinking',
+        how_fast_label: typeof c.how_fast_label === 'string' && c.how_fast_label.trim() ? c.how_fast_label : 'How fast' }
+    : null;
+  const points = (Array.isArray(raw.points) ? raw.points : []).filter(p => typeof p?.heading === 'string' && p.heading.trim() && typeof p?.text === 'string' && p.text.trim())
+    .map(p => ({ heading: p.heading.trim(), text: p.text.trim() }));
+  return { summary: raw.summary.trim(), confidence, points };
+}

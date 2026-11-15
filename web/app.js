@@ -1,8 +1,16 @@
-import { normalizeSeries, normalizeRate, normalizeHotspots, validateGeoJSON, safeSourceURL, formatNumber, isNumber } from './model.mjs';
+import { normalizeSeries, normalizeRate, normalizeHotspots, validateGeoJSON, safeSourceURL, formatNumber, isNumber, cleanInsights } from './model.mjs';
 
 const $ = selector => document.querySelector(selector);
 const DATA = new URL('../data/processed/', import.meta.url);
 const COLORS = { rust: '#A64B2A', ink: '#2D2A25', olive: '#52664B', sand: '#E4D9C9', slate: '#626D76' };
+// Region-wide layers and marker sets exported by the pipeline (data/processed/). Rasters start hidden; NISAR is provisional.
+const REGION_LAYERS = [
+  ['rate_sentinel1_descending', 'Sentinel-1 sinking rate, 2016–2026', false],
+  ['rate_sentinel1_ascending', 'Sentinel-1 cross-check, opposite direction', false],
+  ['rate_nisar_willcox', 'NISAR, Willcox box · provisional', false],
+  ['rate_nisar_eloy', 'NISAR, Eloy box · provisional, under 4 months', false]
+];
+const MARKER_LAYERS = [['mines_excluded', 'Probable mines (not groundwater)'], ['checked_flat', 'Checked: no sinking found']];
 const state = { selected: null, slugs: [], series: new Map(), rates: new Map(), layers: new Map(), outlines: new Map(), base: 'satellite' };
 let map, outlineGroup;
 const el = (tag, className, text) => {
@@ -104,6 +112,27 @@ function makeChart(series) {
   table.append(head, body); details.append(table); wrap.append(details);
   return wrap;
 }
+function renderInsights(root, series) {
+  const ins = cleanInsights(series?.insights);
+  if (!ins) return;
+  const box = el('section', 'insights');
+  box.append(el('h2', 'insights-title', 'In plain terms'), el('p', 'insights-summary', ins.summary));
+  if (ins.confidence) {
+    const row = el('div', 'confidence-row');
+    [[ins.confidence.where_label, ins.confidence.where], [ins.confidence.how_fast_label, ins.confidence.how_fast]].forEach(([label, level]) => {
+      const pill = el('span', 'confidence-pill level-' + level);
+      pill.append(el('small', '', label), el('strong', '', 'Confidence: ' + level));
+      row.append(pill);
+    });
+    box.append(row);
+  }
+  ins.points.forEach(point => {
+    const item = el('div', 'insight-point');
+    item.append(el('h3', '', point.heading), el('p', '', point.text));
+    box.append(item);
+  });
+  root.append(box);
+}
 function renderDetails() {
   const feature = state.hotspots.features.find(f => f.properties.slug === state.selected);
   const p = feature.properties;
@@ -117,6 +146,7 @@ function renderDetails() {
   kicker.append(el('span', '', (p.county || 'Arizona') + ', Arizona'), el('span', '', 'Study ' + String(state.slugs.indexOf(state.selected) + 1).padStart(2, '0')));
   root.append(kicker, el('h1', '', p.name), el('p', 'story-name', p.tagline));
   if (p.confirmation) root.append(el('p', 'confirmation-chip' + (p.confirmation === 'single look direction' ? ' unconfirmed' : ''), p.confirmation === 'single look direction' ? 'Unconfirmed · ' + p.confirmation : p.confirmation));
+  renderInsights(root, series);
   const hasRate = series && isNumber(series.rate_cm_yr);
   const metric = el('section', 'metric' + (hasRate ? '' : ' pending'));
   metric.append(el('p', 'metric-label', 'Reported displacement rate · line of sight'));
@@ -272,7 +302,7 @@ function renderLayerControls() {
     input.id = 'layer-' + key;
     const statusLabel = ready ? '' : config.status === 'missing' || config.status === 'loading' ? 'Pending' : 'Review file';
     label.append(input, el('span', 'layer-title', config.name), el('span', 'layer-state', statusLabel));
-    if (config.error) label.title = config.error;
+    if (config.error) label.title = config.error; else if (config.note) label.title = config.note;
     row.append(label);
     input.addEventListener('change', () => {
       config.visible = input.checked;
@@ -286,7 +316,8 @@ function renderLayerControls() {
       opacity.addEventListener('input', () => {
         config.opacity = Number(opacity.value) / 100;
         if (key === 'rate') state.rateImage?.setOpacity(config.opacity);
-        else config.layer?.setStyle({ opacity: config.opacity, fillOpacity: key === 'adwr_subsidence' ? 0 : config.opacity * 0.15 });
+        else if (config.layer?.setOpacity) config.layer.setOpacity(config.opacity);
+        else config.layer?.setStyle({ opacity: config.opacity, fillOpacity: key === 'adwr_subsidence' ? 0 : MARKER_LAYERS.some(l => l[0] === key) ? config.opacity * 0.8 : config.opacity * 0.15 });
       });
       opacityWrap.append(el('span', '', 'Opacity'), opacity); row.append(opacityWrap);
     }
@@ -339,11 +370,11 @@ function updateRateLayer() {
   renderLayerControls();
 }
 function makeOverlay(raw, key) {
-  const color = key === 'habitat' ? COLORS.olive : key === 'datacenters' ? COLORS.ink : COLORS.rust;
+  const color = key === 'checked_flat' ? COLORS.olive : key === 'mines_excluded' ? COLORS.slate : COLORS.rust;
   return L.geoJSON(raw, {
     bubblingMouseEvents: false,
     style: { color, weight: 1.3, fillOpacity: key === 'adwr_subsidence' ? 0 : 0.12, opacity: 0.8 },
-    pointToLayer: (feature, latlng) => L.circleMarker(latlng, { radius: 5, color, weight: 1.5, fillColor: color, fillOpacity: feature.properties?.status === 'planned' ? 0 : 0.8 }),
+    pointToLayer: (feature, latlng) => L.circleMarker(latlng, { radius: 5, color, weight: 1.5, fillColor: color, fillOpacity: 0.8 }),
     onEachFeature: (feature, layer) => {
       const p = feature.properties || {};
       const popup = el('div');
@@ -352,10 +383,8 @@ function makeOverlay(raw, key) {
         if (p.period) popup.append(el('p', '', p.period));
         if (p.source) popup.append(el('p', '', p.source));
       }
-      if (key === 'datacenters') {
-        popup.append(el('p', '', 'Compiled public-source location. Status: ' + (p.status || 'unknown')));
-        popup.append(el('p', '', 'Water use: ' + (p.water_use ?? 'Not published')));
-      }
+      if (key === 'mines_excluded' && p.reason) popup.append(el('p', '', p.reason));
+      if (key === 'checked_flat' && p.note) popup.append(el('p', '', p.note + (isNumber(p.median_rate_cm_yr) ? ' · median ' + formatNumber(p.median_rate_cm_yr) + ' cm/yr' : '')));
       const source = safeSourceURL(p.source_url);
       if (source) { const a = el('a', '', 'Source'); a.href = source; a.target = '_blank'; a.rel = 'noopener noreferrer'; popup.append(a); }
       layer.bindPopup(popup);
@@ -365,15 +394,15 @@ function makeOverlay(raw, key) {
 const dialogCopy = {
   method: {
     title: 'How we measure ground motion',
-    body: '<p>Satellite radar observes the distance between a satellite and the ground. Comparing repeated passes can reveal motion along that viewing direction.</p><ol><li>Check valid pixels, coherence and the correction layers in each NISAR product.</li><li>Convert corrected phase to distance using the product wavelength and verified sign convention.</li><li>Reference each observation to a stable area, then build a connected time series on one track.</li><li>Fit a rate, estimate uncertainty and compare with ADWR observations over a comparable area and period.</li></ol><p>This first interface reads exported results. It does not calculate a rate from a coloured image. Tracks, dates and release status are displayed only when supplied with the result.</p>'
+    body: '<p>A satellite sends a radar pulse down and times the echo, so it knows how far away the ground is. Flying over the same spot again and again, it can tell when the ground has moved closer or farther by a few millimetres.</p><ol><li><strong>Compare two passes.</strong> If the ground moved between two passes, the radar waves return slightly out of step. That shift tells us how far it moved.</li><li><strong>Add up many pairs.</strong> One pair is noisy, because moisture in the air and the upper atmosphere also change the signal. Chaining many pairs over years lets steady sinking add up while random noise does not.</li><li><strong>Two satellites.</strong> Sentinel-1 has flown since 2016, so it gives a ten-year trend. NASA-ISRO NISAR started in late 2025, so its record is still short. We show the Sentinel-1 trend and mark NISAR as preliminary.</li><li><strong>Two viewing directions.</strong> Satellites look at the ground from the east or from the west. When both agree, the sinking is much more likely to be real.</li><li><strong>Check against the official record.</strong> We compare our numbers with the radar results the Arizona Department of Water Resources publishes itself.</li></ol><p>We removed the effects of the Earth\u2019s tides and of the upper atmosphere. We did not remove water vapour in the lower atmosphere, which is a main source of the remaining noise. Numbers are measured along the satellite\u2019s slanted view, not straight down.</p>'
   },
   limits: {
     title: 'Read the map with its limits',
-    body: '<ul><li><strong>Pending is not zero.</strong> Empty results mean that a file is missing or has not passed the interface checks.</li><li><strong>Radar measures line-of-sight motion.</strong> A vertical sinking rate needs a justified conversion. A positive or negative value is not interpreted without its sign convention.</li><li><strong>Short records need care.</strong> Seasonal movement, atmospheric errors and the stable reference can influence a fitted rate.</li><li><strong>Data quality varies.</strong> Farming and construction can reduce coherence. Product corrections and release status must be checked.</li><li><strong>Location does not establish cause.</strong> A nearby farm, city or data center does not prove responsibility for ground movement.</li><li><strong>Habitat is a separate layer.</strong> Radar does not observe wildlife.</li><li><strong>A study box is not a sinking zone.</strong> Outlines show the areas the team chose to investigate.</li></ul>'
+    body: '<ul><li><strong>Pending is not zero.</strong> Empty results mean that a file is missing or has not passed the interface checks.</li><li><strong>Radar measures line-of-sight motion.</strong> A vertical sinking rate needs a justified conversion. A positive or negative value is not interpreted without its sign convention.</li><li><strong>Short records need care.</strong> Seasonal movement, atmospheric errors and the stable reference can influence a fitted rate.</li><li><strong>Data quality varies.</strong> Farming and construction can reduce coherence. Product corrections and release status must be checked.</li><li><strong>Location does not establish cause.</strong> A nearby farm or city does not prove responsibility for ground movement.</li><li><strong>Radar does not observe wildlife.</strong> Any mention of habitat comes from outside sources, not from this measurement.</li><li><strong>Mines move too.</strong> Open-pit mines and their waste piles shift for reasons unrelated to groundwater. We mark the ones we found.</li><li><strong>Blue patches are probably not real uplift.</strong> Rising values, such as on the Willcox Playa floor, most likely come from wet or swelling soil changing the radar signal. We have not verified this.</li><li><strong>Gaps are not zeros.</strong> Where the map is empty, the radar could not measure reliably (over plowed fields, for example). That does not mean the ground is stable.</li><li><strong>A study box is not a sinking zone.</strong> Outlines show the areas the team chose to investigate.</li></ul>'
   },
   sources: {
     title: 'Data, context & code',
-    body: '<p>Study extents are defined by the project. Context layers are shown only when their source files are available; missing layers are not replaced with invented features.</p><ul><li><a href=\"https://github.com/mansi200304/NASA-Hackathon\" target=\"_blank\" rel=\"noopener noreferrer\">Project repository and processing code</a></li><li><a href=\"https://nisar.jpl.nasa.gov/\" target=\"_blank\" rel=\"noopener noreferrer\">NASA / ISRO NISAR mission</a></li><li><a href=\"https://search.asf.alaska.edu/\" target=\"_blank\" rel=\"noopener noreferrer\">Alaska Satellite Facility data search</a></li><li><a href=\"https://www.azwater.gov/hydrology/field-services/land-subsidence-arizona\" target=\"_blank\" rel=\"noopener noreferrer\">ADWR land subsidence resources</a></li></ul><p>The terrain and satellite basemaps are served by Esri; attribution appears on the map. Mapping software: Leaflet 1.9.4, BSD-2-Clause. Basemap imagery provides geographic context and is not the NISAR measurement layer.</p>'
+    body: '<p>Study extents are defined by the project. Context layers are shown only when their source files are available; missing layers are not replaced with invented features.</p><ul><li><a href=\"https://github.com/mansi200304/NASA-Hackathon\" target=\"_blank\" rel=\"noopener noreferrer\">Project repository and processing code</a></li><li><a href=\"https://nisar.jpl.nasa.gov/\" target=\"_blank\" rel=\"noopener noreferrer\">NASA / ISRO NISAR mission</a></li><li><a href=\"https://search.asf.alaska.edu/\" target=\"_blank\" rel=\"noopener noreferrer\">Alaska Satellite Facility data search</a></li><li><a href=\"https://www.azwater.gov/hydrology/field-services/land-subsidence-arizona\" target=\"_blank\" rel=\"noopener noreferrer\">ADWR land subsidence resources</a></li><li><a href=\"https://www.azwater.gov/gis\" target=\"_blank\" rel=\"noopener noreferrer\">ADWR GIS data: subsidence areas and radar products used for the comparison</a></li><li><a href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\" rel=\"noopener noreferrer\">OpenStreetMap: land-use notes</a></li></ul><p>The terrain and satellite basemaps are served by Esri; attribution appears on the map. Mapping software: Leaflet 1.9.4, BSD-2-Clause. Basemap imagery provides geographic context and is not the NISAR measurement layer.</p>'
   }
 };
 function openDialog(key) {
@@ -414,20 +443,31 @@ async function start() {
   $('#study-count').textContent = String(state.slugs.length).padStart(2, '0');
   state.layers.set('hotspots', { name: 'Study outlines', status: 'ready', visible: true, opacity: 1 });
   state.layers.set('rate', { name: 'Ground motion', status: 'loading', visible: true, opacity: 0.75 });
-  for (const [key, name] of [['adwr_subsidence', 'ADWR subsidence'], ['datacenters', 'Data centers'], ['habitat', 'Habitat']]) state.layers.set(key, { name, status: 'loading', visible: false, opacity: 0.8 });
+  state.layers.set('adwr_subsidence', { name: 'ADWR subsidence areas', status: 'loading', visible: false, opacity: 0.8 });
+  for (const [key, name, visible] of REGION_LAYERS) state.layers.set(key, { name, status: 'loading', visible, opacity: 0.7 });
+  for (const [key, name] of MARKER_LAYERS) state.layers.set(key, { name, status: 'loading', visible: true, opacity: 0.9 });
   renderHotspots(); initMap();
   state.layers.get('hotspots').layer = outlineGroup;
   renderDetails(); renderLayerControls(); selectHotspot(state.selected);
   const tasks = [
     ...state.slugs.map(async slug => state.series.set(slug, await loadJSON('timeseries_' + slug + '.json', raw => normalizeSeries(raw, slug)))),
     ...state.slugs.map(async slug => state.rates.set(slug, await loadJSON('rate_' + slug + '.json', normalizeRate))),
-    ...['adwr_subsidence', 'datacenters', 'habitat'].map(async key => {
+    ...['adwr_subsidence', ...MARKER_LAYERS.map(l => l[0])].map(async key => {
       const result = await loadJSON(key + '.geojson', validateGeoJSON);
       const config = state.layers.get(key); config.status = result.status; config.error = result.error;
       if (result.status === 'ready') {
         if (!result.value.features.length) { config.status = 'missing'; return; }
         if (map) { config.layer = makeOverlay(result.value, key); config.visible = true; config.layer.addTo(map); }
       }
+    }),
+    ...REGION_LAYERS.map(async ([key]) => {
+      const result = await loadJSON(key + '.json', normalizeRate);
+      const config = state.layers.get(key); config.status = result.status; config.error = result.error;
+      if (result.status !== 'ready') return;
+      const meta = result.value;
+      config.note = [meta.track, meta.sign_convention, meta.data_release].filter(Boolean).join(' · ');
+      const src = window.ATLAS_PREVIEW_IMAGES?.[key + '.png'] || new URL(key + '.png', DATA).href;
+      if (map) { config.layer = L.imageOverlay(src, meta.bounds, { pane: 'measurements', opacity: config.opacity, interactive: false }); if (config.visible) config.layer.addTo(map); }
     })
   ];
   await Promise.all(tasks);

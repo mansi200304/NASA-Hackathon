@@ -2,6 +2,16 @@
 
 Newest first. The earlier log is at the end of CLAUDE.md (section 14 and the dated entries after it); new entries go here to avoid merge conflicts with other edits to CLAUDE.md and README.md.
 
+## Nov 14 2026, late night: website review and plain-language insights
+
+- Ran the real front end (unchanged) against our data in a simulated page and listed exactly what a visitor sees. Found: two "not supplied" values (sign convention, data release), two permanently empty layers (Data centers, Habitat), and several things we built but never displayed.
+- Fixed: `sign_convention` and `data_release` now exported for every study and region layer (NISAR's sign convention is stated as unverified).
+- Removed the Data centers and Habitat layers from the UI: no sourced data exists and the data-center story belonged to the dropped Buckeye area. Dialog text updated to match.
+- Added to the layer panel: Sentinel-1 region map and cross-check, NISAR Willcox/Eloy (provisional, hidden by default), probable-mine markers, "checked, no sinking found" markers.
+- Added "In plain terms" to every study panel: summary, two confidence ratings (fixed rules, `src/insights.py`), six short headed paragraphs, about US grade 7. Eloy rates medium (where) and low (speed) because its independent-satellite match is weak; Willcox, Fort Grant Road and Elfrida rate high/high; Bowie-San Simon medium/medium (one look direction).
+- "How we measured" rewritten in plain language and now describes both satellites; Limits gained mines, blue patches and gaps; Sources gained ADWR GIS and OpenStreetMap.
+- Prototype map (`web/map-v0`) removed; export intermediates now live in the gitignored `data/processed/cache/web/`.
+
 ## Nov 14 2026, night: ADWR validation built
 
 - ADWR's own published InSAR data downloaded and compared with ours: official subsidence polygons (May 2026), a Sentinel-1 deformation raster (2017 to 2026, same satellite) and a RADARSAT-2 raster (2010 to 2026, independent sensor). Full results and caveats: `docs/adwr_validation.md`.
