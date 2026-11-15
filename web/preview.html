@@ -1609,6 +1609,7 @@ dialog p,dialog li{font-size:15px;line-height:1.7}
 .workspace .report-highlights .insight-expansion summary{cursor:pointer;color:var(--rust);font:700 13px/1.4 var(--sans);text-decoration:underline;text-underline-offset:4px;list-style-position:inside}
 .workspace .report-highlights .insight-expansion[open] summary{margin-bottom:12px}
 .workspace .report-highlights .insight-expansion p{font:400 14px/1.72 var(--sans);color:var(--slate-deep);margin:0;border-top:1px solid var(--rule);padding-top:13px}
+.workspace #detail-content>.metric,.workspace #detail-content>.report-why{grid-column:span 6}
 .workspace .details-panel .metric,.workspace .details-panel .report-why{
   grid-column:span 6;align-self:stretch;
   border:1px solid #e4ddd1;border-radius:16px;background:var(--faint);
@@ -1676,7 +1677,7 @@ dialog p,dialog li{font-size:15px;line-height:1.7}
  .workspace #detail-content>.report-highlights,.workspace #detail-content>.report-technical,
  .workspace #detail-content>.detail-bottom,.workspace #detail-content>.study-empty{grid-column:1/-1}
  .workspace .report-highlights .insight-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
- .workspace .details-panel .metric,.workspace .details-panel .report-why{grid-column:span 1}
+ .workspace #detail-content>.metric,.workspace #detail-content>.report-why{grid-column:span 1}
  .workspace .report-technical-grid{grid-template-columns:1fr}
  .workspace .map-chart{width:100%}
 }
@@ -1687,7 +1688,7 @@ dialog p,dialog li{font-size:15px;line-height:1.7}
  .workspace .report-highlights .insights-header{align-items:flex-start;flex-direction:column;gap:11px}
  .workspace .report-highlights .confidence-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
  .workspace .report-highlights .insight-point{min-height:0}
- .workspace .details-panel .metric,.workspace .details-panel .report-why{grid-column:1/-1}
+ .workspace #detail-content>.metric,.workspace #detail-content>.report-why{grid-column:1/-1}
  .workspace .report-technical-toggle{padding:20px;align-items:flex-start}
  .workspace .report-technical-grid{padding:23px 20px}
  .look-direction-grid{grid-template-columns:1fr}
