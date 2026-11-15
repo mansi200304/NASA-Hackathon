@@ -1,4 +1,4 @@
-# The Slow Sink (Arizona Is Sinking) — NASA Space Apps 2026, "Dancing with the SARs" (NISAR)
+# SlowSink — NASA Space Apps 2026, "Dancing with the SARs" (NISAR)
 
 ## Current radar decision — November 14, 2026
 
@@ -25,7 +25,7 @@ NISAR's L-band radar can measure it to the millimetre. This project maps where c
 
 ## 3. The end product: what it looks like
 
-### 3.1 Main deliverable: an interactive web map ("The Slow Sink")
+### 3.1 Main deliverable: an interactive web map ("SlowSink")
 A single-page web app that opens on a full-screen map of central Arizona.
 
 **Layout**

@@ -1,6 +1,6 @@
-# The Slow Sink
+# SlowSink
 
-*Arizona is sinking.*
+*NISAR watches Arizona’s ground sink as its aquifers drain*
 
 NASA Space Apps 2026 — **Dancing with the SARs** (NISAR). 
 
