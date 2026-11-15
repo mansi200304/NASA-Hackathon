@@ -506,7 +506,7 @@ function renderLayerControls() {
     const input = el('input');
     input.type = 'checkbox'; input.checked = ready && config.visible; input.disabled = !ready;
     input.id = 'layer-' + key;
-    const statusLabel = ready ? '' : config.status === 'missing' || config.status === 'loading' ? 'Pending' : 'Review file';
+    const statusLabel = ready ? '' : key === 'rate' && !state.selected ? 'Choose an area' : config.status === 'missing' || config.status === 'loading' ? 'Pending' : 'Review file';
     label.append(input, el('span', 'layer-title', config.name), el('span', 'layer-state', statusLabel));
     if (config.error) label.title = config.error; else if (config.note) label.title = config.note;
     row.append(label);
