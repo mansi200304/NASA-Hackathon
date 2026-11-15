@@ -1,0 +1,10 @@
+{
+ "frame": 46289,
+ "period": [
+  "20160702",
+  "20260411"
+ ],
+ "ref": "frame-wide median",
+ "threshold_cm_yr": -1.0,
+ "clusters": []
+}
