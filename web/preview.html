@@ -992,7 +992,6 @@ function cleanInsights(raw) {
   return { summary: raw.summary.trim(), confidence, points };
 }
 
-import { normalizeSeries, normalizeRate, normalizeHotspots, validateGeoJSON, safeSourceURL, formatNumber, isNumber, cleanInsights } from './model.mjs';
 
 
 const $ = selector => document.querySelector(selector);
