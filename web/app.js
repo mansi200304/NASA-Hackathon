@@ -54,9 +54,11 @@ function factList(items) {
   });
   return list;
 }
-function section(title) {
-  const node = el('section', 'detail-section');
-  node.append(el('h2', '', title));
+function section(title, noteKey = null) {
+  const node = el('section', 'detail-section'), header = el('div', 'detail-section-heading');
+  header.append(el('h2', '', title));
+  if (noteKey) header.append(explainButton(noteKey));
+  node.append(header);
   return node;
 }
 function svgNode(tag, attrs = {}, text) {
@@ -264,8 +266,9 @@ function makeTimeControls() {
 function renderInsights(root, series) {
   const ins = cleanInsights(series?.insights);
   if (!ins) return;
-  const box = el('section', 'insights');
-  box.append(el('h2', 'insights-title', 'In plain terms'), el('p', 'insights-summary', ins.summary));
+  const box = el('section', 'insights'), header = el('div', 'detail-section-heading');
+  header.append(el('h2', 'insights-title', 'In plain terms'), explainButton('confidence'));
+  box.append(header, el('p', 'insights-summary', ins.summary));
   if (ins.confidence) {
     const row = el('div', 'confidence-row');
     [[ins.confidence.where_label, ins.confidence.where], [ins.confidence.how_fast_label, ins.confidence.how_fast]].forEach(([label, level]) => {
@@ -282,6 +285,30 @@ function renderInsights(root, series) {
   });
   root.append(box);
 }
+const FIELD_NOTES = {
+  confidence: ['How certain is this observation?', 'Confidence describes the strength and quality of the evidence, not how concerning a place is. Several observations, an appropriate reference and independent look directions strengthen interpretation.', 'Confidence labels are from the team’s processed export.'],
+  rate: ['What does the reported rate mean?', 'This rate summarizes observed motion over a defined interval. A radar satellite views the ground at an angle, so a line-of-sight rate is not automatically a vertical sinking rate.', 'Read the rate together with its uncertainty, time interval, reference area and sign convention. A motion signal does not establish cause.'],
+  chart: ['How do I read the graph?', 'Every dot is an actual exported observation. Tap or focus a dot for its date and value. Blank periods are missing evidence, not zero movement.', 'The dashed comparison, when supplied, tracks stable-reference behavior; no intermediate observations are fabricated.'],
+  record: ['Why does metadata matter?', 'Satellite product, orbit track, look direction, real acquisition dates and reference area determine what is comparable.', 'Different viewing geometries or periods cannot automatically be combined as equivalent vertical rates.'],
+  validation: ['What does the official comparison show?', 'ADWR radar results provide important historical context. Spatial patterns, correlations and medians may agree or disagree across sensors.', 'Different periods, look directions and reference areas limit direct rate comparisons. Agreement does not by itself validate each study.'],
+  study: ['What is a study outline?', 'The boundary represents a project-defined study extent. It is not the observed subsidence footprint.', 'Names and stories are taken from the latest GeoJSON, not a fixed list.'],
+  directions: ['Why do two satellite look directions matter?', 'Ascending passes generally move from south toward north, while descending passes move from north toward south. They observe the landscape from different slanted viewing geometries. Comparing both can help distinguish some components of motion and test consistency.', 'One viewing direction alone does not uniquely determine vertical ground movement. Geometry, quality and reference selection matter.']
+};
+function showFieldNote(title, description, footnote = '') {
+  $('#explain-title').textContent = title;
+  $('#explain-text').textContent = description;
+  $('#explain-note').textContent = footnote;
+  $('#explain-drawer').hidden = false;
+}
+function explainButton(key) {
+  const button = el('button', 'explain-trigger', 'Explain ↗'); button.type = 'button';
+  button.setAttribute('aria-label', 'Explain: ' + FIELD_NOTES[key][0]);
+  button.addEventListener('click', () => showFieldNote(...FIELD_NOTES[key]));
+  return button;
+}
+function showStudyNote(feature) {
+  showFieldNote(feature.properties.name, feature.properties.story || FIELD_NOTES.study[1], FIELD_NOTES.study[2]);
+}
 function renderDetails() {
   resetTimeView();
   const feature = state.hotspots.features.find(f => f.properties.slug === state.selected);
@@ -295,6 +322,7 @@ function renderDetails() {
   const kicker = el('div', 'detail-kicker');
   kicker.append(el('span', '', (p.county || 'Arizona') + ', Arizona'), el('span', '', 'Study ' + String(state.slugs.indexOf(state.selected) + 1).padStart(2, '0')));
   root.append(kicker, el('h1', '', p.name), el('p', 'story-name', p.tagline));
+  const studyContext = el('div', 'study-context'); studyContext.append(explainButton('study')); root.append(studyContext);
   if (p.confirmation) root.append(el('p', 'confirmation-chip' + (p.confirmation === 'single look direction' ? ' unconfirmed' : ''), p.confirmation === 'single look direction' ? 'Unconfirmed · ' + p.confirmation : p.confirmation));
   renderInsights(root, series);
   const hasRate = series && isNumber(series.rate_cm_yr);
@@ -307,8 +335,9 @@ function renderDetails() {
     ? (isNumber(series.rate_sigma) ? (series.rate_sigma_note || 'Uncertainty supplied by the processing pipeline.') : 'Uncertainty has not been supplied.')
     : dataError(result, 'Awaiting a referenced time series and fitted rate.')));
   if (hasRate) metric.append(note(series.sign_convention || 'Sign convention not supplied. This value is not labelled as vertical sinking.'));
+  metric.append(explainButton('rate'));
   root.append(metric);
-  const chartSection = section('Displacement through time');
+  const chartSection = section('Displacement through time', 'chart');
   if (series?.hasData) {
     const cumulative = state.cumulative.get(state.selected);
     const timeMeta = cumulative?.status === 'ready' && map ? cumulative.value : null;
@@ -323,7 +352,7 @@ function renderDetails() {
     chartSection.append(wait);
   }
   root.append(chartSection);
-  const record = section('Measurement record');
+  const record = section('Measurement record', 'record');
   record.append(factList([
     ['Satellite / product', series?.source || meta?.track || 'Not supplied'],
     ['Track / frame', series?.track || meta?.track || 'Coverage check pending'],
@@ -343,7 +372,7 @@ function renderDetails() {
     provisional.append(el('p', 'validation-note', series.nisar.status_note));
     root.append(provisional);
   }
-  const validation = section('ADWR comparison');
+  const validation = section('ADWR comparison', 'validation');
   if (series && (isNumber(series.adwr_rate_cm_yr) || isNumber(series.adwr_rs2_rate_cm_yr))) {
     const c = series.adwr_comparison;
     validation.append(note('Median rates over the same sinking pixels · cm/yr, line of sight · ADWR units inferred. These medians differ from the fitted rate above.'));
@@ -387,7 +416,7 @@ function renderHotspots() {
     const title = el('span', 'place', f.properties.name);
     title.append(el('span', 'tagline', f.properties.tagline));
     button.append(title);
-    button.addEventListener('click', () => selectHotspot(f.properties.slug));
+    button.addEventListener('click', () => { selectHotspot(f.properties.slug); showStudyNote(f); });
     list.append(button);
   });
 }
@@ -418,7 +447,6 @@ function initMap() {
   L.control.zoom({ position: 'topright' }).addTo(map);
   L.control.scale({ imperial: false, position: 'bottomleft' }).addTo(map);
   const tileSources = {
-    dark: { url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', attribution: 'Tiles &copy; Esri, HERE, Garmin, OpenStreetMap contributors', maxNativeZoom: 16 },
     terrain: { url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', attribution: 'Tiles &copy; Esri &mdash; Esri, HERE, Garmin, USGS, NGA, EPA, USDA, NPS' },
     satellite: { url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', attribution: 'Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community' }
   };
@@ -437,14 +465,14 @@ function initMap() {
     const tooltip = el('div', '', f.properties.name);
     if (f.properties.confirmation) tooltip.append(el('small', '', f.properties.confirmation));
     layer.bindTooltip(tooltip, { sticky: true, className: 'study-label' });
-    layer.on('click', () => selectHotspot(f.properties.slug));
+    layer.on('click', () => { selectHotspot(f.properties.slug); showStudyNote(f); });
     layer.addTo(outlineGroup); state.outlines.set(f.properties.slug, layer);
   });
   map.on('click', event => {
     // A PNG contains colours, not numeric pixels. Do not invent a pixel sampler.
-    const node = el('div');
-    node.append(el('strong', '', event.latlng.lat.toFixed(4) + ', ' + event.latlng.lng.toFixed(4)), el('p', '', 'Pixel measurements are unavailable in this first preview. Select a study area for its published record.'));
-    L.popup().setLatLng(event.latlng).setContent(node).openOn(map);
+    showFieldNote('Map coordinate · ' + event.latlng.lat.toFixed(4) + ', ' + event.latlng.lng.toFixed(4),
+      'This is a selected coordinate, not a verified ground-motion measurement. A colour-mapped PNG has no numeric value we can accurately sample here.',
+      'Select a study to inspect the actual exported observations, uncertainty and source metadata.');
   });
   new ResizeObserver(() => map.invalidateSize({ pan: false })).observe($('#map'));
 }
@@ -545,6 +573,9 @@ function makeOverlay(raw, key) {
       const source = safeSourceURL(p.source_url);
       if (source) { const a = el('a', '', 'Source'); a.href = source; a.target = '_blank'; a.rel = 'noopener noreferrer'; popup.append(a); }
       layer.bindPopup(popup);
+      layer.on('click', () => showFieldNote(p.name || p.NAME || 'Mapped context',
+        [p.reason, p.note, p.period, p.source].filter(v => typeof v === 'string' && v.trim()).join(' · ') || 'This mapped feature comes from a supplied context dataset, not a direct satellite measurement.',
+        'Read the feature provenance and study record before interpreting it.'));
     }
   });
 }
@@ -558,8 +589,9 @@ const dialogCopy = {
     body: '<ul><li><strong>Pending is not zero.</strong> Empty results mean that a file is missing or has not passed the interface checks.</li><li><strong>Radar measures line-of-sight motion.</strong> A vertical sinking rate needs a justified conversion. A positive or negative value is not interpreted without its sign convention.</li><li><strong>Short records need care.</strong> Seasonal movement, atmospheric errors and the stable reference can influence a fitted rate.</li><li><strong>Data quality varies.</strong> Farming and construction can reduce coherence. Product corrections and release status must be checked.</li><li><strong>Location does not establish cause.</strong> A nearby farm or city does not prove responsibility for ground movement.</li><li><strong>Radar does not observe wildlife.</strong> Any mention of habitat comes from outside sources, not from this measurement.</li><li><strong>Mines move too.</strong> Open-pit mines and their waste piles shift for reasons unrelated to groundwater. We mark the ones we found.</li><li><strong>Blue patches are probably not real uplift.</strong> Rising values, such as on the Willcox Playa floor, most likely come from wet or swelling soil changing the radar signal. We have not verified this.</li><li><strong>Gaps are not zeros.</strong> Where the map is empty, the radar could not measure reliably (over plowed fields, for example). That does not mean the ground is stable.</li><li><strong>A study box is not a sinking zone.</strong> Outlines show the areas the team chose to investigate.</li></ul>'
   },
   sources: {
-    title: 'Data, context & code',
-    body: '<p>Study extents are defined by the project. Context layers are shown only when their source files are available; missing layers are not replaced with invented features.</p><ul><li><a href=\"https://github.com/mansi200304/NASA-Hackathon\" target=\"_blank\" rel=\"noopener noreferrer\">Project repository and processing code</a></li><li><a href=\"https://nisar.jpl.nasa.gov/\" target=\"_blank\" rel=\"noopener noreferrer\">NASA / ISRO NISAR mission</a></li><li><a href=\"https://search.asf.alaska.edu/\" target=\"_blank\" rel=\"noopener noreferrer\">Alaska Satellite Facility data search</a></li><li><a href=\"https://www.azwater.gov/hydrology/field-services/land-subsidence-arizona\" target=\"_blank\" rel=\"noopener noreferrer\">ADWR land subsidence resources</a></li><li><a href=\"https://www.azwater.gov/gis\" target=\"_blank\" rel=\"noopener noreferrer\">ADWR GIS data: subsidence areas and radar products used for the comparison</a></li><li><a href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\" rel=\"noopener noreferrer\">OpenStreetMap: land-use notes</a></li></ul><p>The terrain and satellite basemaps are served by Esri; attribution appears on the map. Mapping software: Leaflet 1.9.4, BSD-2-Clause. Basemap imagery provides geographic context and is not the NISAR measurement layer.</p>'
+    title: 'Data, sources & research',
+    body: "<p><strong>Project observations</strong> are derived from the team's exported Sentinel-1 and provisional NISAR products, study-area GeoJSON, and comparison files. Published research below supports the regional groundwater and agricultural context; it must not be mistaken for pixel-level cause attribution.</p>\n<h3>Study data &amp; institutional sources</h3>\n<ul>\n<li><a href=\"https://github.com/mansi200304/NASA-Hackathon\" target=\"_blank\" rel=\"noopener noreferrer\">Sinkronized project repository, exported data and analysis code</a></li>\n<li><a href=\"https://nisar.jpl.nasa.gov/\" target=\"_blank\" rel=\"noopener noreferrer\">NASA–ISRO NISAR mission documentation</a></li>\n<li><a href=\"https://search.asf.alaska.edu/\" target=\"_blank\" rel=\"noopener noreferrer\">Alaska Satellite Facility (ASF), radar product catalogue</a></li>\n<li><a href=\"https://www.azwater.gov/hydrology/field-services/land-subsidence-arizona\" target=\"_blank\" rel=\"noopener noreferrer\">Arizona Department of Water Resources (ADWR), land subsidence monitoring</a></li>\n<li><a href=\"https://www.azwater.gov/gis\" target=\"_blank\" rel=\"noopener noreferrer\">ADWR GIS data and radar comparison sources</a></li>\n</ul>\n<h3>Scientific evidence for groundwater pumping and agricultural demand</h3>\n<ol>\n<li><a href=\"https://www.usgs.gov/water-science-school/science/land-subsidence\" target=\"_blank\" rel=\"noopener noreferrer\">USGS, Land Subsidence</a> — explains aquifer compaction from groundwater withdrawal and permanent storage loss.</li>\n<li><a href=\"https://www.azwater.gov/find-info-on/how-do-i/willcox-groundwater-basin\" target=\"_blank\" rel=\"noopener noreferrer\">ADWR, Willcox Groundwater Basin</a> — official 2022 estimates: agriculture 155,805 acre-feet; industry 11,268; municipal 910. ADWR cannot attribute water-level decline to an individual user.</li>\n<li><a href=\"https://doi.org/10.3390/geosciences13060176\" target=\"_blank\" rel=\"noopener noreferrer\">Job, C., Ochoa, C. G., Jarvis, W. T., &amp; Kennedy, R. E. (2023), Geosciences, 13(6), 176</a> — Willcox groundwater records, agricultural land-cover growth and correlations (2008–2021).</li>\n<li><a href=\"https://doi.org/10.1002/hyp.14757\" target=\"_blank\" rel=\"noopener noreferrer\">Majumdar, S., Smith, R., Conway, B. D., &amp; Lakshmi, V. (2022), Hydrological Processes, 36(11), e14757</a> — statewide groundwater-withdrawal estimates and co-occurrence with subsidence, with basin-to-basin variability.</li>\n<li><a href=\"https://doi.org/10.3133/cir1182\" target=\"_blank\" rel=\"noopener noreferrer\">Galloway, D. L., Jones, D. R., &amp; Ingebritsen, S. E. (1999), USGS Circular 1182</a> — foundational report on land subsidence in the United States.</li>\n<li><a href=\"https://azgs.arizona.edu/geohazards/arizona-geohazards-resources/earth-fissures-subsidence\" target=\"_blank\" rel=\"noopener noreferrer\">Arizona Geological Survey, Earth Fissures &amp; Subsidence</a> — regional hazards and mapped fissures.</li>\n</ol>\n<h3>Map context</h3>\n<p>Satellite and terrain basemaps are served by Esri; attribution appears on the map. Mapping software is Leaflet 1.9.4 (BSD-2-Clause). Basemap images are geographic context—not measured NISAR pixels. Additional region/context layers appear only when their data exports exist. No unverified data-center or habitat causal claims are shown.</p>\n<p><strong>Evidence boundary:</strong> extensive groundwater pumping, including agricultural withdrawals, is a documented cause of subsidence in Arizona. No individual farm, water user or specific location in this map is assigned a cause without matching independent groundwater and geological evidence.</p>"
+
   }
 };
 function openDialog(key) {
@@ -570,6 +602,8 @@ function openDialog(key) {
 }
 document.querySelectorAll('[data-dialog]').forEach(b => b.addEventListener('click', () => openDialog(b.dataset.dialog)));
 $('#close-dialog').addEventListener('click', () => $('#about-dialog').close());
+$('#close-explain').addEventListener('click', () => { $('#explain-drawer').hidden = true; });
+document.addEventListener('keydown', event => { if (event.key === 'Escape') $('#explain-drawer').hidden = true; });
 $('#about-dialog').addEventListener('click', e => { if (e.target === $('#about-dialog')) { const r = e.target.getBoundingClientRect(); if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) e.target.close(); } });
 $('#reload-data').addEventListener('click', () => location.reload());
 $('#toggle-layers').addEventListener('click', () => {
@@ -579,6 +613,17 @@ $('#toggle-layers').addEventListener('click', () => {
 });
 $('#show-all').addEventListener('click', showAll);
 $('#fit-study').addEventListener('click', fitSelected);
+if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  const steps = document.querySelectorAll('.overview-steps > div');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('is-visible');
+      observer.unobserve(entry.target);
+    });
+  }, { threshold: 0.1 });
+  steps.forEach(step => { step.classList.add('overview-step-in'); observer.observe(step); });
+}
 document.querySelectorAll('[data-basemap]').forEach(button => button.addEventListener('click', () => {
   if (!map) return;
   map.removeLayer(state.basemaps[state.base]); state.base = button.dataset.basemap;
