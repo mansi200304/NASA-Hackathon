@@ -4,9 +4,9 @@ import { readFile, writeFile, readdir } from 'node:fs/promises';
 import { normalizeHotspots } from './model.mjs';
 const root = new URL('./', import.meta.url);
 const read = path => readFile(new URL(path, root), 'utf8');
-const [html, css, mapCSS, leafletCSS, leaflet, model, app] = await Promise.all([
+const [html, css, mapCSS, leafletCSS, leaflet, model, app, motion] = await Promise.all([
   read('index.html'), read('styles.css'), read('map.css'), read('vendor/leaflet.css'),
-  read('vendor/leaflet.js'), read('model.mjs'), read('app.js')
+  read('vendor/leaflet.js'), read('model.mjs'), read('app.js'), read('motion.js')
 ]);
 const data = {}, images = {};
 for (const name of await readdir(new URL('../data/processed/', root))) {
@@ -29,6 +29,7 @@ let preview = html
   .replace('<link rel="stylesheet" href="./styles.css">', () => '<style>' + css + '</style>')
   .replace('<link rel="stylesheet" href="./map.css">', () => '<style>' + mapCSS + '</style>')
   .replace('<script src="./vendor/leaflet.js" defer></script>', () => '<script>' + leaflet.replace(/<\/script/gi, '<\\/script') + '</script>')
+  .replace('<script src="./motion.js" defer></script>', () => '<script>' + motion.replace(/<\\/script/gi, '<\\\\/script') + '</script>')
   .replace('<script type="module" src="./app.js"></script>', () => '<script type="module">' + inlineJS.replace(/<\/script/gi, '<\\/script') + '</script>')
   .replace('Independent team project · Preliminary research', 'Portable preview · Preliminary research');
 const output = new URL('preview.html', root);
