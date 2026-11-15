@@ -19,14 +19,45 @@
   <header class="masthead">
     <a class="wordmark" href="./" aria-label="Sinkronized, home"><img class="logo" src="./assets/logo.png" alt="" width="46" height="46"><span>Sinkronized</span></a>
     <span class="project-label">The desert sinks. The radar keeps the beat.</span>
-    <nav aria-label="About the project">
+    <nav aria-label="Site navigation">
+      <a class="nav-overview" href="#overview">Overview</a>
+      <a class="nav-explore" href="#atlas">Explore map</a>
       <button type="button" data-dialog="method">How we measured</button>
       <button type="button" data-dialog="limits">Limits</button>
       <button type="button" data-dialog="sources">Sources <span class="out-arrow" aria-hidden="true"></span></button>
     </nav>
   </header>
 
-  <main class="workspace">
+  <section id="overview" class="overview" aria-labelledby="overview-title">
+    <div class="overview-topline"><span>ARIZONA / EARTH OBSERVATION</span><span>AN INDEPENDENT FIELD ATLAS &nbsp;·&nbsp; 2026</span></div>
+    <div class="overview-hero">
+      <div class="overview-copy">
+        <p class="overview-kicker"><span class="status-dot" aria-hidden="true"></span> UNDERSTANDING A LANDSCAPE IN MOTION</p>
+        <h1 id="overview-title">Arizona is sinking.<em>The evidence is beneath the surface.</em></h1>
+        <p class="overview-lede">When groundwater is withdrawn, underground sediments can compact and the land above can move. Satellites help reveal that movement—even when it is too slow to see on the ground.</p>
+        <p class="overview-subcopy">Sinkronized brings satellite radar observations, Arizona water-agency comparisons and uncertainty into one place. Explore what we can measure, where the evidence is still limited, and why that matters.</p>
+        <div class="overview-actions">
+          <a class="overview-primary" href="#atlas">Explore the interactive map <span aria-hidden="true">↗</span></a>
+          <button type="button" class="overview-secondary" data-dialog="method">How does radar see sinking?</button>
+        </div>
+        <p class="overview-caveat">Radar reports movement along its viewing direction; an observed rate is not automatically a vertical sinking rate or proof of its cause.</p>
+      </div>
+      <div class="overview-visual" aria-hidden="true">
+        <div class="overview-rings"><span class="overview-ring overview-ring-1"></span><span class="overview-ring overview-ring-2"></span><span class="overview-ring overview-ring-3"></span>
+          <img src="./assets/logo-512.png" alt="" width="300" height="300">
+          <span class="overview-orbit-dot"></span>
+        </div>
+        <span class="overview-visual-label">SONORAN BASIN / SATELLITE OBSERVATION</span>
+      </div>
+    </div>
+    <div class="overview-steps" aria-label="Explore the evidence in three steps">
+      <div><span>01 / LOCATE</span><p>Choose a study area drawn from the team’s latest dataset—not a fixed list.</p></div>
+      <div><span>02 / READ</span><p>Inspect measured movement, acquisition dates and comparisons where records exist.</p></div>
+      <div><span>03 / QUESTION</span><p>Check confidence, viewing direction and missing observations before drawing conclusions.</p></div>
+    </div>
+  </section>
+
+  <main id="atlas" class="workspace">
     <aside class="sidebar" aria-label="Study areas and map layers">
       <div class="sidebar-intro"><span class="eyebrow">Arizona / Ground & water</span><p>Ground in motion.<br>One shared resource.</p></div>
       <section class="study-section" aria-labelledby="study-heading">
@@ -43,10 +74,10 @@
     </aside>
 
     <section class="map-column" aria-label="Interactive study map">
-      <div class="map-toolbar"><div class="basemap-options" role="group" aria-label="Basemap"><button type="button" data-basemap="dark" aria-pressed="false">Dark</button><button type="button" data-basemap="terrain" aria-pressed="false">Terrain</button><button type="button" data-basemap="satellite" aria-pressed="true">Satellite</button></div><button id="fit-study" type="button" title="Fit selected study area">Fit study</button></div>
+      <div class="map-toolbar"><div class="basemap-options" role="group" aria-label="Basemap"><button type="button" data-basemap="satellite" aria-pressed="true">Satellite</button><button type="button" data-basemap="terrain" aria-pressed="false">Terrain</button></div><button id="fit-study" type="button" title="Fit selected study area">Fit study</button></div>
       <div id="map" role="region" aria-label="Arizona map. Use arrow keys to pan and plus or minus to zoom."></div>
       <div id="map-error" class="map-message" role="status" hidden>Basemap tiles could not load. Study outlines are still available. Try the other basemap.</div>
-      <div class="map-caption"><span id="map-location">Loading study areas…</span><span>Outlines mark study extents, not sinking zones.</span></div>
+      <div class="map-caption"><span id="map-location">Loading study areas…</span><span>Select an outlined area to read its field note. Outlines are study extents, not sinking zones.</span></div>
       <div id="rate-legend" class="rate-legend" hidden></div>
     </section>
 
@@ -54,6 +85,12 @@
       <div id="detail-content" aria-live="polite"></div>
     </aside>
   </main>
+  <aside id="explain-drawer" class="explain-drawer" tabindex="-1" aria-labelledby="explain-title" aria-live="polite" hidden>
+    <div class="explain-drawer-head"><span class="eyebrow" id="explain-kicker">FIELD NOTE</span><button id="close-explain" type="button" aria-label="Close field note">Close ×</button></div>
+    <h2 id="explain-title"></h2>
+    <p id="explain-text"></p>
+    <p id="explain-note" class="explain-note"></p>
+  </aside>
   <footer class="page-footer"><span>NASA Space Apps 2026 <span class="footer-separator">/</span> Dancing with the SARs</span><span>Independent team project · Preliminary research</span></footer>
 
   <dialog id="about-dialog" aria-labelledby="dialog-title">
