@@ -78,7 +78,7 @@ def main():
     json.dump({"type": "FeatureCollection", "features": feats}, open(f"{OUT}/hotspots.geojson", "w"), indent=1)
     # extra, region-wide layers: copy the mosaics with UI-friendly metadata
     first = min(f["properties"] for f in feats[:1]) if False else None
-    src_dir = f"{ROOT}/web/map-v0/data"
+    src_dir = f"{ROOT}/data/processed/cache/web"
     d0 = cache["central"]["dates"][0]; d1 = cache["southeast"]["dates"][-1]; iso = lambda d: f"{d[:4]}-{d[4:6]}-{d[6:]}"
     for name, out, trk in [("s1_rate_desc", "rate_sentinel1_descending", "Sentinel-1 descending frames, mosaic"), ("s1_rate_asc", "rate_sentinel1_ascending", "Sentinel-1 ascending frame 5125 (cross-check)"),
                            ("nisar_willcox", "rate_nisar_willcox", "NISAR track 128 descending, rate relative to box median, PRELIMINARY"),

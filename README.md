@@ -37,7 +37,7 @@ See [Track selection and next checkpoint](docs/track_selection.md). Some pairs s
 - [x] Stage 4: rates compared with ADWR's own InSAR products (strong in the southeast, weak at Eloy); see `docs/adwr_validation.md`
 - [ ] Stage 5: other hotspots
 - [ ] Stage 6: overlays
-- [x] Stage 7 (v0): data contract for the front end in `data/processed/` (see `docs/UI_DATA_CONTRACT.md`); working prototype map in `web/map-v0/`
+- [x] Stage 7 (v0): data contract for the front end in `data/processed/` (see `docs/UI_DATA_CONTRACT.md`)
 
 ## Limits
 
@@ -56,9 +56,12 @@ See [CLAUDE.md](CLAUDE.md) for the full project brief.
 
 ## Run the map locally
 
+From the repository root:
+
 ```
-cd web/map-v0
 python -m http.server 8765
 ```
-Open http://localhost:8765. To rebuild the data files from the processed cubes: `python src/export_web.py` then `python src/export_contract.py`.
-Open a hotspot directly with `?open=willcox` (also `eloy`, `north_willcox`, `south`, `east`).
+
+Open http://localhost:8765/web/index.html. The app reads its data from `data/processed/`, so the server must be started at the repository root.
+
+To rebuild the data files from the processed cubes: `python src/export_web.py` then `python src/export_contract.py`.

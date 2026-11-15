@@ -1,4 +1,5 @@
-"""Export everything the web map needs into web/data/ from the processed cubes (scan_*.npz) and NISAR stacks.
+"""Intermediate step: build region mosaics, NISAR rasters and marker lists into data/processed/cache/web/ (gitignored) from the processed cubes (scan_*.npz) and NISAR stacks.
+export_contract.py turns these into the files the web app reads in data/processed/.
 All Sentinel-1 numbers (map raster, hotspot stats, chart series) come from the SAME cube, so map and panel agree.
 Usage: python export_web.py"""
 import json, os, glob, datetime as dt, numpy as np
@@ -6,7 +7,7 @@ from pyproj import Transformer
 from PIL import Image
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CACHE = f"{ROOT}/data/processed/cache"; OUT = f"{ROOT}/web/map-v0/data"; os.makedirs(OUT, exist_ok=True)
+CACHE = f"{ROOT}/data/processed/cache"; OUT = f"{ROOT}/data/processed/cache/web"; os.makedirs(OUT, exist_ok=True)
 THR = -1.0                      # cm/yr: "sinking" threshold used for all hotspot masks
 RES = 0.0025                    # degrees per web-raster pixel (~250 m)
 AZ = (-114.85, 31.30, -109.00, 37.00)   # lon/lat window for the web raster
