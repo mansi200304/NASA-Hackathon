@@ -775,28 +775,48 @@ function renderAbout(team) {
   const grid = $('#team-grid'), intro = $('#about-intro');
   if (!grid || !intro) return;
   grid.replaceChildren();
-  if (!team) { intro.textContent = 'Team profiles are being added.'; intro.hidden = false; return; }
-  intro.textContent = team.intro || ''; intro.hidden = !team.intro;
-  team.members.forEach(member => {
+  if (!team) {
+    intro.textContent = 'Team profiles will appear here when the project roster is available.';
+    intro.hidden = false;
+    return;
+  }
+  intro.textContent = team.intro || '';
+  intro.hidden = !team.intro;
+  team.members.forEach((member, index) => {
     const card = el('article', 'team-card');
+    const top = el('div', 'team-card-top');
+    top.append(el('span', 'team-number', String(index + 1).padStart(2, '0')));
     if (member.photo) {
       const photo = el('img', 'team-photo');
-      photo.src = new URL(member.photo, import.meta.url).href; photo.alt = 'Photo of ' + member.name; photo.loading = 'lazy'; photo.width = 84; photo.height = 84;
-      card.append(photo);
+      photo.src = new URL(member.photo, import.meta.url).href;
+      photo.alt = 'Photo of ' + member.name;
+      photo.loading = 'lazy'; photo.width = 62; photo.height = 62;
+      top.append(photo);
     } else {
-      const avatar = el('div', 'team-avatar', initials(member.name)); avatar.setAttribute('aria-hidden', 'true'); card.append(avatar);
+      const avatar = el('div', 'team-avatar', initials(member.name));
+      avatar.setAttribute('aria-hidden', 'true');
+      top.append(avatar);
     }
-    card.append(el('h3', '', member.name));
+    card.append(top, el('h3', '', member.name));
     if (member.role) card.append(el('p', 'team-role', member.role));
-    const facts = el('dl');
-    const fact = (label, node) => { const row = el('div'); row.append(el('dt', '', label), node); facts.append(row); };
-    if (member.study) fact('Studying', el('dd', '', member.study));
-    if (member.interests.length) { const dd = el('dd'), tags = el('ul', 'team-tags'); member.interests.forEach(tag => tags.append(el('li', '', tag))); dd.append(tags); fact('Interests', dd); }
-    if (member.bio) fact('About', el('dd', '', member.bio));
-    if (facts.children.length) card.append(facts); else if (!member.links.length) card.append(el('p', 'team-soon', 'Profile coming soon.'));
+    if (member.bio) card.append(el('p', 'team-bio', member.bio));
+    if (member.study) {
+      const focus = el('div', 'team-specialism');
+      focus.append(el('span', 'team-specialism-label', 'Focus'), el('span', 'team-specialism-text', member.study));
+      card.append(focus);
+    }
+    if (member.interests.length) {
+      const tags = el('ul', 'team-tags');
+      member.interests.forEach(tag => tags.append(el('li', '', tag)));
+      card.append(tags);
+    }
     if (member.links.length) {
       const row = el('div', 'team-links');
-      member.links.forEach(link => { const anchor = el('a', '', link.label + ' \u2197'); anchor.href = link.url; anchor.target = '_blank'; anchor.rel = 'noopener noreferrer'; row.append(anchor); });
+      member.links.forEach(link => {
+        const anchor = el('a', '', link.label + ' ↗');
+        anchor.href = link.url; anchor.target = '_blank'; anchor.rel = 'noopener noreferrer';
+        row.append(anchor);
+      });
       card.append(row);
     }
     grid.append(card);
