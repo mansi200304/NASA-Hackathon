@@ -799,6 +799,7 @@ function renderAbout(team) {
     }
     card.append(top, el('h3', '', member.name));
     if (member.role) card.append(el('p', 'team-role', member.role));
+    if (member.education) card.append(el('p', 'team-education', member.education));
     if (member.bio) card.append(el('p', 'team-bio', member.bio));
     if (member.study) {
       const focus = el('div', 'team-specialism');
