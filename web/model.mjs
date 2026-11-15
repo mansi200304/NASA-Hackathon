@@ -124,7 +124,7 @@ export function cleanTeam(raw) {
       .map(t => teamText(t, 40)).filter(Boolean).slice(0, 12);
     const links = (Array.isArray(m.links) ? m.links : []).map(l => ({ label: teamText(l?.label, 40), url: safeSourceURL(l?.url) }))
       .filter(l => l.label && l.url).slice(0, 6);
-    members.push({ name, role: teamText(m.role, 120), study: teamText(m.study, 160), bio: teamText(m.bio, 600), interests, links,
+    members.push({ name, role: teamText(m.role, 120), study: teamText(m.study, 160), education: teamText(m.education, 200), bio: teamText(m.bio, 600), interests, links,
       photo: typeof m.photo === 'string' && TEAM_PHOTO.test(m.photo) ? m.photo : null });
   }
   return members.length ? { intro: teamText(raw.intro, 400), members } : null;
