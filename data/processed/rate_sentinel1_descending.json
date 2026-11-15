@@ -18,5 +18,7 @@
   "2016-07-16",
   "2026-04-14"
  ],
- "crs": "EPSG:4326"
+ "crs": "EPSG:4326",
+ "sign_convention": "Positive values mean the ground moved toward the satellite; negative values mean it moved away (sinking). Measured along the satellite's slanted view, not straight down. (OPERA product convention.)",
+ "data_release": "OPERA L3 DISP-S1 v1.0 (Sentinel-1), records 2016-07-16 to 2026-04-14"
 }

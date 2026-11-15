@@ -176,5 +176,42 @@
   "Uncertainty combines the straight-line fit error with the disagreement between descending and ascending satellite tracks; reference-site bias is not separately included.",
   "Sinking does not by itself show who or what caused it."
  ],
- "source": "Sentinel-1 OPERA DISP-S1 block-final granules, 6-month steps"
+ "source": "Sentinel-1 OPERA DISP-S1 block-final granules, 6-month steps",
+ "sign_convention": "Positive values mean the ground moved toward the satellite; negative values mean it moved away (sinking). Measured along the satellite's slanted view, not straight down. (OPERA product convention.)",
+ "data_release": "OPERA L3 DISP-S1 v1.0 (Sentinel-1), records 2016-07-23 to 2026-04-14",
+ "insights": {
+  "summary": "Over about 10 years, the ground in the sinking part of this area has dropped by roughly 27 cm (11 inches) on average, and the fastest spots have dropped more.",
+  "confidence": {
+   "where": "high",
+   "how_fast": "high",
+   "where_label": "Where it is sinking",
+   "how_fast_label": "How fast"
+  },
+  "points": [
+   {
+    "heading": "What we found",
+    "text": "About 386 square kilometres (149 square miles) of ground here is sinking at roughly 2.7 cm a year (1.1 inches a year), give or take 0.4 cm a year. In the fastest-sinking 5% of this patch, the ground drops by more than 5.2 cm a year."
+   },
+   {
+    "heading": "How sure are we?",
+    "text": "Satellite views from two opposite directions both see the ground sinking here. Arizona's water agency (ADWR) also lists this area as an official sinking-ground zone, which it calls Kansas Settlement. ADWR's own measurements from a separate satellite (RADARSAT-2) show the same pattern and a similar speed, about 2.3 cm a year over the same spots. Confidence that the ground is sinking here: high. Confidence in the exact speed: high."
+   },
+   {
+    "heading": "Why is the ground sinking?",
+    "text": "In farming valleys, the usual cause of sinking is groundwater being pumped out faster than rain and rivers refill it. When the water level drops, layers of clay and sand underground squeeze together and the land above settles. Irrigated farmland surrounds this area. Our data show where the ground is moving, not who is pumping or why. That needs other evidence."
+   },
+   {
+    "heading": "Why it matters",
+    "text": "Sinking ground can crack roads, canals and wells, and can open long cracks in the ground called earth fissures. Much of the squeeze underground is permanent, so the space that once held water is lost for good."
+   },
+   {
+    "heading": "What about NASA's new satellite?",
+    "text": "NASA's new NISAR satellite has watched this area for about a year. That is too short, and too uncertain, to give a trustworthy speed yet, so the ten-year trend above comes from the older Sentinel-1 satellite."
+   },
+   {
+    "heading": "Good to know",
+    "text": "These numbers are measured along the satellite's slanted view, not straight down, and relative to the surrounding ground. If the ground is moving straight down, the true drop is likely somewhat larger. All numbers are preliminary."
+   }
+  ]
+ }
 }

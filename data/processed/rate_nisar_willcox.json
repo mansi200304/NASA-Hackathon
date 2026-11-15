@@ -18,5 +18,7 @@
   "2025-10-26",
   "2026-10-21"
  ],
- "crs": "EPSG:4326"
+ "crs": "EPSG:4326",
+ "sign_convention": "NISAR sign convention not yet verified against the product specification; read with care.",
+ "data_release": "NASA NISAR L2 GUNW, Provisional release (production CRID P05023)"
 }

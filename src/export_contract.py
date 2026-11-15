@@ -5,12 +5,18 @@ Usage: python export_contract.py   (run export_web.py first is not required; thi
 import json, os, numpy as np
 from PIL import Image
 import export_web as ew
+import insights
 ADWRJ = json.load(open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data/processed/adwr_validation.json"))) if os.path.exists(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data/processed/adwr_validation.json")) else {}
 
 ROOT = ew.ROOT; OUT = f"{ROOT}/data/processed"
 TAG = {  # tagline, county (all text is plain, factual, and matches docs/UI_DATA_CONTRACT.md)
     "eloy": ("The long sink", "Pinal"), "willcox": ("The largest sink", "Cochise"), "north_willcox": ("The fastest patch", "Graham"),
     "south": ("The southern sink", "Cochise"), "east": ("Unconfirmed: one look direction", "Cochise")}
+FARM = {"eloy": "yes", "willcox": "yes", "north_willcox": "unchecked", "south": "yes", "east": "little"}   # from the OpenStreetMap land-use check (docs/STATUS.md)
+SIGN_S1 = "Positive values mean the ground moved toward the satellite; negative values mean it moved away (sinking). Measured along the satellite's slanted view, not straight down. (OPERA product convention.)"
+SIGN_NISAR = "NISAR sign convention not yet verified against the product specification; read with care."
+REL_NISAR = "NASA NISAR L2 GUNW, Provisional release (production CRID P05023)"
+rel_s1 = lambda a, b: f"OPERA L3 DISP-S1 v1.0 (Sentinel-1), records {a} to {b}"
 REF_TEXT = {"central": "median ground of the whole Sentinel-1 frame 7091 (descending, track 27); not a hand-picked site",
             "southeast": "median ground of the whole Sentinel-1 frame 34478 (descending, track 129); not a hand-picked site"}
 TRACK = {"central": "Sentinel-1 track 27 descending, frame 7091", "southeast": "Sentinel-1 track 129 descending, frame 34478"}
@@ -70,10 +76,14 @@ def main():
               "sinking_threshold_cm_yr": ew.THR, "ascending_check": st.get("ascending"), "confirmation": status,
               "stable_ground_displacement": None if stable is None else [round(v / 10, 2) for v in stable],
               "nisar": nisar, "caveats": CAVEATS, "source": "Sentinel-1 OPERA DISP-S1 block-final granules, 6-month steps"}
+        ts["sign_convention"] = SIGN_S1; ts["data_release"] = rel_s1(st["dates"][0], st["dates"][-1])
+        names_in = [k for k, v in ADWRJ.get("feature_overlap", {}).get(slug, {}).items() if k != "outside_any_feature" and v >= 50]
+        ts["insights"] = insights.build(ts, FARM[slug], names_in)
         json.dump(ts, open(f"{OUT}/timeseries_{slug}.json", "w"), indent=1)
         pct = crop_png([D], h["bbox"], slug)
         json.dump({"bounds": [[s, w], [n, e]], "units": "cm/yr", "vmin": -6, "vmax": 2, "colormap": "custom: red = sinking (away from satellite), transparent = stable, blue = rising",
-                   "track": TRACK[h["D"]], "dates": [st["dates"][0], st["dates"][-1]], "crs": "EPSG:4326", "valid_pct_of_box": round(pct, 1)}, open(f"{OUT}/rate_{slug}.json", "w"), indent=1)
+                   "track": TRACK[h["D"]], "dates": [st["dates"][0], st["dates"][-1]], "crs": "EPSG:4326", "valid_pct_of_box": round(pct, 1),
+                   "sign_convention": SIGN_S1, "data_release": rel_s1(st["dates"][0], st["dates"][-1])}, open(f"{OUT}/rate_{slug}.json", "w"), indent=1)
         report.append((slug, len(st["dates"]), st["series_rate"], status))
     json.dump({"type": "FeatureCollection", "features": feats}, open(f"{OUT}/hotspots.geojson", "w"), indent=1)
     # extra, region-wide layers: copy the mosaics with UI-friendly metadata
@@ -87,7 +97,9 @@ def main():
         b = json.load(open(f"{src_dir}/{name}.json")); Image.open(f"{src_dir}/{name}.png").save(f"{OUT}/{out}.png", optimize=True)
         dates = ["2025-10-26", "2026-10-21"] if name == "nisar_willcox" else ["2026-06-19", "2026-10-17"] if name == "nisar_eloy" else [iso(d0), iso(d1)]
         json.dump({"bounds": b["bounds"], "units": "cm/yr", "vmin": -6, "vmax": 2, "colormap": "custom: red = sinking, transparent = stable, blue = rising", "track": trk,
-                   "dates": dates, "crs": "EPSG:4326"}, open(f"{OUT}/{out}.json", "w"), indent=1)
+                   "dates": dates, "crs": "EPSG:4326",
+                   "sign_convention": SIGN_NISAR if name.startswith("nisar") else SIGN_S1,
+                   "data_release": REL_NISAR if name.startswith("nisar") else rel_s1(dates[0], dates[1])}, open(f"{OUT}/{out}.json", "w"), indent=1)
     ex = json.load(open(f"{src_dir}/excluded.json")); fl = json.load(open(f"{src_dir}/flat.json"))
     pt = lambda lon, lat, p: {"type": "Feature", "geometry": {"type": "Point", "coordinates": [lon, lat]}, "properties": p}
     json.dump({"type": "FeatureCollection", "features": [pt(x["lon"], x["lat"], {"name": x["name"], "reason": x["why"], "source": "OpenStreetMap place and land-use lookup"}) for x in ex]},
