@@ -19,17 +19,111 @@
   <header class="masthead">
     <a class="wordmark" href="./" aria-label="Sinkronized, home"><img class="logo" src="./assets/logo.png" alt="" width="46" height="46"><span>Sinkronized</span></a>
     <span class="project-label">The desert sinks. The radar keeps the beat.</span>
-    <nav aria-label="About the project">
+    <nav aria-label="Site navigation">
+      <a class="nav-overview" href="#overview">Overview</a>
+      <a class="nav-explore" href="#atlas">Explore map</a>
       <button type="button" data-dialog="method">How we measured</button>
       <button type="button" data-dialog="limits">Limits</button>
-      <button type="button" data-dialog="sources">Sources <span class="out-arrow" aria-hidden="true"></span></button>
+      <button type="button" data-dialog="sources">Resources <span class="out-arrow" aria-hidden="true"></span></button>
     </nav>
   </header>
 
-  <main class="workspace">
+  <section id="overview" class="overview" aria-labelledby="overview-title">
+    <div class="overview-topline"><span>ARIZONA / EARTH OBSERVATION</span><span>AN INDEPENDENT FIELD ATLAS &nbsp;·&nbsp; 2026</span></div>
+    <div class="overview-hero">
+      <div class="overview-copy">
+        <p class="overview-kicker"><span class="status-dot" aria-hidden="true"></span> OUR STORY / WHY WE BUILT SINKRONIZED</p>
+        <h1 id="overview-title">Arizona is our home.<em>What happens beneath it matters.</em></h1>
+        <p class="overview-lede">For us, Arizona is more than a place on a map. It is where we live, learn and imagine our future. Its desert landscapes, expanding cities and agricultural communities are connected by something most of us rarely see: groundwater.</p>
+        <p class="overview-story">We began with a question that felt close to home. <strong>What happens when the land itself starts to change, slowly enough that most people never notice?</strong> In Arizona’s alluvial basins, decades of groundwater extraction have lowered water levels and compacted sediment, contributing to subsidence and earth fissures. This is documented in <a href="https://pubs.usgs.gov/publication/wri004277" target="_blank" rel="noopener noreferrer">USGS research</a>. These changes can put roads, canals, wells and buildings at risk.</p>
+        <p class="overview-story">The evidence also identifies significant water-use pressures. In the Willcox Basin, agriculture accounts for most estimated water use, while a <a href="https://www.mdpi.com/2076-3263/13/6/176" target="_blank" rel="noopener noreferrer">2023 peer-reviewed study</a> found agricultural expansion strongly associated with groundwater declines. Those findings are important, but the research is often buried in technical datasets and reports. People deserve a clearer way to understand what is happening—and what remains uncertain.</p>
+        <div class="overview-mission">
+          <span class="overview-mission-label">WHY WE CREATED THIS</span>
+          <p>We built <strong>Sinkronized</strong> to turn satellite observations into an understandable picture of Arizona’s changing ground. By combining radar measurements from Sentinel-1 and NISAR with comparisons to Arizona water-agency research, we can explore <strong>where movement is observed, how it changes over time and how much confidence we should place in the evidence.</strong></p>
+          <p>We should name the causes where the evidence supports them: groundwater overdraft and irrigation pumping have contributed to land subsidence in particular Arizona basins. But this differs from assigning a particular coloured pixel to one farm, well or development. Our aim is to make that distinction transparent, so people can ask better questions about the ground and water we share.</p>
+        </div>
+        <div class="overview-actions">
+          <a class="overview-primary" href="#atlas">Explore the interactive map <span aria-hidden="true">↗</span></a>
+          <a class="overview-story-link" href="#overview-purpose">See who this helps <span aria-hidden="true">↓</span></a>
+        </div>
+        <p class="overview-caveat">Historical causes cited here come from published USGS, ADWR and peer-reviewed research. The map reports our team's radar line-of-sight measurements; it does not identify the specific water user responsible for an individual observation.</p>
+      </div>
+      <div class="overview-visual" aria-hidden="true">
+        <div class="overview-rings"><span class="overview-ring overview-ring-1"></span><span class="overview-ring overview-ring-2"></span><span class="overview-ring overview-ring-3"></span>
+          <img src="./assets/logo-512.png" alt="" width="300" height="300">
+          <span class="overview-orbit-dot"></span>
+        </div>
+        <span class="overview-visual-label">ARIZONA / ONE SHARED LANDSCAPE</span>
+      </div>
+    </div>
+    <section id="overview-purpose" class="overview-purpose" aria-labelledby="purpose-title">
+      <div class="overview-purpose-header">
+        <div><span class="overview-mission-label">WHY THIS MATTERS</span><h2 id="purpose-title">A clearer view of the ground we share.</h2></div>
+        <p>Making the evidence understandable helps people see where closer investigation, monitoring and better-informed decisions may be needed.</p>
+      </div>
+      <div class="overview-audiences">
+        <article><span>01 / COMMUNITIES</span><h3>Understand your surroundings</h3><p>Residents and students can see which places have been studied, what movement the satellites detected and where measurements are incomplete.</p></article>
+        <article><span>02 / PLANNING &amp; WATER</span><h3>See patterns worth investigating</h3><p>Planners, engineers and water managers can put ground-motion evidence alongside longer-term context when thinking about infrastructure and groundwater management.</p></article>
+        <article><span>03 / RESEARCH &amp; CONSERVATION</span><h3>Ask more precise questions</h3><p>Researchers and conservation groups can explore measured trends and uncertainty while recognizing that radar cannot establish causes or directly measure habitat impacts.</p></article>
+      </div>
+    </section>
+    <section class="overview-proof" aria-labelledby="proof-title">
+      <div class="overview-proof-heading">
+        <span class="overview-mission-label">THE EVIDENCE / NOT JUST A THEORY</span>
+        <h2 id="proof-title">What the research already tells us</h2>
+        <p>These findings are from published scientific research and agency records. They provide historical context, <strong>not measurements made by the Sinkronized processing pipeline.</strong></p>
+      </div>
+      <div class="overview-proof-grid">
+        <article class="overview-proof-card">
+          <span class="overview-proof-id">01 / THE MECHANISM</span>
+          <strong class="overview-proof-number">Groundwater loss</strong>
+          <h3>Pumping can compact aquifers permanently.</h3>
+          <p>When groundwater levels fall, compressible sediments can compact, lowering the land surface and permanently reducing water-storage capacity.</p>
+          <a href="https://www.usgs.gov/water-science-school/science/land-subsidence" target="_blank" rel="noopener noreferrer">USGS · Subsidence science ↗</a>
+        </article>
+        <article class="overview-proof-card">
+          <span class="overview-proof-id">02 / ELOY, ARIZONA</span>
+          <strong class="overview-proof-number">1.09 m</strong>
+          <h3>Measured historical ground lowering.</h3>
+          <p>USGS documented 1.09 metres of subsidence caused by groundwater withdrawal at a monitoring site near Eloy between 1965 and 1983.</p>
+          <a href="https://pubs.usgs.gov/publication/wri874143" target="_blank" rel="noopener noreferrer">USGS · Epstein (1987) ↗</a>
+        </article>
+        <article class="overview-proof-card">
+          <span class="overview-proof-id">03 / WILLCOX, ARIZONA</span>
+          <strong class="overview-proof-number">155,805 <small>acre-feet</small></strong>
+          <h3>Estimated agricultural water use in 2022.</h3>
+          <p>ADWR identifies agriculture as Willcox's largest water-use sector. Research also associates expanded agricultural land with falling groundwater levels.</p>
+          <a href="https://www.azwater.gov/find-info-on/how-do-i/willcox-groundwater-basin" target="_blank" rel="noopener noreferrer">ADWR · Willcox groundwater conditions ↗</a>
+          <a href="https://www.mdpi.com/2076-3263/13/6/176" target="_blank" rel="noopener noreferrer">Geosciences · 2023 research paper ↗</a>
+        </article>
+      </div>
+      <p class="overview-proof-qualifier"><strong>Supported:</strong> groundwater extraction is a documented driver of land subsidence, and agriculture is a significant pumping pressure in these basins. <strong>Not supported by this map alone:</strong> attributing a specific new satellite observation to an individual farm, well or facility. <button type="button" data-dialog="sources">View all research sources ↗</button></p>
+    </section>
+    <div class="overview-evidence">
+      <div class="overview-evidence-copy">
+        <span class="overview-mission-label">WHAT WE ARE STUDYING</span>
+        <h2>Not just whether the land moves. <em>How confidently we can say so.</em></h2>
+        <p>We investigate ground movement in the study areas supplied by our team’s current dataset. Satellite radar reveals changes along its viewing direction; real acquisition dates, stable reference areas, data quality and comparisons with Arizona Department of Water Resources research help us interpret those signals.</p>
+        <p>We distinguish the longer Sentinel-1 record from newer, preliminary NISAR measurements. Where the evidence is weak or missing, the website says so instead of presenting a guess as a result.</p>
+      </div>
+      <details class="overview-science-note">
+        <summary>How do two satellite viewing directions help? <span aria-hidden="true">+</span></summary>
+        <p>Satellites make ascending (generally south-to-north) and descending (generally north-to-south) passes, observing the land from different slanted angles. Comparing these perspectives can strengthen confidence and help separate some components of motion, but one view alone cannot establish a unique vertical sinking rate.</p>
+        <button type="button" class="overview-secondary" data-dialog="method">Read how the measurements work</button>
+      </details>
+    </div>
+    <div class="overview-steps" aria-label="Explore the evidence in three steps">
+      <div><span>01 / LOCATE</span><p>Choose a study area drawn from the team’s latest dataset—not a fixed list.</p></div>
+      <div><span>02 / READ</span><p>Inspect measured movement, acquisition dates and comparisons where records exist.</p></div>
+      <div><span>03 / QUESTION</span><p>Check confidence, viewing direction and missing observations before drawing conclusions.</p></div>
+    </div>
+  </section>
+
+  <main id="atlas" class="workspace">
     <aside class="sidebar" aria-label="Study areas and map layers">
       <div class="sidebar-intro"><span class="eyebrow">Arizona / Ground & water</span><p>Ground in motion.<br>One shared resource.</p></div>
       <section class="study-section" aria-labelledby="study-heading">
+        <a class="return-overview" href="#overview">← Back to overview</a>
         <h2 id="study-heading">Study areas <span id="study-count">—</span></h2>
         <div id="hotspot-list" class="hotspot-list"></div>
         <button id="show-all" class="text-action" type="button">View all study areas <span class="out-arrow" aria-hidden="true"></span></button>
@@ -43,10 +137,10 @@
     </aside>
 
     <section class="map-column" aria-label="Interactive study map">
-      <div class="map-toolbar"><div class="basemap-options" role="group" aria-label="Basemap"><button type="button" data-basemap="dark" aria-pressed="false">Dark</button><button type="button" data-basemap="terrain" aria-pressed="false">Terrain</button><button type="button" data-basemap="satellite" aria-pressed="true">Satellite</button></div><button id="fit-study" type="button" title="Fit selected study area">Fit study</button></div>
+      <div class="map-toolbar"><div class="basemap-options" role="group" aria-label="Basemap"><button type="button" data-basemap="satellite" aria-pressed="true">Satellite</button><button type="button" data-basemap="terrain" aria-pressed="false">Terrain</button></div><button id="fit-study" type="button" title="Fit selected study area">Fit study</button></div>
       <div id="map" role="region" aria-label="Arizona map. Use arrow keys to pan and plus or minus to zoom."></div>
       <div id="map-error" class="map-message" role="status" hidden>Basemap tiles could not load. Study outlines are still available. Try the other basemap.</div>
-      <div class="map-caption"><span id="map-location">Loading study areas…</span><span>Outlines mark study extents, not sinking zones.</span></div>
+      <div class="map-caption"><span id="map-location">Loading study areas…</span><span>Select an outlined area to read its field note. Outlines are study extents, not sinking zones.</span></div>
       <div id="rate-legend" class="rate-legend" hidden></div>
     </section>
 
@@ -54,6 +148,12 @@
       <div id="detail-content" aria-live="polite"></div>
     </aside>
   </main>
+  <aside id="explain-drawer" class="explain-drawer" tabindex="-1" aria-labelledby="explain-title" aria-live="polite" hidden>
+    <div class="explain-drawer-head"><span class="eyebrow" id="explain-kicker">FIELD NOTE</span><button id="close-explain" type="button" aria-label="Close field note">Close ×</button></div>
+    <h2 id="explain-title"></h2>
+    <p id="explain-text"></p>
+    <p id="explain-note" class="explain-note"></p>
+  </aside>
   <footer class="page-footer"><span>NASA Space Apps 2026 <span class="footer-separator">/</span> Dancing with the SARs</span><span>Independent team project · Preliminary research</span></footer>
 
   <dialog id="about-dialog" aria-labelledby="dialog-title">
