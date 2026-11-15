@@ -1,4 +1,4 @@
-# SlowSink — NASA Space Apps 2026, "Dancing with the SARs" (NISAR)
+# Sinkronized — NASA Space Apps 2026, "Dancing with the SARs" (NISAR)
 
 ## Current radar decision — November 14, 2026
 
@@ -25,7 +25,7 @@ NISAR's L-band radar can measure it to the millimetre. This project maps where c
 
 ## 3. The end product: what it looks like
 
-### 3.1 Main deliverable: an interactive web map ("SlowSink")
+### 3.1 Main deliverable: an interactive web map ("Sinkronized")
 A single-page web app that opens on a full-screen map of central Arizona.
 
 **Layout**
@@ -285,7 +285,7 @@ The three tracks run **in parallel from hour 0**. They connect only through the 
 - Two layers: NISAR rate rasters (Willcox 128 D, Eloy 077 A) and Sentinel-1 descending mosaic (frames southeast, 34477, central, 7092, 7090) plus ascending cross-check (frame 5125). Hotspots: Eloy-Picacho, Willcox basin, North of Willcox, South of Willcox (Elfrida/McNeal area?), East of Willcox. Probable-mine markers and checked-flat markers from the same cubes.
 - DECISION TO REVIEW: the NISAR rate rasters are OFF by default and drawn relative to the box median. Reason: shown raw, each NISAR box turned uniformly dark red (about -3 cm/yr common drift from a short, noisy record), which would misread as fast sinking. Flip the default in web/index.html if the team disagrees.
 - Hotspot stats (sinking pixels <= -1 cm/yr in each box, Sentinel-1 descending; ascending median at the same pixels): Eloy-Picacho 85 km2 median -1.23 (asc -1.43, only 153 px); Willcox 386 km2 median -2.38 (asc -1.63); North of Willcox 116 km2 median -4.66 (asc -3.55); South 127 km2 median -2.86 (asc -1.91); East 337 km2 median -2.17 (no ascending coverage).
-- Ascending medians are consistently about 30% smaller than descending. Not explained yet (different look geometry, horizontal motion, reference). Treat the two directions as agreeing in sign and ranking, not in size.
+- In three of the four areas that have an ascending check (Willcox, Fort Grant Road, Elfrida) the ascending median is about a quarter to a third smaller than the descending one; at Eloy (only 153 pixels) it is about 16% larger. Not explained yet (different look geometry, horizontal motion, reference). Treat the two directions as agreeing in sign and ranking, not in size.
 - Blue (rising) patch on the Willcox Playa floor: probably wet or swelling soil, unverified.
 - Not done: click-any-point values, ADWR comparison, farmland acres, data centers, time slider, GitHub Pages deploy (needs repo owner's OK).
 - Basemap: Esri World Dark Gray / World Imagery (CARTO tiles now require an API key). CDN scripts pinned with integrity hashes.

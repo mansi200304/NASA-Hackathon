@@ -1,6 +1,6 @@
-# SlowSink
+# Sinkronized
 
-*Arizona’s groundwater is draining. Its ground is sinking.*
+*The desert sinks. The radar keeps the beat.*
 
 NASA Space Apps 2026 — **Dancing with the SARs** (NISAR). 
 
