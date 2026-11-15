@@ -324,9 +324,6 @@ function explainButton(key) {
   button.addEventListener('click', () => showFieldNote(...FIELD_NOTES[key]));
   return button;
 }
-function showStudyNote(feature) {
-  showFieldNote(feature.properties.name, feature.properties.story || FIELD_NOTES.study[1], FIELD_NOTES.study[2]);
-}
 function renderDetails() {
   resetTimeView();
   const feature = state.hotspots.features.find(f => f.properties.slug === state.selected);
