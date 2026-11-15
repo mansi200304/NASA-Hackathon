@@ -6,7 +6,7 @@ from pyproj import Transformer
 from PIL import Image
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CACHE = f"{ROOT}/data/processed/cache"; OUT = f"{ROOT}/web/data"; os.makedirs(OUT, exist_ok=True)
+CACHE = f"{ROOT}/data/processed/cache"; OUT = f"{ROOT}/web/map-v0/data"; os.makedirs(OUT, exist_ok=True)
 THR = -1.0                      # cm/yr: "sinking" threshold used for all hotspot masks
 RES = 0.0025                    # degrees per web-raster pixel (~250 m)
 AZ = (-114.85, 31.30, -109.00, 37.00)   # lon/lat window for the web raster

@@ -1,0 +1,22 @@
+{
+ "bounds": [
+  [
+   32.6,
+   -111.9
+  ],
+  [
+   33.0,
+   -111.4
+  ]
+ ],
+ "units": "cm/yr",
+ "vmin": -6,
+ "vmax": 2,
+ "colormap": "custom: red = sinking, transparent = stable, blue = rising",
+ "track": "NISAR track 077 ascending, rate relative to box median, PRELIMINARY (under 4 months)",
+ "dates": [
+  "2026-06-19",
+  "2026-10-17"
+ ],
+ "crs": "EPSG:4326"
+}

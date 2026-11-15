@@ -1,0 +1,65 @@
+{
+ "type": "FeatureCollection",
+ "features": [
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -111.13,
+     31.861
+    ]
+   },
+   "properties": {
+    "name": "Sierrita Mine area",
+    "reason": "Open-pit copper mine (OpenStreetMap). Ground motion here is mining, not groundwater.",
+    "source": "OpenStreetMap place and land-use lookup"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -111.058,
+     31.983
+    ]
+   },
+   "properties": {
+    "name": "Mission Complex area",
+    "reason": "Copper mine complex (OpenStreetMap). Mining, not groundwater.",
+    "source": "OpenStreetMap place and land-use lookup"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -110.968,
+     33.148
+    ]
+   },
+   "properties": {
+    "name": "Ray Mine area",
+    "reason": "Open-pit copper mine (OpenStreetMap). Mining, not groundwater.",
+    "source": "OpenStreetMap place and land-use lookup"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -109.346,
+     33.127
+    ]
+   },
+   "properties": {
+    "name": "Morenci area",
+    "reason": "Placed at the mining town of Morenci; mine features not retrieved. Likely mining, not groundwater.",
+    "source": "OpenStreetMap place and land-use lookup"
+   }
+  }
+ ]
+}

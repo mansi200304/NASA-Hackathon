@@ -1,0 +1,22 @@
+{
+ "bounds": [
+  [
+   31.300000000005184,
+   -114.85
+  ],
+  [
+   36.070000000000846,
+   -109.00000000000531
+  ]
+ ],
+ "units": "cm/yr",
+ "vmin": -6,
+ "vmax": 2,
+ "colormap": "custom: red = sinking, transparent = stable, blue = rising",
+ "track": "Sentinel-1 descending frames, mosaic",
+ "dates": [
+  "2016-07-16",
+  "2026-04-14"
+ ],
+ "crs": "EPSG:4326"
+}

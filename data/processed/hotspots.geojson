@@ -1,0 +1,205 @@
+{
+ "type": "FeatureCollection",
+ "features": [
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -111.7,
+       32.55
+      ],
+      [
+       -111.4,
+       32.55
+      ],
+      [
+       -111.4,
+       32.82
+      ],
+      [
+       -111.7,
+       32.82
+      ],
+      [
+       -111.7,
+       32.55
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "slug": "eloy",
+    "name": "Eloy \u2013 Picacho",
+    "tagline": "The long sink",
+    "county": "Pinal",
+    "story": "A long-known farm-pumping subsidence area. The sinking belt is real but modest in this record.",
+    "confirmation": "both look directions",
+    "land_use_note": "Farmland all around (60 OpenStreetMap polygons within 3 km of the core); no mines nearby.",
+    "source_note": "Sentinel-1 OPERA DISP-S1, 2016 to 2026; outline is the study box, not the sinking area"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -110.1,
+       31.9
+      ],
+      [
+       -109.6,
+       31.9
+      ],
+      [
+       -109.6,
+       32.34
+      ],
+      [
+       -110.1,
+       32.34
+      ],
+      [
+       -110.1,
+       31.9
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "slug": "willcox",
+    "name": "Willcox basin",
+    "tagline": "The largest sink",
+    "county": "Cochise",
+    "story": "The largest sinking area we found, in a valley with heavy irrigation pumping and the Willcox Playa crane habitat.",
+    "confirmation": "both look directions",
+    "land_use_note": "Farmland all around (24 OpenStreetMap polygons within 3 km); no mines nearby.",
+    "source_note": "Sentinel-1 OPERA DISP-S1, 2016 to 2026; outline is the study box, not the sinking area"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -110.15,
+       32.36
+      ],
+      [
+       -109.85,
+       32.36
+      ],
+      [
+       -109.85,
+       32.6
+      ],
+      [
+       -110.15,
+       32.6
+      ],
+      [
+       -110.15,
+       32.36
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "slug": "north_willcox",
+    "name": "North of Willcox",
+    "tagline": "The fastest patch",
+    "county": "Graham",
+    "story": "A fast-sinking patch north of the Willcox basin, seen by three different satellite tracks.",
+    "confirmation": "both look directions",
+    "land_use_note": "Not checked (map-service lookup failed).",
+    "source_note": "Sentinel-1 OPERA DISP-S1, 2016 to 2026; outline is the study box, not the sinking area"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -109.85,
+       31.55
+      ],
+      [
+       -109.55,
+       31.55
+      ],
+      [
+       -109.55,
+       31.9
+      ],
+      [
+       -109.85,
+       31.9
+      ],
+      [
+       -109.85,
+       31.55
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "slug": "south",
+    "name": "South of Willcox (Elfrida / McNeal area?)",
+    "tagline": "The southern sink",
+    "county": "Cochise",
+    "story": "A second sinking area in the same valley system, confirmed from two look directions.",
+    "confirmation": "both look directions",
+    "land_use_note": "Farmland all around (19 OpenStreetMap polygons within 3 km); no mines nearby. The place name is a guess.",
+    "source_note": "Sentinel-1 OPERA DISP-S1, 2016 to 2026; outline is the study box, not the sinking area"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -109.55,
+       32.1
+      ],
+      [
+       -109.05,
+       32.1
+      ],
+      [
+       -109.05,
+       32.45
+      ],
+      [
+       -109.55,
+       32.45
+      ],
+      [
+       -109.55,
+       32.1
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "slug": "east",
+    "name": "East of Willcox",
+    "tagline": "Unconfirmed: one look direction",
+    "county": "Cochise",
+    "story": "Large sinking area seen from one look direction only, so it is shown as unconfirmed.",
+    "confirmation": "single look direction",
+    "land_use_note": "Little farmland nearby (0 to 2 polygons); the cause is unclear.",
+    "source_note": "Sentinel-1 OPERA DISP-S1, 2016 to 2026; outline is the study box, not the sinking area"
+   }
+  }
+ ]
+}
