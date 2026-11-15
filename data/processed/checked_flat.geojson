@@ -1,0 +1,133 @@
+{
+ "type": "FeatureCollection",
+ "features": [
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -112.58,
+     33.37
+    ]
+   },
+   "properties": {
+    "name": "Buckeye",
+    "median_rate_cm_yr": -0.03,
+    "p5_rate_cm_yr": -0.24,
+    "note": "Median within 3 km, Sentinel-1 2016 to 2026; no sinking found"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -112.36,
+     33.43
+    ]
+   },
+   "properties": {
+    "name": "Goodyear",
+    "median_rate_cm_yr": 0.0,
+    "p5_rate_cm_yr": -0.22,
+    "note": "Median within 3 km, Sentinel-1 2016 to 2026; no sinking found"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -112.37,
+     33.63
+    ]
+   },
+   "properties": {
+    "name": "Surprise",
+    "median_rate_cm_yr": -0.12,
+    "p5_rate_cm_yr": -0.19,
+    "note": "Median within 3 km, Sentinel-1 2016 to 2026; no sinking found"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -112.27,
+     33.6
+    ]
+   },
+   "properties": {
+    "name": "Sun City",
+    "median_rate_cm_yr": -0.22,
+    "p5_rate_cm_yr": -0.44,
+    "note": "Median within 3 km, Sentinel-1 2016 to 2026; no sinking found"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -112.19,
+     33.54
+    ]
+   },
+   "properties": {
+    "name": "Glendale",
+    "median_rate_cm_yr": -0.03,
+    "p5_rate_cm_yr": -0.12,
+    "note": "Median within 3 km, Sentinel-1 2016 to 2026; no sinking found"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -112.07,
+     33.45
+    ]
+   },
+   "properties": {
+    "name": "Phoenix",
+    "median_rate_cm_yr": -0.07,
+    "p5_rate_cm_yr": -0.11,
+    "note": "Median within 3 km, Sentinel-1 2016 to 2026; no sinking found"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -111.83,
+     33.42
+    ]
+   },
+   "properties": {
+    "name": "Mesa",
+    "median_rate_cm_yr": 0.09,
+    "p5_rate_cm_yr": 0.03,
+    "note": "Median within 3 km, Sentinel-1 2016 to 2026; no sinking found"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -111.757,
+     32.879
+    ]
+   },
+   "properties": {
+    "name": "Casa Grande",
+    "median_rate_cm_yr": 0.03,
+    "p5_rate_cm_yr": -0.55,
+    "note": "Median within 3 km, Sentinel-1 2016 to 2026; no sinking found"
+   }
+  }
+ ]
+}

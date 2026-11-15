@@ -1,0 +1,22 @@
+{
+ "bounds": [
+  [
+   31.300000000005184,
+   -112.3200000000023
+  ],
+  [
+   33.02000000000362,
+   -109.40500000000495
+  ]
+ ],
+ "units": "cm/yr",
+ "vmin": -6,
+ "vmax": 2,
+ "colormap": "custom: red = sinking, transparent = stable, blue = rising",
+ "track": "Sentinel-1 ascending frame 5125 (cross-check)",
+ "dates": [
+  "2016-07-16",
+  "2026-04-14"
+ ],
+ "crs": "EPSG:4326"
+}

@@ -1,0 +1,23 @@
+{
+ "bounds": [
+  [
+   31.55,
+   -109.85
+  ],
+  [
+   31.9,
+   -109.55
+  ]
+ ],
+ "units": "cm/yr",
+ "vmin": -6,
+ "vmax": 2,
+ "colormap": "custom: red = sinking (away from satellite), transparent = stable, blue = rising",
+ "track": "Sentinel-1 track 129 descending, frame 34478",
+ "dates": [
+  "2016-07-23",
+  "2026-04-14"
+ ],
+ "crs": "EPSG:4326",
+ "valid_pct_of_box": 92.8
+}
