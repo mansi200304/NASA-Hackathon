@@ -21,7 +21,8 @@ The brand remains **Sinkronized**, with the existing Arizona logo, original Sono
 
 | Element | Target CSS | Why |
 | --- | --- | --- |
-| Typeface | System sans: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica Neue, Arial | Robust, crisp, no license-dependent downloads |
+| Body typeface | DM Sans (Google Fonts), falling back to Segoe UI and Arial | Calm, readable longer scientific descriptions |
+| Display typeface | Space Grotesk (Google Fonts), falling back to Avenir Next and Segoe UI | More distinctive but restrained headings |
 | Brand wordmark | 24px, weight 750 | Clear but not dominant |
 | Navigation | 12–13px, weight 600–700 | Compact but readable |
 | Hero primary line | 45–68px, weight 750; 42–56px on mobile | Confident display hierarchy |
@@ -53,3 +54,18 @@ The brand remains **Sinkronized**, with the existing Arizona logo, original Sono
 5. Refresh `web/preview.html` using `node web/build-preview.mjs` after source changes.
 
 **Deployment:** The original repository's `main` does not automatically deploy the public Vercel site; it is connected to teammate's `ray021207/NASA-Hackathon` fork. A teammate with fork write access must sync that fork's `main`.
+
+## Study report after laptop screenshot review
+
+- Selecting a study region must **only** update the outlined study, interactive graph, selected data and report. It must **not** open the bottom field-note drawer.
+- The basemap has no click-to-field-note behavior. ADWR context polygons must remain click-through so the study outline receives selection clicks. Discrete source markers may still have small attribution popups.
+- Explicit **Explain** buttons remain interactive and use a compact explanation panel, not a full-width bottom sheet. Label text should be at least 14px.
+- The field report begins with its authentic short insight summary, confidence labels and six concise insight cards. Each card exposes a first-sentence excerpt taken directly from the data; expanded text is the exact source text.
+- Show the rate and region context side by side on laptops. Put observation records, ADWR comparisons, NISAR status and study limitations inside the **Methods, measurements & validation** disclosure, using a two-column grid when space permits.
+- Preserve the existing interactive map graph, time-frame controls and full observation table. Nothing may fabricate movement rates or confidence.
+- The Overview's **Why look in both directions?** explainer should display ascending and descending views as two cards on sufficiently wide screens, with the single-look uncertainty caveat intact.
+- On narrow viewports, report cards and technical evidence collapse to one column. Avoid overlapping map controls and chart.
+
+## Font loading
+
+`web/index.html` requests the open-source DM Sans and Space Grotesk families via Google Fonts. If the font host is offline or blocked, the local fallbacks remain usable. No font binaries are checked into the repository.

@@ -288,3 +288,174 @@ dialog p,dialog li{font-size:15px;line-height:1.7}
 @media(prefers-reduced-motion:reduce){
  *,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important}
 }
+
+/* Report readability pass — user review of 13-inch laptop screenshot.
+   Space Grotesk is a display face; DM Sans stays legible for long scientific copy. */
+:root{
+  --sans:"DM Sans","Segoe UI",Arial,sans-serif;
+  --display:"Space Grotesk","Avenir Next","Segoe UI",sans-serif;
+}
+.masthead .wordmark,.overview h1,.overview h1 em,
+.overview-narrative-head h2,.overview-purpose-header h2,.overview-proof-heading h2,
+.overview-evidence h2,.workspace .atlas-heading h2,.workspace .details-panel h1,
+.workspace .study-empty h2,.workspace .sidebar-intro p,dialog h2,
+.overview-narrative-grid h3,.overview-audiences h3,.overview-proof-number,
+.overview-proof-card h3,.workspace .details-panel .insight-point h3{
+  font-family:var(--display);
+  letter-spacing:-.042em;
+}
+.overview h1{font-weight:700;line-height:1.09}
+.overview h1 em{font-weight:400;letter-spacing:-.036em}
+.overview-narrative-head h2,.overview-purpose-header h2,.overview-proof-heading h2,.overview-evidence h2,
+.workspace .atlas-heading h2{font-weight:600}
+.workspace .details-panel h1{font-weight:650;line-height:1.18}
+.workspace .map-chart .detail-section-heading{align-items:center;gap:14px;flex-wrap:wrap}
+.workspace .map-chart .detail-section h2{font-family:var(--display);font-size:18px;font-weight:600;letter-spacing:-.025em;margin:0 0 12px}
+.workspace .map-chart{width:min(430px,calc(100% - 36px))}
+.workspace .map-chart .chart-readout{font-size:14px;line-height:1.5}
+.workspace .map-chart .chart-label{font-size:12px}
+.workspace .map-chart .chart svg{min-height:190px}
+.workspace .explain-trigger,
+.workspace .map-chart .explain-trigger,
+.overview .explain-trigger{
+  display:inline-flex;align-items:center;justify-content:center;gap:5px;
+  font:700 14px/1.3 var(--sans);
+  color:var(--rust);background:#f8eee7;border:1px solid #ead5c7;border-radius:10px;
+  padding:9px 12px;text-decoration:none;white-space:normal;max-width:none;
+  transition:background .18s ease,border-color .18s ease;
+}
+.workspace .explain-trigger:hover{background:#f2dfd1;border-color:#dab4a1}
+.workspace .study-context{margin:0 0 14px}
+.workspace .study-context .explain-trigger{font-size:14px}
+.workspace .details-panel .metric .explain-trigger{margin-top:13px}
+.explain-drawer{
+  position:fixed;left:auto;right:clamp(14px,3vw,36px);bottom:clamp(14px,3vw,36px);
+  width:min(440px,calc(100vw - 28px));max-height:min(510px,75dvh);
+  overflow:auto;z-index:1900;background:var(--paper);
+  border:1px solid #dfd6cd;border-top:3px solid var(--rust);border-radius:17px;
+  box-shadow:0 20px 70px rgba(26,23,19,.22);padding:23px 25px 24px;
+}
+.explain-drawer h2{font:600 25px/1.2 var(--display);letter-spacing:-.03em;margin:13px 0 12px}
+.explain-drawer p{font:400 15px/1.7 var(--sans);max-width:none}
+.explain-drawer .explain-note{font-size:13px}
+.explain-drawer-head .eyebrow{font-size:12px}
+.explain-drawer-head button{font-size:14px;font-weight:700}
+
+/* A prominent overview, with six brief, independently scannable insight cards. */
+.workspace #detail-content{grid-template-columns:repeat(12,minmax(0,1fr));gap:18px 24px;align-items:stretch}
+.workspace #detail-content>*{grid-column:span 6}
+.workspace #detail-content>.detail-kicker,
+.workspace #detail-content>h1,.workspace #detail-content>.story-name,
+.workspace #detail-content>.study-context,.workspace #detail-content>.confirmation-chip,
+.workspace #detail-content>.report-highlights,.workspace #detail-content>.report-technical,
+.workspace #detail-content>.detail-bottom,.workspace #detail-content>.study-empty{grid-column:1/-1}
+.workspace .details-panel .report-highlights{
+  padding:20px 0 32px;border-top:1px solid var(--rule);border-bottom:0;
+  display:block;min-width:0;
+}
+.workspace .report-highlights .insights-header{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:17px}
+.workspace .report-highlights .report-eyebrow{display:block;color:var(--olive);font:750 11px/1.4 var(--sans);letter-spacing:.11em;margin-bottom:8px}
+.workspace .report-highlights .insights-title{font:600 clamp(26px,3vw,37px)/1.18 var(--display);letter-spacing:-.04em;margin:0}
+.workspace .report-highlights .insights-lead{display:grid;grid-template-columns:minmax(0,1.32fr) minmax(260px,.68fr);align-items:center;gap:25px;margin-bottom:24px}
+.workspace .report-highlights .insights-summary{font:450 clamp(17px,1.7vw,21px)/1.62 var(--sans);color:var(--ink);max-width:790px;margin:0}
+.workspace .report-highlights .confidence-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:0}
+.workspace .report-highlights .confidence-pill{display:flex;flex-direction:column;justify-content:center;gap:4px;padding:14px 13px;border:1px solid #ded8cc;background:var(--faint);border-radius:12px;min-width:0}
+.workspace .report-highlights .confidence-pill small{display:block;color:var(--slate-deep);font:600 12px/1.35 var(--sans)}
+.workspace .report-highlights .confidence-pill strong{display:block;font:700 14px/1.4 var(--sans);color:var(--ink)}
+.workspace .report-highlights .insight-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch;gap:14px}
+.workspace .report-highlights .insight-point{display:flex;flex-direction:column;gap:0;min-width:0;min-height:210px;border:1px solid #e2dcd2;border-radius:16px;background:var(--paper);padding:22px 21px 20px}
+.workspace .report-highlights .insight-number{display:inline-block;color:var(--olive);font:750 11px/1.4 var(--sans);letter-spacing:.1em}
+.workspace .report-highlights .insight-point h3{font:600 20px/1.26 var(--display);letter-spacing:-.035em;margin:15px 0 12px;color:var(--ink)}
+.workspace .report-highlights .insight-point>p{font:400 15px/1.66 var(--sans);color:var(--slate-deep);margin:0}
+.workspace .report-highlights .insight-expansion{margin-top:auto;padding-top:17px}
+.workspace .report-highlights .insight-expansion summary{cursor:pointer;color:var(--rust);font:700 13px/1.4 var(--sans);text-decoration:underline;text-underline-offset:4px;list-style-position:inside}
+.workspace .report-highlights .insight-expansion[open] summary{margin-bottom:12px}
+.workspace .report-highlights .insight-expansion p{font:400 14px/1.72 var(--sans);color:var(--slate-deep);margin:0;border-top:1px solid var(--rule);padding-top:13px}
+.workspace #detail-content>.metric,.workspace #detail-content>.report-why{grid-column:span 6}
+.workspace .details-panel .metric,.workspace .details-panel .report-why{
+  grid-column:span 6;align-self:stretch;
+  border:1px solid #e4ddd1;border-radius:16px;background:var(--faint);
+  padding:25px 28px;margin:0;min-width:0;
+}
+.workspace .details-panel .metric{border-left:3px solid var(--rust)}
+.workspace .details-panel .metric-value{font:650 clamp(29px,3vw,42px)/1.23 var(--display);letter-spacing:-.045em}
+.workspace .details-panel .metric-label{font:700 12px/1.4 var(--sans);text-transform:uppercase;letter-spacing:.055em}
+.workspace .details-panel .metric-note{font:400 13.5px/1.65 var(--sans)}
+.workspace .details-panel .report-why{border-left:3px solid var(--olive)}
+.workspace .details-panel .report-why .detail-section-heading h2{font:600 23px/1.3 var(--display);letter-spacing:-.025em}
+.workspace .details-panel .report-why .detail-copy{font:400 16px/1.7 var(--sans)}
+
+/* Technical material remains complete but no longer overwhelms the report. */
+.workspace .report-technical{grid-column:1/-1;border:1px solid #e2dcd2;border-radius:16px;overflow:hidden;background:var(--paper);margin-top:9px}
+.workspace .report-technical-toggle{display:flex;align-items:center;justify-content:space-between;gap:12px 30px;flex-wrap:wrap;cursor:pointer;padding:23px 26px;list-style:none}
+.workspace .report-technical-toggle::-webkit-details-marker{display:none}
+.workspace .report-technical-title{font:600 clamp(20px,2.2vw,26px)/1.3 var(--display);letter-spacing:-.028em;color:var(--ink)}
+.workspace .report-technical-hint{font:500 13px/1.55 var(--sans);color:var(--slate-deep)}
+.workspace .report-technical-toggle::after{content:"+";font:400 27px/1 var(--display);color:var(--rust)}
+.workspace .report-technical[open] .report-technical-toggle::after{content:"−"}
+.workspace .report-technical-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 35px;border-top:1px solid var(--rule);padding:28px 27px 32px}
+.workspace .report-technical-grid>.detail-section{margin:0;padding:0;min-width:0;border:0}
+.workspace .report-technical-grid>.detail-section .detail-section-heading{padding:0 0 13px;border-bottom:1px solid var(--rule)}
+.workspace .report-technical-grid>.detail-section h2{font:600 18px/1.32 var(--display);letter-spacing:-.025em}
+.workspace .report-technical-grid>.detail-section .detail-facts{font-size:14px}
+.workspace .report-technical-grid>.detail-section .validation-note{font-size:14px;line-height:1.7}
+.workspace .report-technical-grid .chart{display:block}
+.workspace .report-technical-grid table{font-size:13px}
+.workspace .report-technical-grid .chart details summary{font-size:14px;padding:6px 0}
+.workspace .report-technical-grid a{font-weight:700}
+.workspace .details-panel .detail-bottom{grid-column:1/-1}
+.workspace .details-panel .detail-bottom button{font:700 14px/1.4 var(--sans);text-decoration:underline}
+.workspace .details-panel .confirmation-chip{display:inline-block;justify-self:start;width:max-content;max-width:100%;font-size:12px}
+.workspace .details-panel .story-name{margin-bottom:12px}
+
+/* Two legitimate look geometries; two columns, not one long paragraph. */
+.overview-evidence .overview-science-note{padding:22px 25px}
+.overview-evidence .overview-science-note summary{font:600 clamp(18px,2.2vw,24px)/1.28 var(--display);letter-spacing:-.025em;gap:25px}
+.overview-evidence .overview-science-note summary span{font-size:26px}
+.look-direction-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;margin:10px 0 18px}
+.look-direction-tile{padding:18px;border:1px solid #e2dcd2;border-radius:12px;background:var(--faint);min-width:0}
+.look-direction-tile .direction-number{display:block;font:700 11px/1.4 var(--sans);letter-spacing:.06em;color:var(--olive);margin-bottom:12px}
+.look-direction-tile strong{font:600 19px/1.3 var(--display);letter-spacing:-.026em;color:var(--ink)}
+.look-direction-tile strong span{color:var(--rust)}
+.overview-evidence .overview-science-note .look-direction-tile p{font-size:14px;line-height:1.6;margin:10px 0 0}
+.overview-evidence .overview-science-note .look-direction-caveat{font-size:15px;line-height:1.7;margin:9px 0 18px}
+
+@media(max-width:1240px){
+ .workspace .report-highlights .insights-lead{grid-template-columns:minmax(0,1fr) minmax(230px,.8fr)}
+ .workspace .report-highlights .insight-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .workspace .map-chart{width:min(375px,calc(100% - 28px))}
+}
+@media(max-width:900px){
+ .workspace .report-highlights .insights-lead{grid-template-columns:1fr;gap:17px}
+ .workspace .report-highlights .confidence-row{max-width:530px}
+ .workspace .map-chart{width:min(335px,calc(100% - 24px))}
+ .workspace .report-technical-grid{gap:18px}
+}
+@media(max-width:800px){
+ .workspace #detail-content{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+ .workspace #detail-content>*{grid-column:span 1}
+ .workspace #detail-content>.detail-kicker,.workspace #detail-content>h1,.workspace #detail-content>.story-name,
+ .workspace #detail-content>.study-context,.workspace #detail-content>.confirmation-chip,
+ .workspace #detail-content>.report-highlights,.workspace #detail-content>.report-technical,
+ .workspace #detail-content>.detail-bottom,.workspace #detail-content>.study-empty{grid-column:1/-1}
+ .workspace .report-highlights .insight-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .workspace #detail-content>.metric,.workspace #detail-content>.report-why{grid-column:span 1}
+ .workspace .report-technical-grid{grid-template-columns:1fr}
+ .workspace .map-chart{width:100%}
+}
+@media(max-width:620px){
+ .workspace #detail-content{grid-template-columns:1fr}
+ .workspace #detail-content>*{grid-column:1/-1}
+ .workspace .report-highlights .insight-grid{grid-template-columns:1fr}
+ .workspace .report-highlights .insights-header{align-items:flex-start;flex-direction:column;gap:11px}
+ .workspace .report-highlights .confidence-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+ .workspace .report-highlights .insight-point{min-height:0}
+ .workspace #detail-content>.metric,.workspace #detail-content>.report-why{grid-column:1/-1}
+ .workspace .report-technical-toggle{padding:20px;align-items:flex-start}
+ .workspace .report-technical-grid{padding:23px 20px}
+ .look-direction-grid{grid-template-columns:1fr}
+ .explain-drawer{right:12px;bottom:12px;max-height:75dvh;padding:20px}
+}
+@media(prefers-reduced-motion:reduce){
+ .workspace .report-highlights .insight-point{animation:none;transition:none}
+}
