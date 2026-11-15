@@ -2704,6 +2704,9 @@ function makeOverlay(raw, key) {
   const color = key === 'checked_flat' ? COLORS.olive : key === 'mines_excluded' ? COLORS.slate : COLORS.rust;
   return L.geoJSON(raw, {
     bubblingMouseEvents: false,
+    // Official ADWR context polygons sit above study outlines. Do not let them
+    // intercept clicks meant to select a study and load its graph/report.
+    interactive: key !== 'adwr_subsidence',
     style: { color, weight: 1.3, fillOpacity: key === 'adwr_subsidence' ? 0 : 0.12, opacity: 0.8 },
     pointToLayer: (feature, latlng) => L.circleMarker(latlng, { radius: 5, color, weight: 1.5, fillColor: color, fillOpacity: 0.8 }),
     onEachFeature: (feature, layer) => {
@@ -2718,7 +2721,7 @@ function makeOverlay(raw, key) {
       if (key === 'checked_flat' && p.note) popup.append(el('p', '', p.note + (isNumber(p.median_rate_cm_yr) ? ' · median ' + formatNumber(p.median_rate_cm_yr) + ' cm/yr' : '')));
       const source = safeSourceURL(p.source_url);
       if (source) { const a = el('a', '', 'Source'); a.href = source; a.target = '_blank'; a.rel = 'noopener noreferrer'; popup.append(a); }
-      layer.bindPopup(popup);
+      if (key !== 'adwr_subsidence') layer.bindPopup(popup);
       // Context layers retain their Leaflet source popup without a second drawer.
     }
   });
