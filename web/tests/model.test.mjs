@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizeSeries, normalizeRate, normalizeHotspots, validateGeoJSON, safeSourceURL, formatNumber, cleanInsights, normalizeCumulative, cleanTeam, cleanNisar } from '../model.mjs';
+import { normalizeSeries, normalizeRate, normalizeHotspots, validateGeoJSON, safeSourceURL, formatNumber, cleanInsights, normalizeCumulative, cleanTeam, cleanNisar, cleanPumping } from '../model.mjs';
 import { readFile } from 'node:fs/promises';
 
 const series = extra => ({ hotspot: 'eloy', units: 'cm', reference: 'Synthetic test reference', dates: ['2026-01-01', '2026-01-13'], displacement: [0, -1], rate_cm_yr: -2, rate_sigma: 0.2, ...extra });
@@ -172,4 +172,24 @@ test('Overview: the NISAR section sits right after the hero, is hidden until dat
   assert.ok(spans.length >= 15);
   const app = await readFile(new URL('../app.js', import.meta.url), 'utf8');
   for (const key of new Set(spans)) assert.ok(app.includes(key === 'r' || /^[a-z]+$/.test(key) ? key : "'" + key + "'"), 'app.js fills ' + key);
+});
+
+test('Pumping summary: the real file validates; any bad or missing field hides the section', async () => {
+  const raw = JSON.parse(await readFile(new URL('../../data/processed/pumping_summary.json', import.meta.url), 'utf8'));
+  const p = cleanPumping(raw);
+  assert.ok(p, 'real summary is valid');
+  assert.ok(p.high < p.none, 'sinking is faster where pumping is highest');
+  const bad = (k, v) => cleanPumping({ ...raw, [k]: v });
+  assert.equal(bad('rho', null), null);
+  assert.equal(bad('rho', 2), null);
+  assert.equal(bad('rate_high', 'x'), null);
+  assert.equal(bad('fields', 0), null);
+  assert.equal(cleanPumping(null), null);
+  assert.equal(cleanPumping({}), null);
+  const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
+  const i = html.indexOf('id="overview-pumping"');
+  assert.ok(i > html.indexOf('id="overview-nisar"') && i < html.indexOf('id="overview-story"'));
+  assert.match(html.slice(i - 20, i + 200), /hidden/);
+  const app = await readFile(new URL('../app.js', import.meta.url), 'utf8');
+  for (const key of new Set([...html.matchAll(/data-pump="([a-z0-9-]+)"/g)].map(m => m[1]))) assert.ok(app.includes(key === 'acft' || /^[a-z]+$/.test(key) ? key : "'" + key + "'"), 'app.js fills ' + key);
 });

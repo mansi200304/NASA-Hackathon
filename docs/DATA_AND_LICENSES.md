@@ -9,6 +9,7 @@
 | OPERA DISP-S1 (Sentinel-1 displacement) | 2016-2026 sinking map and study-area rates | NASA JPL OPERA project via ASF DAAC. Derived from Copernicus Sentinel-1 data (ESA). Open with citation. |
 | ADWR land-subsidence products | Check of our results; official sinking zones | Arizona Department of Water Resources. Used here as a published reference for comparison. **Terms not independently verified by us; attribute ADWR and do not present our maps as ADWR products.** |
 | OpenStreetMap | Identifying probable mines and farmland near clusters | (c) OpenStreetMap contributors, ODbL. `mines_excluded` and `checked_flat` are derived from it. |
+| USGS irrigation withdrawals, Willcox basin, 2024 (DOI 10.5066/P1ZU6T5N) | Field polygons with modelled irrigation withdrawals (acre-feet per year) for the pumping-vs-sinking analysis | USGS Arizona Water Science Center (Read, Kahler, Porter, Potteiger), published 2025-08-13, CC0 1.0 (public domain). Modelled estimates (modified Blaney-Criddle consumptive use); the release states no uncertainty. |
 | Esri basemap tiles | Map background | Esri terms of use; attribution is shown on the map. Not redistributed. |
 | Copernicus GLO-30 DEM | Ground heights to apply NISAR's troposphere tables (not redistributed; cached locally) | Free licence from Copernicus/ESA; EGM2008 heights; public distribution needs the source notice "Contains modified Copernicus data" and credit to DLR and Airbus for modified data. |
 | Leaflet 1.9.4 | Map library (`web/vendor/`) | BSD-2-Clause, `web/vendor/LICENSE-leaflet`. |

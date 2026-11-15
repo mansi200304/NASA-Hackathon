@@ -1,4 +1,4 @@
-import { normalizeSeries, normalizeRate, normalizeHotspots, validateGeoJSON, safeSourceURL, formatNumber, isNumber, cleanInsights, normalizeCumulative, cleanTeam, cleanNisar } from './model.mjs';
+import { cleanPumping, normalizeSeries, normalizeRate, normalizeHotspots, validateGeoJSON, safeSourceURL, formatNumber, isNumber, cleanInsights, normalizeCumulative, cleanTeam, cleanNisar } from './model.mjs';
 
 const $ = selector => document.querySelector(selector);
 const DATA = new URL('../data/processed/', import.meta.url);
@@ -646,6 +646,7 @@ const dialogCopy = {
       <li><a href="https://github.com/mansi200304/NASA-Hackathon" target="_blank" rel="noopener noreferrer">Sinkronized · code and pipeline outputs</a></li>
       <li><a href="https://nisar.jpl.nasa.gov/" target="_blank" rel="noopener noreferrer">NASA-ISRO NISAR mission information</a></li>
       <li><a href="https://doi.org/10.5067/NIL2GUNW-P1" target="_blank" rel="noopener noreferrer">NISAR L2 Geocoded Unwrapped Interferogram (GUNW), Provisional · ASF DAAC</a> — DOI 10.5067/NIL2GUNW-P1; the NISAR data processed here.</li>
+      <li><a href="https://doi.org/10.5066/P1ZU6T5N" target="_blank" rel="noopener noreferrer">Read, A. L., Kahler, A. J., Porter, T. J. &amp; Potteiger, S. E. \u00b7 Estimated crop irrigation water use withdrawals in Willcox Groundwater Basin, Arizona for 2024 (USGS data release)</a> \u2014 DOI 10.5066/P1ZU6T5N, CC0; field polygons with modelled withdrawals (modified Blaney-Criddle consumptive-use model; no uncertainty stated).</li>
       <li><a href="https://doi.org/10.5281/ZENODO.20075813" target="_blank" rel="noopener noreferrer">NISAR Data User Guide (Kristenson et al., 2026) · ASF</a> — DOI 10.5281/ZENODO.20075813; product definitions, maturity levels and availability used throughout this project.</li>
       <li><a href="https://doi.org/10.48577/jpl.UD4HV3" target="_blank" rel="noopener noreferrer">NASA-ISRO SAR (NISAR) Mission Science Users’ Handbook, Second Edition (2025)</a> — DOI 10.48577/jpl.UD4HV3.</li>
       <li><a href="https://ecommons.cornell.edu/entities/publication/5e298b2f-9ae6-4861-abfe-a8c194323c08" target="_blank" rel="noopener noreferrer">Devlin, K. (2025) · More Than Just Noise: Effects of Vegetation and Agriculture on InSAR Time Series Analysis</a> — Cornell University PhD dissertation; reports an average bias of about 2–4 cm/yr of apparent subsidence for crops such as cotton in Sentinel-1 data, and the largest C-band versus L-band differences in orchard crops.</li>
@@ -871,3 +872,30 @@ function renderNisar(n) {
   section.hidden = false;
 }
 loadNisar().then(renderNisar);
+
+// Pumping-vs-sinking section: filled only from validated data (data/processed/pumping_summary.json); hidden if anything is missing or malformed.
+async function loadPumping() {
+  try {
+    if (window.ATLAS_PREVIEW_DATA && 'pumping_summary.json' in window.ATLAS_PREVIEW_DATA) return cleanPumping(window.ATLAS_PREVIEW_DATA['pumping_summary.json']);
+    const response = await fetch(new URL('pumping_summary.json', DATA), { cache: 'no-cache' });
+    return response.ok ? cleanPumping(await response.json()) : null;
+  } catch { return null; }
+}
+function renderPumping(p) {
+  const section = $('#overview-pumping');
+  if (!section) return;
+  if (!p) { section.hidden = true; return; }
+  const n0 = x => new Intl.NumberFormat('en-US').format(Math.round(x)), one = x => (Math.round(x * 10) / 10).toFixed(1), two = x => (Math.round(x * 100) / 100).toFixed(2);
+  const s2 = x => (x < 0 ? '−' : '') + two(Math.abs(x)), s1 = x => (Math.round(x * 10) === 0 ? '0.0' : (x < 0 ? '−' : '') + one(Math.abs(x)));
+  const values = {
+    acft: n0(Math.round(p.acreFt / 1000) * 1000), acres: n0(p.acres), fields: n0(p.fields), radius: String(p.radius),
+    none: s1(p.none), low: s1(p.low), medium: s1(p.medium), high: s1(p.high),
+    rho: s2(p.rho), 'rho-lo': s2(p.rhoLo), 'rho-hi': s2(p.rhoHi), 'rho-in': s2(p.rhoIn), 'rho-acres': s2(p.rhoAcres),
+    partial: s2(p.partial), 'partial-lo': s2(p.partialLo), 'partial-hi': s2(p.partialHi),
+    coherent: String(Math.round(p.coherent)), 'row-fields': n0(p.rowFields), 'row-with': n0(p.rowWith), 'field-n': n0(p.fieldN),
+    'field-rho': s2(p.fieldRho), 'field-lo': s2(p.fieldLo), 'field-hi': s2(p.fieldHi)
+  };
+  section.querySelectorAll('[data-pump]').forEach(node => { node.textContent = values[node.dataset.pump] ?? ''; });
+  section.hidden = false;
+}
+loadPumping().then(renderPumping);

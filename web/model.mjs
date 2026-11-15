@@ -173,3 +173,16 @@ export function cleanNisar(raw) {
   const ok = [out.pattern, out.weather, out.sinking, out.playa, out.overlap].every(g => Object.values(g).every(v => v !== null)) && out.willcox && out.eloy && out.figure && out.farmland && out.directions;
   return ok ? out : null;
 }
+// Pumping-vs-sinking numbers for the Overview (data/processed/pumping_summary.json, src/export_pumping.py). Strict like cleanNisar: any bad field hides the section.
+export function cleanPumping(raw) {
+  if (!raw || typeof raw !== 'object') return null;
+  const o = {
+    fields: nz(raw.fields, 1, 1e6), acres: nz(raw.acres, 1, 1e8), acreFt: nz(raw.withdrawal_acre_ft, 1, 1e9), radius: nz(raw.radius_km, 0.1, 100),
+    none: nz(raw.rate_none, -100, 100), low: nz(raw.rate_low, -100, 100), medium: nz(raw.rate_medium, -100, 100), high: nz(raw.rate_high, -100, 100),
+    rho: nz(raw.rho, -1, 1), rhoLo: nz(raw.rho_lo, -1, 1), rhoHi: nz(raw.rho_hi, -1, 1), rhoIn: nz(raw.rho_in, -1, 1), rhoInLo: nz(raw.rho_in_lo, -1, 1), rhoInHi: nz(raw.rho_in_hi, -1, 1),
+    rhoAcres: nz(raw.rho_acres, -1, 1), partial: nz(raw.partial, -1, 1), partialLo: nz(raw.partial_lo, -1, 1), partialHi: nz(raw.partial_hi, -1, 1),
+    fieldN: nz(raw.field_n, 1, 1e6), fieldRho: nz(raw.field_rho, -1, 1), fieldLo: nz(raw.field_lo, -1, 1), fieldHi: nz(raw.field_hi, -1, 1), coherent: nz(raw.field_coherent_pct, 0, 100),
+    rowFields: nz(raw.rowcrop_fields, 1, 1e6), rowWith: nz(raw.rowcrop_with_rate, 0, 1e6)
+  };
+  return Object.values(o).every(v => v !== null) ? o : null;
+}

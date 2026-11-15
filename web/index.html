@@ -163,6 +163,34 @@
         <p class="overview-proof-qualifier"><strong>Other cautions.</strong> Rain brightens every land type at once: NISAR’s scene-wide brightness follows the previous three days’ rainfall (rank correlation <span data-nisar="rho-hh"></span> for HH, <span data-nisar="rho-hv"></span> for HV; rainfall from the ERA5 weather reanalysis on a 25 km grid). So we compare crops with desert on the same date and re-checked the scores using only the <span data-nisar="dry"></span> dry dates. Not settled: NISAR’s own L-band rates also put cropland below desert (<span data-nisar="nisar-diff"></span> cm/yr), but only <span data-nisar="nisar-cells"></span> cropland cells stay coherent all year, so we do not trust that size. The land-cover map describes the 2025 growing season while the radar year runs to November 2026, and fields rotate. None of this shows which farm, well or user caused any sinking.</p>
       </div>
     </section>
+    <section id="overview-pumping" class="overview-proof overview-nisar" aria-labelledby="pumping-title" hidden>
+      <div class="overview-proof-heading">
+        <span class="overview-mission-label">PUMPING / WHERE THE WATER IS TAKEN</span>
+        <h2 id="pumping-title">Where farms are estimated to pump the most, the ground sinks the most.</h2>
+        <p>The USGS maps every irrigated field in the Willcox basin and estimates how much groundwater each one drew in 2024. We laid those estimates over the ten-year Sentinel-1 sinking map. <strong>The pumping figures are a model’s estimates, not meter readings.</strong></p>
+      </div>
+      <div class="overview-proof-grid">
+        <article class="overview-proof-card">
+          <span class="overview-proof-id">01 / THE PUMPING</span>
+          <strong class="overview-proof-number"><span data-pump="acft"></span> <small>acre-feet a year</small></strong>
+          <h3>About <span data-pump="acft"></span> acre-feet from <span data-pump="acres"></span> irrigated acres.</h3>
+          <p>USGS counts <span data-pump="fields"></span> irrigated fields, all watered from groundwater, in 2024. An acre-foot is the water that covers an acre one foot deep.</p>
+        </article>
+        <article class="overview-proof-card">
+          <span class="overview-proof-id">02 / WHERE IT SINKS</span>
+          <strong class="overview-proof-number"><span data-pump="high"></span> <small>cm/yr where pumping is highest</small></strong>
+          <h3>Sinking steps up with the pumping nearby.</h3>
+          <p>Sorting the basin into 300 m blocks by the estimated pumping within <span data-pump="radius"></span> km, the typical block reads <span data-pump="none"></span> cm/yr with no field nearby, <span data-pump="low"></span> with a little pumping, <span data-pump="medium"></span> with more, and <span data-pump="high"></span> with the most (negative means sinking).</p>
+        </article>
+        <article class="overview-proof-card">
+          <span class="overview-proof-id">03 / HOW STRONG</span>
+          <strong class="overview-proof-number"><span data-pump="rho"></span> <small>correlation</small></strong>
+          <h3>A clear link, but mostly about where the fields are.</h3>
+          <p>Ranking blocks by pumping and by sinking gives <span data-pump="rho"></span> (95% range <span data-pump="rho-lo"></span> to <span data-pump="rho-hi"></span>); <span data-pump="rho-in"></span> inside the pumped area alone. Irrigated acreage by itself scores <span data-pump="rho-acres"></span>, so the modelled volumes add little beyond where the irrigated land is (<span data-pump="partial"></span>, range <span data-pump="partial-lo"></span> to <span data-pump="partial-hi"></span>).</p>
+        </article>
+      </div>
+      <p class="overview-proof-qualifier"><strong>What this does not show.</strong> Matching places is not proof of cause: the pumping is a 2024 model estimate while the radar rate averages ten years, and C-band radar can over-read sinking over farmland (see above). The field-by-field test is inconclusive: only <span data-pump="coherent"></span>% of fields kept a usable 30 m radar reading, mostly idle land, orchards and vineyards, while almost all of the <span data-pump="row-fields"></span> field-crop fields (small grains, cover crops, alfalfa, corn and cotton) lost it (<span data-pump="row-with"></span> kept), so the heaviest pumpers are missing. Across the <span data-pump="field-n"></span> pumped fields that did keep one, pumping per acre and sinking were barely related (<span data-pump="field-rho"></span>, range <span data-pump="field-lo"></span> to <span data-pump="field-hi"></span>). Water levels in wells, geology and the depth of the clay layers are not included. <button type="button" data-dialog="sources">See the data source ↗</button></p>
+    </section>
     <section id="overview-story" class="overview-narrative" aria-labelledby="overview-narrative-title">
       <div class="overview-narrative-head">
         <div>
