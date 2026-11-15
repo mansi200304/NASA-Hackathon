@@ -531,3 +531,15 @@ html{scroll-padding-top:132px}
 .nisar-figure{margin:30px 0 0;background:var(--paper);border:1px solid #e3ddd3;border-radius:var(--edge-radius);padding:18px 18px 16px}
 .nisar-figure img{display:block;width:100%;height:auto;border-radius:4px}
 .nisar-figure figcaption{font:400 13.5px/1.65 var(--sans);color:var(--slate-deep);margin:12px 4px 0;max-width:960px}
+/* About Us: consistent circular portrait crops for all three contributors. */
+#about .team-photo,
+#about .team-avatar {
+  border-radius: 50%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+}
+#about .team-photo {
+  display: block;
+  object-fit: cover;
+  object-position: center center;
+}
