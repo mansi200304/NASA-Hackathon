@@ -103,7 +103,7 @@ The chart under each study follows the pointer: a cursor, a readout of both line
 
 ## Logo and icons
 
-The original logo is `docs/brand/sinkronized-logo-original.png`. `python src/make_logo_assets.py` trims it and writes `web/assets/` (header logo, 512 px version, browser-tab icon, phone icon). To change the logo, replace the original and re-run that command. The header image is decorative (the name beside it is the accessible label).
+The original logo is `docs/brand/sinkronized-logo-original.png`. `python src/make_logo_assets.py` trims it and writes `web/assets/` (header logo, 512 px version, browser-tab icon, phone icon). To change the logo, replace the original and re-run that command (if the original has an opaque white background, the script clears it automatically). The header image is decorative (the name beside it is the accessible label).
 
 ## Design
 
