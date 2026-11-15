@@ -2,6 +2,8 @@
 
 *The desert sinks. The radar keeps the beat.*
 
+**Live site: https://sinkronized.vercel.app**
+
 NASA Space Apps 2026 — **Dancing with the SARs** (NISAR). 
 
 Arizona's aquifers are being pumped faster than they refill, and the ground is sinking. NISAR's L-band radar can measure that motion to the millimetre. This project maps where central Arizona is sinking, how fast, and what sits on top of it: farms, new data centers, and wildlife habitat.
