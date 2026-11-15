@@ -11,6 +11,10 @@ Newest first. The earlier log is at the end of AGENTS.md (section 14 and the dat
 - Willcox NISAR LOS rate: -3.44 +/- 1.23 before, -2.82 +/- 0.93 cm/yr after. Still not stable: -1.1 cm/yr if the series stops at Aug 22; lag-1 correlation -0.47 shows single bad dates remain (Sep 15 2026 is the worst). Not a reliable rate.
 - Eloy 077 A (same reference as before, 3.9 months): residual 9.2 to 6.0 mm; rate -3.92 +/- 3.00 before, -4.76 +/- 1.94 cm/yr after. Short record; Sentinel-1 gives about -1.3 at Eloy-Picacho, so this is not used as a result.
 - Sentinel-1 results are unchanged. Exports rebuilt (timeseries_*.json, rate_nisar_*.png).
+- NISAR vs Sentinel-1 at Willcox, spatial (src/compare_nisar_s1.py, docs/nisar_vs_sentinel1_willcox.png, data/processed/nisar_vs_sentinel1.json). Both descending (NISAR 128 D, Sentinel-1 129 D), 300 m blocks, each map shifted by its own median:
+  - NISAR 1-year per-pixel rate vs Sentinel-1 10-year rate, 12,850 blocks: r = 0.581 (0.60 without the Sep 15 date; 0.48 using only the two end dates). Where Sentinel-1 shows sinking (<= -1 cm/yr, 1404 blocks) NISAR shows -3.87 cm/yr relative to the rest, Sentinel-1 -2.27: same place, NISAR larger (short noisy record or recent acceleration; not resolved).
+  - Playa circle: NISAR net change over 0.99 yr = -1.74 cm (a bad middle date cancels in the chain), Sentinel-1 10-year trend -1.68 cm/yr and last-3-years -2.74 cm/yr. Consistent within the noise (one date is about 1 to 1.5 cm); not a precise validation.
+  - Six-month overlap change (Oct 2025 to Apr 2026): NO agreement (r = -0.172). The signal in six months (about 1 cm) is below the noise, and Sentinel-1 has only two dates in that window (nearest Oct 4 and Apr 14, 22 days off NISAR's start). Reported as a limit.
 
 ## Nov 14 2026, late night: website review and plain-language insights
 
