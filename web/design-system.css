@@ -515,3 +515,13 @@ html{scroll-padding-top:132px}
 .about-outro a:hover{color:var(--rust)}
 @media(max-width:950px){.about-lead{grid-template-columns:1fr;gap:22px}.about-heading h2{max-width:720px}.about-story{max-width:740px}.team-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.team-card{min-height:320px}}
 @media(max-width:650px){.about{padding-top:62px;scroll-margin-top:35px}.about-heading h2{font-size:clamp(38px,9vw,52px)}.about-lead{padding-bottom:43px}.about-roster-heading{align-items:flex-start;flex-direction:column;gap:6px}.team-grid{grid-template-columns:1fr;gap:12px}.team-card{min-height:0;padding:24px}.team-card-top{margin-bottom:25px}.team-bio{margin-bottom:22px}.about-outro{align-items:flex-start;flex-direction:column;gap:12px}}
+
+/* Real team photos, education details and readable card hierarchy. */
+.team-card-top{margin-bottom:25px}
+.team-photo,.team-avatar{width:112px;height:112px;border-radius:14px}
+.team-photo{object-position:center 40%;background:var(--surface)}
+.team-avatar{font-size:30px}
+.team-card .team-education{margin:6px 0 20px;padding:14px 0 0;border-top:1px solid var(--rule);font:500 14px/1.6 var(--sans);color:var(--on-sand)}
+.team-card .team-bio{color:var(--muted)}
+.team-card .team-specialism{margin-top:auto}
+@media(max-width:650px){.team-photo,.team-avatar{width:96px;height:96px}}
