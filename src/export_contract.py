@@ -1,4 +1,4 @@
-"""Write the data contract the Field-atlas UI reads (CLAUDE.md section 13) into data/processed/, from the same cubes as the map.
+"""Write the data contract the Field-atlas UI reads (AGENTS.md section 13) into data/processed/, from the same cubes as the map.
 Files: hotspots.geojson, timeseries_<slug>.json, rate_<slug>.png/.json  (+ extra region layers, see docs/UI_DATA_CONTRACT.md).
 Values: LOS cm and cm/yr, negative = sinking (ground moving away from the satellite). Unknown = null, never 0.
 Usage: python export_contract.py   (run export_web.py first is not required; this script loads the cubes itself)"""

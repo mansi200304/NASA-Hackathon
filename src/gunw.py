@@ -1,5 +1,5 @@
 """Read one NISAR GUNW pair, subtract the ionosphere screen, and return LOS displacement (mm) over a lon/lat window.
-Sign convention d = -(lambda/4pi)*phi is the CLAUDE.md assumption and is UNVERIFIED against the product spec."""
+Sign convention d = -(lambda/4pi)*phi is the AGENTS.md assumption and is UNVERIFIED against the product spec."""
 import h5py, numpy as np
 from pyproj import Transformer
 GRID = "science/LSAR/GUNW/grids/frequencyA/"

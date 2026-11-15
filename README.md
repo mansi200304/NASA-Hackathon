@@ -54,7 +54,7 @@ See [Track selection and next checkpoint](docs/track_selection.md). Some pairs s
 
 MVP: NISAR GUNW (ASF), ADWR historical subsidence maps, ADWR boundaries, compiled data-center locations and a protected/riparian layer. USDA Cropland Data Layer is a stretch goal. Sentinel-1 processing and the time slider are outside the 12-hour MVP.
 
-See [CLAUDE.md](CLAUDE.md) for the full project brief.
+See [AGENTS.md](AGENTS.md) for the full project brief.
 
 ## Run the map locally
 

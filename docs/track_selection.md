@@ -6,7 +6,7 @@ This handoff updates the original track-128-at-Eloy plan without changing the 12
 
 Reviewed repository snapshot: [54a66b8](https://github.com/mansi200304/NASA-Hackathon/commit/54a66b87649333a0ef3de4b28db4a4b7dbb216e6), November 14, 2026.
 
-- [CLAUDE.md, section 14](../CLAUDE.md): Reshma's recorded results from the track-128 D / frame-072 October 9–21, 2026 test file.
+- [AGENTS.md, section 14](../AGENTS.md): Reshma's recorded results from the track-128 D / frame-072 October 9–21, 2026 test file.
 - [scene_list.json](../data/processed/scene_list.json): committed catalogue records audited here.
 - [coverage_check2.py](../src/coverage_check2.py): existing coverage diagnostics.
 

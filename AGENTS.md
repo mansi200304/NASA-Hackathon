@@ -140,7 +140,7 @@ docs/            # method + limits text
 - Data is Provisional / Uncalibrated; numbers are preliminary.
 - Data center water use is often not published; where unknown, we say so.
 
-## 10. How I want to work (instructions for Claude)
+## 10. How I want to work (instructions for the AI assistant)
 - Teach step by step; explain the "why" before the code. Don't build everything at once.
 - Every stage ends in a real measured number, not just a working demo.
 - Real processing pipeline; no hardcoded or ground-truth shortcuts.

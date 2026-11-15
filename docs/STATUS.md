@@ -1,6 +1,6 @@
 # Status log
 
-Newest first. The earlier log is at the end of CLAUDE.md (section 14 and the dated entries after it); new entries go here to avoid merge conflicts with other edits to CLAUDE.md and README.md.
+Newest first. The earlier log is at the end of AGENTS.md (section 14 and the dated entries after it); new entries go here to avoid merge conflicts with other edits to AGENTS.md and README.md.
 
 ## Nov 14 2026, late night: website review and plain-language insights
 

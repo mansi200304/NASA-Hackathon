@@ -1,7 +1,7 @@
 import sys, json, numpy as np
 from gunw import read_window, ref_median
 path = sys.argv[1]
-# Hotspot windows (from CLAUDE.md) and a UNVERIFIED hand-picked reference point (mountain bedrock) per hotspot.
+# Hotspot windows (from AGENTS.md) and a UNVERIFIED hand-picked reference point (mountain bedrock) per hotspot.
 H = {"eloy": ((-111.9, 32.6, -111.4, 33.0), (-111.3, 32.75)),   # Picacho/Silver Bell area east edge: placeholder reference, unverified
      "willcox": ((-110.1, 31.9, -109.6, 32.4), (-109.98, 31.95))}  # Dragoon Mountains (unverified coordinates)
 out = {}
