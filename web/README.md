@@ -142,3 +142,9 @@ This is the first UI for team review. It does not deploy GitHub Pages or change 
 The Overview, bottom field notes and interactive chart points are all presentation-layer changes; they do not alter measured values, map rasters, study geometries or scientific assumptions. The number, names and order of studies still come from `hotspots.geojson`. No fabricated observations or per-pixel measurements are added.
 
 To test: open `/web/` from a repository-root server, select every available study, inspect a point in each chart, open and close a field note, toggle satellite/terrain imagery, and review the layout at desktop and phone widths. `node web/build-preview.mjs` recreates the distributable data-snapshot page after later pipeline changes.
+
+## Why Arizona? Research-backed Overview
+
+The new opening story explains why this Arizona-based team chose to study groundwater-related land subsidence and who can benefit from the atlas (residents, planners, water managers, researchers and conservation groups). The Overview includes three **historical evidence cards** with direct source links: the USGS compaction mechanism, the 1.09 m 1965–1983 Eloy measurement, and ADWR's estimated 155,805 acre-feet of agricultural water use in Willcox in 2022. The latter is supported by a peer-reviewed 2023 Willcox land-use/groundwater paper.
+
+The Resources dialog includes an annotated bibliography of the agency reports, peer-reviewed research, processing data and mapping sources. **`docs/overview_evidence.md` maps each claim to a publication, year, geographic scope and limitation.** Historical agency and research results are explicitly distinct from the team's satellite-exported measurements. In particular, regional groundwater pumping and farming pressures do not identify the operator or activity responsible for any individual map pixel.
