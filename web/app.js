@@ -356,7 +356,12 @@ function renderDetails() {
     wait.append(el('span', 'waiting-mark'), el('p', '', 'No observations to plot yet'), el('small', '', dataError(result, 'The chart will use the measured record. Pending does not mean zero movement.')));
     chartSection.append(wait);
   }
-  root.append(chartSection);
+  const chartTarget = $('#study-chart');
+  chartTarget.hidden = false;
+  chartTarget.replaceChildren(chartSection);
+  const chartFooter = el('a', 'map-chart-details', 'Read the full ' + p.name + ' study report ↓');
+  chartFooter.href = '#details';
+  chartTarget.append(chartFooter);
   const record = section('Measurement record', 'record');
   record.append(factList([
     ['Satellite / product', series?.source || meta?.track || 'Not supplied'],
@@ -366,6 +371,14 @@ function renderDetails() {
     ['Data release', series?.data_release || meta?.data_release || 'Not supplied']
   ]));
   root.append(record);
+  // The observation table belongs with the report; the map shows the graph only.
+  const table = chartSection.querySelector('.chart details');
+  if (table) {
+    table.remove();
+    const observations = section('Observation table');
+    observations.append(table);
+    root.append(observations);
+  }
   const caveats = Array.isArray(series?.caveats) ? series.caveats.filter(text => typeof text === 'string' && text.trim()) : [];
   if (caveats.length) {
     const limits = section('Study measurement limits');
@@ -421,7 +434,7 @@ function renderHotspots() {
     const title = el('span', 'place', f.properties.name);
     title.append(el('span', 'tagline', f.properties.tagline));
     button.append(title);
-    button.addEventListener('click', () => { selectHotspot(f.properties.slug); showStudyNote(f); });
+    button.addEventListener('click', () => selectHotspot(f.properties.slug));
     list.append(button);
   });
 }
@@ -449,7 +462,7 @@ function initMap() {
   map = L.map('map', { zoomControl: false, minZoom: 5, maxZoom: 18, zoomSnap: 0.25, attributionControl: true }).setView([32.8, -111.65], 9);
   map.createPane('measurements'); map.getPane('measurements').style.zIndex = 330;
   map.createPane('timeframes'); map.getPane('timeframes').style.zIndex = 335;
-  L.control.zoom({ position: 'topright' }).addTo(map);
+  L.control.zoom({ position: 'bottomright' }).addTo(map);
   L.control.scale({ imperial: false, position: 'bottomleft' }).addTo(map);
   const tileSources = {
     terrain: { url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', attribution: 'Tiles &copy; Esri &mdash; Esri, HERE, Garmin, USGS, NGA, EPA, USDA, NPS' },
@@ -470,7 +483,7 @@ function initMap() {
     const tooltip = el('div', '', f.properties.name);
     if (f.properties.confirmation) tooltip.append(el('small', '', f.properties.confirmation));
     layer.bindTooltip(tooltip, { sticky: true, className: 'study-label' });
-    layer.on('click', () => { selectHotspot(f.properties.slug); showStudyNote(f); });
+    layer.on('click', () => selectHotspot(f.properties.slug));
     layer.addTo(outlineGroup); state.outlines.set(f.properties.slug, layer);
   });
   map.on('click', event => {
@@ -639,7 +652,7 @@ $('#reload-data').addEventListener('click', () => location.reload());
 $('#toggle-layers').addEventListener('click', () => {
   const open = $('.sidebar').classList.toggle('layers-open');
   $('#toggle-layers').setAttribute('aria-expanded', String(open));
-  $('#toggle-layers').textContent = open ? 'Hide layers' : 'Layers';
+  $('#toggle-layers').textContent = open ? 'Hide map layers' : 'Show map layers';
 });
 $('#show-all').addEventListener('click', showAll);
 $('#fit-study').addEventListener('click', fitSelected);
@@ -672,7 +685,7 @@ async function start() {
   }
   state.hotspots = hotspots.value;
   state.slugs = state.hotspots.features.map(f => f.properties.slug);
-  state.selected = state.slugs[0];
+  state.selected = null; // Begin with all study outlines, not a preselected location.
   $('#study-count').textContent = String(state.slugs.length).padStart(2, '0');
   state.layers.set('hotspots', { name: LAYER_INFO.hotspots.name, status: 'ready', visible: true, opacity: 1 });
   state.layers.set('rate', { name: LAYER_INFO.rate.name, status: 'loading', visible: true, opacity: 0.75 });
@@ -682,7 +695,7 @@ async function start() {
   for (const [key] of MARKER_LAYERS) state.layers.set(key, { name: LAYER_INFO[key].name, status: 'loading', visible: true, opacity: 0.9 });
   renderHotspots(); initMap();
   state.layers.get('hotspots').layer = outlineGroup;
-  renderDetails(); renderLayerControls(); selectHotspot(state.selected);
+  renderLayerControls(); showAll();
   const tasks = [
     ...state.slugs.map(async slug => state.series.set(slug, await loadJSON('timeseries_' + slug + '.json', raw => normalizeSeries(raw, slug)))),
     ...state.slugs.map(async slug => state.rates.set(slug, await loadJSON('rate_' + slug + '.json', normalizeRate))),
@@ -719,7 +732,8 @@ async function start() {
     })()
   ];
   await Promise.all(tasks);
-  renderDetails(); updateRateLayer();
+  if (state.selected) renderDetails();
+  updateRateLayer();
   const hasMeasurements = [...state.series.values()].some(r => r.status === 'ready' && r.value.hasData);
   const problems = [...state.series.values(), ...state.rates.values(), ...state.layers.values()].some(r => ['invalid', 'error'].includes(r.status));
   setStatus(problems ? 'Some files need review' : hasMeasurements ? 'Measured record loaded' : 'Measurements pending');

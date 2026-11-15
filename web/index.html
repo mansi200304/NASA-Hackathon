@@ -80,7 +80,7 @@
         <p class="overview-lede">Our cities, farms and desert communities depend on groundwater that lies out of sight. When water levels decline, the land above can slowly sink.</p>
         <p class="overview-subcopy">Sinkronized brings satellite radar observations and published groundwater research together, so the evidence is easier to explore—and its limits easier to understand.</p>
         <div class="overview-actions">
-          <a class="overview-primary" href="#atlas">Explore the interactive map <span aria-hidden="true">↗</span></a>
+          <a class="overview-primary" href="#atlas">Explore study regions <span aria-hidden="true">↗</span></a>
           <a class="overview-story-link" href="#overview-story">Read our story <span aria-hidden="true">↓</span></a>
         </div>
       </div>
@@ -184,14 +184,20 @@
   </section>
 
   <main id="atlas" class="workspace">
-    <aside class="sidebar" aria-label="Study areas and map layers">
-      <div class="sidebar-intro"><span class="eyebrow">Arizona / Ground & water</span><p>Ground in motion.<br>One shared resource.</p></div>
+    <header class="atlas-heading">
+      <span class="eyebrow">ARIZONA / SATELLITE FIELD ATLAS</span>
+      <h2>Explore study regions</h2>
+      <p>Select one of the outlined study areas to view its measured displacement graph. The accompanying study report appears below the map.</p>
+    </header>
+
+    <aside class="sidebar" aria-label="Study regions and map layers">
+      <div class="sidebar-intro"><span class="eyebrow">STUDY REGIONS</span><p>Select a region</p></div>
       <section class="study-section" aria-labelledby="study-heading">
         <a class="return-overview" href="#overview">← Back to overview</a>
-        <h2 id="study-heading">Study areas <span id="study-count">—</span></h2>
+        <h2 id="study-heading">Regions in the dataset <span id="study-count">—</span></h2>
         <div id="hotspot-list" class="hotspot-list"></div>
-        <button id="show-all" class="text-action" type="button">View all study areas <span class="out-arrow" aria-hidden="true"></span></button>
-        <button id="toggle-layers" class="mobile-layer-toggle" type="button" aria-controls="layer-section" aria-expanded="false">Layers</button>
+        <button id="show-all" class="text-action" type="button">Show all regions on map <span class="out-arrow" aria-hidden="true"></span></button>
+        <button id="toggle-layers" class="mobile-layer-toggle" type="button" aria-controls="layer-section" aria-expanded="false">Show map layers</button>
       </section>
       <section id="layer-section" class="layer-section" aria-labelledby="layers-heading">
         <h2 id="layers-heading">Map layers</h2>
@@ -200,17 +206,27 @@
       <div class="sidebar-footer"><span class="status-dot"></span><span id="data-status">Loading project files…</span><button id="reload-data" type="button">Refresh data</button></div>
     </aside>
 
-    <section class="map-column" aria-label="Interactive study map">
-      <div class="map-toolbar"><div class="basemap-options" role="group" aria-label="Basemap"><button type="button" data-basemap="satellite" aria-pressed="true">Satellite</button><button type="button" data-basemap="terrain" aria-pressed="false">Terrain</button></div><button id="fit-study" type="button" title="Fit selected study area">Fit study</button></div>
-      <div id="map" role="region" aria-label="Arizona map. Use arrow keys to pan and plus or minus to zoom."></div>
+    <section class="map-column" aria-label="Interactive Arizona study map">
+      <div class="map-toolbar"><div class="basemap-options" role="group" aria-label="Basemap"><button type="button" data-basemap="satellite" aria-pressed="true">Satellite</button><button type="button" data-basemap="terrain" aria-pressed="false">Terrain</button></div><button id="fit-study" type="button" title="Fit selected study area">Fit selected region</button></div>
+      <div id="map" role="region" aria-label="Arizona study region map. Select an outlined study region to inspect its graph and full report."></div>
       <div id="map-error" class="map-message" role="status" hidden>Basemap tiles could not load. Study outlines are still available. Try the other basemap.</div>
-      <div class="map-caption"><span id="map-location">Loading study areas…</span><span>Select an outlined area to read its field note. Outlines are study extents, not sinking zones.</span></div>
+      <div class="map-caption"><span id="map-location">All Arizona study regions</span><span>Outlines represent study extents, not measured sinking footprints.</span></div>
       <div id="rate-legend" class="rate-legend" hidden></div>
+      <aside id="study-chart" class="map-chart" aria-label="Interactive graph for the selected study region" hidden></aside>
     </section>
 
-    <aside id="details" class="details-panel" tabindex="-1" aria-label="Selected study details">
-      <div id="detail-content" aria-live="polite"></div>
-    </aside>
+    <section id="details" class="details-panel" tabindex="-1" aria-label="Selected study report">
+      <div class="study-details-head">
+        <span class="eyebrow">STUDY REGION / FIELD REPORT</span>
+        <a href="#atlas">↑ Back to the map</a>
+      </div>
+      <div id="detail-content" aria-live="polite">
+        <div class="study-empty">
+          <h2>Select a study region to read its report.</h2>
+          <p>The map will display the current regions from the team's dataset. Select an outline or region name to view the interactive graph and its supporting measurement record, interpretations and limitations.</p>
+        </div>
+      </div>
+    </section>
   </main>
   <aside id="explain-drawer" class="explain-drawer" tabindex="-1" aria-labelledby="explain-title" aria-live="polite" hidden>
     <div class="explain-drawer-head"><span class="eyebrow" id="explain-kicker">FIELD NOTE</span><button id="close-explain" type="button" aria-label="Close field note">Close ×</button></div>
