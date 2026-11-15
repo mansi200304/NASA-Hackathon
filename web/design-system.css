@@ -500,6 +500,7 @@ html{scroll-padding-top:132px}
 .team-avatar{display:grid;place-items:center;background:var(--surface);color:var(--on-sand);font:700 21px/1 var(--display,var(--sans));letter-spacing:-.04em}
 .team-card h3{font:700 clamp(22px,2vw,28px)/1.16 var(--display,var(--sans));letter-spacing:-.035em;margin:0 0 7px;overflow-wrap:break-word}
 .team-role{font:600 14px/1.45 var(--sans);color:var(--rust);margin:0 0 18px}
+.team-education{font:600 14px/1.6 var(--sans);color:var(--on-sand);margin:-6px 0 18px;max-width:34ch}
 .team-bio{font:400 16px/1.65 var(--sans);color:var(--ink);margin:0 0 24px}
 .team-specialism{border-top:1px solid var(--rule);padding-top:15px;margin-top:auto;display:grid;gap:6px}
 .team-specialism-label{font:700 11px/1.4 var(--sans);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
