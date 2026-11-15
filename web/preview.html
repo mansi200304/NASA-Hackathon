@@ -1063,6 +1063,125 @@ dialog p{color:var(--slate-deep)}
  .overview-rings img{opacity:1!important;transform:none!important;filter:drop-shadow(0 10px 18px #2d2a2520)!important;will-change:auto}
  .overview-rings,.overview-visual-label{opacity:1!important}
 }
+
+/* Map-first study reading. Change layout only; scientific maps and timestamps remain source-led. */
+.workspace{height:auto;min-height:0;display:grid;grid-template-columns:minmax(240px,285px) minmax(0,1fr);grid-template-rows:auto minmax(570px,72dvh) auto;grid-template-areas:"atlas-heading atlas-heading" "regions region-map" "report report";align-items:stretch;background:var(--canvas)}
+.atlas-heading{grid-area:atlas-heading;padding:46px clamp(24px,5vw,76px) 32px;background:var(--canvas);border-top:1px solid var(--rule)}
+.atlas-heading .eyebrow{font:700 11px/1.5 var(--sans);letter-spacing:.1em;color:var(--olive)}
+.atlas-heading h2{font:400 clamp(37px,4.25vw,60px)/1.12 var(--serif);letter-spacing:-.035em;margin:10px 0 14px}
+.atlas-heading p{max-width:800px;font:16px/1.68 var(--sans);color:var(--slate-deep);margin:0}
+.workspace>.sidebar{grid-area:regions;min-height:0;height:100%;overflow:auto;background:var(--surface);padding:22px 20px 19px;border-right:1px solid var(--rule)}
+.workspace .sidebar-intro{display:block}
+.workspace .sidebar-intro .eyebrow{font-size:11px;color:var(--olive);letter-spacing:.1em}
+.workspace .sidebar-intro p{font-size:26px;margin:9px 0 23px}
+.workspace .sidebar h2{font-size:13px;line-height:1.4;align-items:center}
+.workspace .hotspot-button{grid-template-columns:25px 1fr;padding:13px 8px}
+.workspace .hotspot-button .place{font-size:18px}
+.workspace .hotspot-button .tagline{font-size:12px}
+.workspace .text-action{font-size:13px;color:var(--rust)}
+.workspace .mobile-layer-toggle{display:inline-block;margin-top:15px;padding:10px 0;color:var(--rust);font:600 13px/1.4 var(--sans);text-decoration:underline;text-underline-offset:4px}
+.workspace .layer-section{display:none;margin:15px 0 0}
+.workspace .sidebar.layers-open .layer-section{display:block}
+.workspace .layer-section .layer-row label{font-size:13px}
+.workspace .sidebar-footer{font-size:11px}
+.workspace>.map-column{grid-area:region-map;height:100%;min-height:0;position:relative;overflow:hidden}
+.workspace #map{height:100%;width:100%}
+.workspace .map-toolbar{left:18px;right:18px;top:18px}
+.workspace .map-toolbar button{font-size:12px}
+.workspace .map-caption{left:18px;right:18px;bottom:42px;max-width:360px}
+.workspace .map-caption span:first-child{font-size:18px}
+.workspace .map-caption span:last-child{font-size:11px;line-height:1.5}
+.workspace .map-chart{position:absolute;z-index:700;right:20px;top:75px;width:min(395px,calc(100% - 40px));max-height:calc(100% - 116px);overflow:auto;scrollbar-width:thin;background:rgba(244,239,230,.97);border:1px solid rgba(45,42,37,.2);border-top:3px solid var(--rust);box-shadow:0 14px 42px rgba(45,42,37,.16);padding:19px 20px 17px;backdrop-filter:blur(11px)}
+.workspace .map-chart .detail-section{margin:0}
+.workspace .map-chart .detail-section h2{font:600 15px/1.35 var(--sans);margin:0 0 15px}
+.workspace .map-chart .chart svg{width:100%;max-height:none;display:block;overflow:visible}
+.workspace .map-chart .chart .metric-note{font-size:12px}
+.workspace .map-chart .chart-readout{font-size:13px;min-height:45px}
+.workspace .map-chart .time-controls{margin-top:11px}
+.workspace .map-chart .time-row{display:flex;gap:7px;flex-wrap:wrap}
+.workspace .map-chart .time-btn{font-size:11.5px;line-height:1.32;padding:9px 10px}
+.workspace .map-chart .time-status{font-size:12px;line-height:1.6;margin-top:10px}
+.workspace .map-chart .metric-note{font-size:12px;line-height:1.5}
+.workspace .map-chart-details{display:inline-flex;padding:12px 0 2px;text-decoration:none;border-bottom:1px solid var(--rust);font:700 13px/1.45 var(--sans);color:var(--rust)}
+.workspace .rate-legend{z-index:620;right:20px;bottom:54px;max-width:250px}
+.workspace .leaflet-control-zoom{margin:0 18px 180px 0!important}
+.workspace>.details-panel{grid-area:report;min-width:0;overflow:visible;background:var(--canvas);padding:46px clamp(24px,6vw,90px) 75px;border-top:2px solid var(--rust);border-left:0;max-width:none;margin:0}
+.workspace .study-details-head{display:flex;justify-content:space-between;align-items:center;gap:20px;border-bottom:1px solid var(--rule);padding-bottom:17px;margin-bottom:31px}
+.workspace .study-details-head .eyebrow{font:700 11px/1.4 var(--sans);letter-spacing:.12em;color:var(--olive)}
+.workspace .study-details-head a{font:600 13px/1.5 var(--sans);color:var(--rust)}
+.workspace #detail-content{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:clamp(28px,5vw,86px);row-gap:18px;max-width:1320px;margin:0 auto}
+.workspace #detail-content>*{min-width:0;grid-column:span 1}
+.workspace #detail-content>.detail-kicker,.workspace #detail-content>h1,.workspace #detail-content>.story-name,.workspace #detail-content>.study-context,.workspace #detail-content>.confirmation-chip,.workspace #detail-content>.insights,.workspace #detail-content>.metric,.workspace #detail-content>.detail-bottom,.workspace #detail-content>.study-empty{grid-column:1/-1}
+.workspace .details-panel h1{background:transparent;color:var(--ink);border:0;padding:0;margin:0;font:400 clamp(38px,4vw,55px)/1.13 var(--serif);letter-spacing:-.035em}
+.workspace .details-panel .story-name{background:transparent;color:var(--slate-deep);border:0;padding:0;margin:0 0 18px;font:italic 21px/1.45 var(--serif)}
+.workspace .detail-kicker{font:600 12px/1.6 var(--sans);color:var(--olive);margin:0}
+.workspace .study-context{margin:-8px 0 8px}
+.workspace .details-panel .metric{background:var(--faint);padding:20px 24px;border:1px solid var(--rule);margin:0 0 7px}
+.workspace .details-panel .metric-value{font-size:42px}
+.workspace .details-panel .metric-label,.workspace .details-panel .detail-section h2{font-size:14px}
+.workspace .details-panel .detail-section{margin:0;padding:19px 0;border-top:1px solid var(--rule)}
+.workspace .details-panel .detail-section p,.workspace .details-panel .detail-copy{font-size:15.5px;line-height:1.77}
+.workspace .details-panel .validation-note,.workspace .details-panel .metric-note{font-size:13.5px;line-height:1.75}
+.workspace .details-panel .detail-facts{font-size:14px}
+.workspace .details-panel .detail-facts div{grid-template-columns:minmax(110px,.33fr) 1fr}
+.workspace .details-panel .insights{padding:25px 0 18px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.workspace .details-panel .insight-point p{font-size:15px;line-height:1.75}
+.workspace .details-panel .insights-summary{font-size:17px;line-height:1.7}
+.workspace .details-panel .detail-bottom{font-size:13px;line-height:1.65;margin-top:16px}
+.workspace .details-panel .chart{display:none}
+.workspace .study-empty{padding:35px 0 65px;max-width:790px}
+.workspace .study-empty h2{font:400 clamp(27px,3vw,40px)/1.2 var(--serif);margin:0 0 18px}
+.workspace .study-empty p{font:16px/1.75 var(--sans);color:var(--slate-deep);margin:0}
+.workspace .map-chart .chart-wait{height:auto;min-height:130px}
+@media(min-width:1600px){
+ .workspace{grid-template-columns:300px minmax(0,1fr)}
+ .workspace .map-chart{width:440px}
+}
+@media(min-width:801px) and (max-width:1130px){
+ .workspace{grid-template-columns:242px minmax(0,1fr);grid-template-rows:auto minmax(550px,75dvh) auto}
+ .workspace .map-chart{width:min(350px,calc(100% - 30px));right:15px;top:69px;padding:15px 16px}
+ .workspace .map-toolbar{left:12px;right:12px}
+ .workspace .rate-legend{right:15px}
+ .workspace>.sidebar{padding:18px 14px}
+ .workspace .hotspot-button .place{font-size:17px}
+}
+@media(max-width:800px){
+ .workspace{display:flex;flex-direction:column;min-height:0;height:auto}
+ .workspace>.atlas-heading{padding:28px 18px 22px}
+ .workspace .atlas-heading h2{font-size:39px}
+ .workspace .atlas-heading p{font-size:15.5px}
+ .workspace>.sidebar{height:auto;overflow:visible;padding:17px 18px 18px;border-right:0;border-bottom:1px solid var(--rule)}
+ .workspace .sidebar-intro{display:none}
+ .workspace .hotspot-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px 10px}
+ .workspace .hotspot-button{padding:11px 8px;grid-template-columns:1fr}
+ .workspace .hotspot-button .place{font-size:17px}
+ .workspace .layer-section #layer-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .workspace .sidebar-footer{padding:9px;margin-top:12px}
+ .workspace>.map-column{height:auto;min-height:0;display:flex;flex-direction:column;overflow:visible}
+ .workspace #map{height:56dvh;min-height:390px;max-height:690px;flex:none}
+ .workspace .map-chart{position:relative;top:auto;right:auto;width:100%;max-height:none;overflow:visible;box-shadow:none;border-left:0;border-right:0;border-bottom:1px solid var(--rule);padding:20px 18px 22px;background:var(--canvas);backdrop-filter:none}
+ .workspace .map-chart .chart svg{max-width:550px}
+ .workspace .map-toolbar{left:12px;right:12px;top:12px}
+ .workspace .map-caption{top:calc(clamp(390px,56dvh,690px) - 70px);bottom:auto;left:12px;max-width:260px}
+ .workspace .rate-legend{top:calc(clamp(390px,56dvh,690px) - 160px);bottom:auto;right:12px;max-width:170px}
+ .workspace .leaflet-control-zoom{margin:0 12px 85px 0!important}
+ .workspace>.details-panel{padding:32px 20px 45px}
+ .workspace #detail-content{grid-template-columns:1fr;gap:15px}
+ .workspace #detail-content>*{grid-column:1/-1}
+ .workspace .study-details-head{margin-bottom:23px}
+ .workspace .details-panel h1{font-size:40px}
+ .workspace .details-panel .story-name{font-size:19px}
+}
+@media(max-width:420px){
+ .workspace .atlas-heading h2{font-size:34px}
+ .workspace .hotspot-list{grid-template-columns:1fr 1fr;gap:3px 7px}
+ .workspace .hotspot-button .place{font-size:15px}
+ .workspace .map-caption span:first-child{font-size:15px}
+ .workspace .map-chart .time-row{gap:6px}
+ .workspace .map-chart .time-btn{font-size:11px}
+ .workspace .study-details-head{align-items:flex-start}
+ .workspace .study-details-head a{white-space:nowrap}
+}
 </style>
   <style>/* Map-only treatment. The Sonoran Sand application layout and typography are unchanged. */
 .map-column #map{background:#303333}
@@ -1880,7 +1999,12 @@ function renderDetails() {
     wait.append(el('span', 'waiting-mark'), el('p', '', 'No observations to plot yet'), el('small', '', dataError(result, 'The chart will use the measured record. Pending does not mean zero movement.')));
     chartSection.append(wait);
   }
-  root.append(chartSection);
+  const chartTarget = $('#study-chart');
+  chartTarget.hidden = false;
+  chartTarget.replaceChildren(chartSection);
+  const chartFooter = el('a', 'map-chart-details', 'Read the full ' + p.name + ' study report ↓');
+  chartFooter.href = '#details';
+  chartTarget.append(chartFooter);
   const record = section('Measurement record', 'record');
   record.append(factList([
     ['Satellite / product', series?.source || meta?.track || 'Not supplied'],
@@ -1890,6 +2014,14 @@ function renderDetails() {
     ['Data release', series?.data_release || meta?.data_release || 'Not supplied']
   ]));
   root.append(record);
+  // The observation table belongs with the report; the map shows the graph only.
+  const table = chartSection.querySelector('.chart details');
+  if (table) {
+    table.remove();
+    const observations = section('Observation table');
+    observations.append(table);
+    root.append(observations);
+  }
   const caveats = Array.isArray(series?.caveats) ? series.caveats.filter(text => typeof text === 'string' && text.trim()) : [];
   if (caveats.length) {
     const limits = section('Study measurement limits');
@@ -1945,7 +2077,7 @@ function renderHotspots() {
     const title = el('span', 'place', f.properties.name);
     title.append(el('span', 'tagline', f.properties.tagline));
     button.append(title);
-    button.addEventListener('click', () => { selectHotspot(f.properties.slug); showStudyNote(f); });
+    button.addEventListener('click', () => selectHotspot(f.properties.slug));
     list.append(button);
   });
 }
@@ -1973,7 +2105,7 @@ function initMap() {
   map = L.map('map', { zoomControl: false, minZoom: 5, maxZoom: 18, zoomSnap: 0.25, attributionControl: true }).setView([32.8, -111.65], 9);
   map.createPane('measurements'); map.getPane('measurements').style.zIndex = 330;
   map.createPane('timeframes'); map.getPane('timeframes').style.zIndex = 335;
-  L.control.zoom({ position: 'topright' }).addTo(map);
+  L.control.zoom({ position: 'bottomright' }).addTo(map);
   L.control.scale({ imperial: false, position: 'bottomleft' }).addTo(map);
   const tileSources = {
     terrain: { url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', attribution: 'Tiles &copy; Esri &mdash; Esri, HERE, Garmin, USGS, NGA, EPA, USDA, NPS' },
@@ -1994,7 +2126,7 @@ function initMap() {
     const tooltip = el('div', '', f.properties.name);
     if (f.properties.confirmation) tooltip.append(el('small', '', f.properties.confirmation));
     layer.bindTooltip(tooltip, { sticky: true, className: 'study-label' });
-    layer.on('click', () => { selectHotspot(f.properties.slug); showStudyNote(f); });
+    layer.on('click', () => selectHotspot(f.properties.slug));
     layer.addTo(outlineGroup); state.outlines.set(f.properties.slug, layer);
   });
   map.on('click', event => {
@@ -2163,7 +2295,7 @@ $('#reload-data').addEventListener('click', () => location.reload());
 $('#toggle-layers').addEventListener('click', () => {
   const open = $('.sidebar').classList.toggle('layers-open');
   $('#toggle-layers').setAttribute('aria-expanded', String(open));
-  $('#toggle-layers').textContent = open ? 'Hide layers' : 'Layers';
+  $('#toggle-layers').textContent = open ? 'Hide map layers' : 'Show map layers';
 });
 $('#show-all').addEventListener('click', showAll);
 $('#fit-study').addEventListener('click', fitSelected);
@@ -2196,7 +2328,7 @@ async function start() {
   }
   state.hotspots = hotspots.value;
   state.slugs = state.hotspots.features.map(f => f.properties.slug);
-  state.selected = state.slugs[0];
+  state.selected = null; // Begin with all study outlines, not a preselected location.
   $('#study-count').textContent = String(state.slugs.length).padStart(2, '0');
   state.layers.set('hotspots', { name: LAYER_INFO.hotspots.name, status: 'ready', visible: true, opacity: 1 });
   state.layers.set('rate', { name: LAYER_INFO.rate.name, status: 'loading', visible: true, opacity: 0.75 });
@@ -2206,7 +2338,7 @@ async function start() {
   for (const [key] of MARKER_LAYERS) state.layers.set(key, { name: LAYER_INFO[key].name, status: 'loading', visible: true, opacity: 0.9 });
   renderHotspots(); initMap();
   state.layers.get('hotspots').layer = outlineGroup;
-  renderDetails(); renderLayerControls(); selectHotspot(state.selected);
+  renderLayerControls(); showAll();
   const tasks = [
     ...state.slugs.map(async slug => state.series.set(slug, await loadJSON('timeseries_' + slug + '.json', raw => normalizeSeries(raw, slug)))),
     ...state.slugs.map(async slug => state.rates.set(slug, await loadJSON('rate_' + slug + '.json', normalizeRate))),
@@ -2243,7 +2375,8 @@ async function start() {
     })()
   ];
   await Promise.all(tasks);
-  renderDetails(); updateRateLayer();
+  if (state.selected) renderDetails();
+  updateRateLayer();
   const hasMeasurements = [...state.series.values()].some(r => r.status === 'ready' && r.value.hasData);
   const problems = [...state.series.values(), ...state.rates.values(), ...state.layers.values()].some(r => ['invalid', 'error'].includes(r.status));
   setStatus(problems ? 'Some files need review' : hasMeasurements ? 'Measured record loaded' : 'Measurements pending');
@@ -2254,6 +2387,7 @@ start().catch(error => {
   $('#map-error').hidden = false;
   console.error('Atlas initialization failed:', error);
 });
+
 
 </script>
 </head>
@@ -2426,14 +2560,20 @@ start().catch(error => {
   </section>
 
   <main id="atlas" class="workspace">
-    <aside class="sidebar" aria-label="Study areas and map layers">
-      <div class="sidebar-intro"><span class="eyebrow">Arizona / Ground & water</span><p>Ground in motion.<br>One shared resource.</p></div>
+    <header class="atlas-heading">
+      <span class="eyebrow">ARIZONA / SATELLITE FIELD ATLAS</span>
+      <h2>Explore study regions</h2>
+      <p>Select one of the outlined study areas to view its measured displacement graph. The accompanying study report appears below the map.</p>
+    </header>
+
+    <aside class="sidebar" aria-label="Study regions and map layers">
+      <div class="sidebar-intro"><span class="eyebrow">STUDY REGIONS</span><p>Select a region</p></div>
       <section class="study-section" aria-labelledby="study-heading">
         <a class="return-overview" href="#overview">← Back to overview</a>
-        <h2 id="study-heading">Study areas <span id="study-count">—</span></h2>
+        <h2 id="study-heading">Regions in the dataset <span id="study-count">—</span></h2>
         <div id="hotspot-list" class="hotspot-list"></div>
-        <button id="show-all" class="text-action" type="button">View all study areas <span class="out-arrow" aria-hidden="true"></span></button>
-        <button id="toggle-layers" class="mobile-layer-toggle" type="button" aria-controls="layer-section" aria-expanded="false">Layers</button>
+        <button id="show-all" class="text-action" type="button">Show all regions on map <span class="out-arrow" aria-hidden="true"></span></button>
+        <button id="toggle-layers" class="mobile-layer-toggle" type="button" aria-controls="layer-section" aria-expanded="false">Show map layers</button>
       </section>
       <section id="layer-section" class="layer-section" aria-labelledby="layers-heading">
         <h2 id="layers-heading">Map layers</h2>
@@ -2442,17 +2582,27 @@ start().catch(error => {
       <div class="sidebar-footer"><span class="status-dot"></span><span id="data-status">Loading project files…</span><button id="reload-data" type="button">Refresh data</button></div>
     </aside>
 
-    <section class="map-column" aria-label="Interactive study map">
-      <div class="map-toolbar"><div class="basemap-options" role="group" aria-label="Basemap"><button type="button" data-basemap="satellite" aria-pressed="true">Satellite</button><button type="button" data-basemap="terrain" aria-pressed="false">Terrain</button></div><button id="fit-study" type="button" title="Fit selected study area">Fit study</button></div>
-      <div id="map" role="region" aria-label="Arizona map. Use arrow keys to pan and plus or minus to zoom."></div>
+    <section class="map-column" aria-label="Interactive Arizona study map">
+      <div class="map-toolbar"><div class="basemap-options" role="group" aria-label="Basemap"><button type="button" data-basemap="satellite" aria-pressed="true">Satellite</button><button type="button" data-basemap="terrain" aria-pressed="false">Terrain</button></div><button id="fit-study" type="button" title="Fit selected study area">Fit selected region</button></div>
+      <div id="map" role="region" aria-label="Arizona study region map. Select an outlined study region to inspect its graph and full report."></div>
       <div id="map-error" class="map-message" role="status" hidden>Basemap tiles could not load. Study outlines are still available. Try the other basemap.</div>
-      <div class="map-caption"><span id="map-location">Loading study areas…</span><span>Select an outlined area to read its field note. Outlines are study extents, not sinking zones.</span></div>
+      <div class="map-caption"><span id="map-location">All Arizona study regions</span><span>Outlines represent study extents, not measured sinking footprints.</span></div>
       <div id="rate-legend" class="rate-legend" hidden></div>
+      <aside id="study-chart" class="map-chart" aria-label="Interactive graph for the selected study region" hidden></aside>
     </section>
 
-    <aside id="details" class="details-panel" tabindex="-1" aria-label="Selected study details">
-      <div id="detail-content" aria-live="polite"></div>
-    </aside>
+    <section id="details" class="details-panel" tabindex="-1" aria-label="Selected study report">
+      <div class="study-details-head">
+        <span class="eyebrow">STUDY REGION / FIELD REPORT</span>
+        <a href="#atlas">↑ Back to the map</a>
+      </div>
+      <div id="detail-content" aria-live="polite">
+        <div class="study-empty">
+          <h2>Select a study region to read its report.</h2>
+          <p>The map will display the current regions from the team's dataset. Select an outline or region name to view the interactive graph and its supporting measurement record, interpretations and limitations.</p>
+        </div>
+      </div>
+    </section>
   </main>
   <aside id="explain-drawer" class="explain-drawer" tabindex="-1" aria-labelledby="explain-title" aria-live="polite" hidden>
     <div class="explain-drawer-head"><span class="eyebrow" id="explain-kicker">FIELD NOTE</span><button id="close-explain" type="button" aria-label="Close field note">Close ×</button></div>
