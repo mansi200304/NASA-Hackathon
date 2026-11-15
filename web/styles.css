@@ -371,3 +371,23 @@ dialog p{color:var(--slate-deep)}
  .overview-primary,.overview-story-link,.overview-narrative-grid a{transition:none}
  .motion-active .motion-reveal{opacity:1!important;transform:none!important;transition:none!important}
 }
+
+/* Sonoran landscape is decorative and washed out behind the copy. */
+.overview-hero{position:relative;isolation:isolate}
+.overview-desert-art{position:absolute;left:-5vw;bottom:-29px;width:calc(100% + 10vw);height:calc(100% + 42px);z-index:0;pointer-events:none;opacity:.64;filter:saturate(.76);-webkit-mask-image:linear-gradient(to bottom,transparent 0%,#000 23%,#000 85%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0%,#000 23%,#000 85%,transparent 100%)}
+.overview-copy,.overview-visual{position:relative;z-index:1}
+.overview-copy{text-shadow:0 1px 0 rgba(244,239,230,.33)}
+.overview-primary{border-radius:14px;box-shadow:0 8px 18px rgba(166,75,42,.12)}
+.overview-primary:focus-visible{border-radius:14px}
+.overview-rings img{opacity:var(--logo-opacity,1);transform:scale(var(--logo-scale,1));filter:blur(var(--logo-blur,0px)) drop-shadow(0 10px 18px #2d2a2520);will-change:opacity,transform,filter}
+.overview-rings{opacity:var(--rings-opacity,1)}
+.overview-fluid{z-index:2}
+.overview-visual-label{z-index:3;opacity:var(--label-opacity,1)}
+@media(max-width:800px){
+ .overview-desert-art{left:-18%;width:136%;height:430px;bottom:2px;opacity:.44}
+ .overview-primary{border-radius:13px}
+}
+@media(prefers-reduced-motion:reduce){
+ .overview-rings img{opacity:1!important;transform:none!important;filter:drop-shadow(0 10px 18px #2d2a2520)!important;will-change:auto}
+ .overview-rings,.overview-visual-label{opacity:1!important}
+}
