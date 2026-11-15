@@ -43,3 +43,7 @@
 .time-btn[data-kind=stable]::before{background:var(--slate-deep)}
 .time-status{min-height:2.6em}
 @media(max-width:800px){.time-btn{padding:9px 11px;font-size:12px}}
+.layer-group{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--on-sand);font-weight:600;margin:16px 0 2px}
+.layer-group:first-child{margin-top:4px}
+.layer-desc{font-size:11px;line-height:1.5;color:var(--muted);margin:3px 0 0 23px}
+@media(max-width:800px){.layer-section #layer-list .layer-group{grid-column:1/-1;margin-top:10px}}

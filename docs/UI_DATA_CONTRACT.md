@@ -64,7 +64,7 @@ Each `timeseries_<slug>.json` has an `insights` object, written for non-experts 
 
 The app shows `insights` first ("In plain terms"), then the technical panel. Also shown: `rate_sigma_note`, `caveats`, `nisar.status_note`, `land_use_note`, `sign_convention`, `data_release`, the stable-ground chart line, the ADWR comparison and the study `confirmation`.
 
-Region layers listed in the layer panel: `rate_sentinel1_descending` and `_ascending` (hidden by default), `rate_nisar_willcox` and `rate_nisar_eloy` (hidden by default, provisional), `mines_excluded` and `checked_flat` markers (on), plus the ADWR areas. Rate-image JSON carries `sign_convention` and `data_release`, shown as the layer's tooltip.
+Layers in the panel, in four groups, each with a one-line explanation (`LAYER_INFO` in `web/app.js`): Where to look (study areas); What we measured (ground motion for the selected area, the regional `rate_sentinel1_descending` map, and one NISAR switch covering `rate_nisar_willcox` and `rate_nisar_eloy`, hidden by default, provisional); The official record (ADWR areas); Read with care (`mines_excluded`, `checked_flat`). `rate_sentinel1_ascending` is still exported (the cross-check is explained in the Overview) but is not a panel layer. Rate-image JSON carries `sign_convention` and `data_release`, shown as the layer's tooltip.
 
 ## 8. ADWR comparison: how to word it
 

@@ -3,14 +3,19 @@ import { normalizeSeries, normalizeRate, normalizeHotspots, validateGeoJSON, saf
 const $ = selector => document.querySelector(selector);
 const DATA = new URL('../data/processed/', import.meta.url);
 const COLORS = { rust: '#A64B2A', ink: '#2D2A25', olive: '#52664B', sand: '#E4D9C9', slate: '#626D76' };
-// Region-wide layers and marker sets exported by the pipeline (data/processed/). Rasters start hidden; NISAR is provisional.
-const REGION_LAYERS = [
-  ['rate_sentinel1_descending', 'Sentinel-1 sinking rate, 2016–2026', false],
-  ['rate_sentinel1_ascending', 'Sentinel-1 cross-check, opposite direction', false],
-  ['rate_nisar_willcox', 'NISAR, Willcox box · provisional', false],
-  ['rate_nisar_eloy', 'NISAR, Eloy box · provisional, under 4 months', false]
-];
-const MARKER_LAYERS = [['mines_excluded', 'Probable mines (not groundwater)'], ['checked_flat', 'Checked: no sinking found']];
+// Layers in the panel. Each has a group heading and one plain-language line: what it is, and why it is there.
+const LAYER_INFO = {
+  hotspots: { group: 'Where to look', name: 'Study areas', desc: 'The places we studied. Click one to read its numbers and watch it change over time.' },
+  rate: { group: 'What we measured', name: 'Ground motion, selected area', desc: 'How fast the ground in the chosen area moved from 2016 to 2026. Red means sinking. This is our main result.' },
+  rate_sentinel1_descending: { group: 'What we measured', name: 'Sinking map, southern Arizona', desc: 'The same measurement across the whole region, so you can see where the ground is sinking and where it is not.' },
+  nisar: { group: 'What we measured', name: 'NASA NISAR, early record', desc: 'NASA\u2019s new satellite over Willcox and Eloy. Its record is still too short for a reliable speed, so treat it as a preview.' },
+  adwr_subsidence: { group: 'The official record', name: 'Official sinking zones (ADWR)', desc: 'Areas Arizona\u2019s water agency maps as sinking. A check that our results match the official record.' },
+  mines_excluded: { group: 'Read with care', name: 'Probable mines', desc: 'Open-pit mines move for reasons unrelated to groundwater. We mark them so they are not mistaken for aquifer sinking.' },
+  checked_flat: { group: 'Read with care', name: 'Checked: no sinking found', desc: 'Places we checked where the ground is steady, such as Phoenix and the West Valley. Sinking is local, not everywhere.' }
+};
+const REGION_LAYERS = [['rate_sentinel1_descending', false]];                    // region-wide Sentinel-1 rate map (hidden by default)
+const NISAR_LAYERS = ['rate_nisar_willcox', 'rate_nisar_eloy'];                    // one switch for both provisional NISAR overlays
+const MARKER_LAYERS = [['mines_excluded'], ['checked_flat']];
 const state = { selected: null, slugs: [], cumulative: new Map(), time: null, series: new Map(), rates: new Map(), layers: new Map(), outlines: new Map(), base: 'satellite' };
 let map, outlineGroup;
 const el = (tag, className, text) => {
@@ -478,7 +483,10 @@ function initMap() {
 }
 function renderLayerControls() {
   const list = $('#layer-list'); list.replaceChildren();
+  let lastGroup = null;
   state.layers.forEach((config, key) => {
+    const info = LAYER_INFO[key];
+    if (info && info.group !== lastGroup) { lastGroup = info.group; list.append(el('h3', 'layer-group', info.group)); }
     const ready = config.status === 'ready';
     const row = el('div', 'layer-row' + (ready ? '' : ' unavailable'));
     const label = el('label');
@@ -489,6 +497,7 @@ function renderLayerControls() {
     label.append(input, el('span', 'layer-title', config.name), el('span', 'layer-state', statusLabel));
     if (config.error) label.title = config.error; else if (config.note) label.title = config.note;
     row.append(label);
+    if (info?.desc) row.append(el('p', 'layer-desc', info.desc));
     input.addEventListener('change', () => {
       config.visible = input.checked;
       if (key === 'rate') updateRateLayer();
@@ -501,6 +510,7 @@ function renderLayerControls() {
       opacity.addEventListener('input', () => {
         config.opacity = Number(opacity.value) / 100;
         if (key === 'rate') state.rateImage?.setOpacity(config.opacity);
+        else if (key === 'nisar') config.layer?.eachLayer(layer => layer.setOpacity(config.opacity));
         else if (config.layer?.setOpacity) config.layer.setOpacity(config.opacity);
         else config.layer?.setStyle({ opacity: config.opacity, fillOpacity: key === 'adwr_subsidence' ? 0 : MARKER_LAYERS.some(l => l[0] === key) ? config.opacity * 0.8 : config.opacity * 0.15 });
       });
@@ -664,11 +674,12 @@ async function start() {
   state.slugs = state.hotspots.features.map(f => f.properties.slug);
   state.selected = state.slugs[0];
   $('#study-count').textContent = String(state.slugs.length).padStart(2, '0');
-  state.layers.set('hotspots', { name: 'Study outlines', status: 'ready', visible: true, opacity: 1 });
-  state.layers.set('rate', { name: 'Ground motion', status: 'loading', visible: true, opacity: 0.75 });
-  state.layers.set('adwr_subsidence', { name: 'ADWR subsidence areas', status: 'loading', visible: false, opacity: 0.8 });
-  for (const [key, name, visible] of REGION_LAYERS) state.layers.set(key, { name, status: 'loading', visible, opacity: 0.7 });
-  for (const [key, name] of MARKER_LAYERS) state.layers.set(key, { name, status: 'loading', visible: true, opacity: 0.9 });
+  state.layers.set('hotspots', { name: LAYER_INFO.hotspots.name, status: 'ready', visible: true, opacity: 1 });
+  state.layers.set('rate', { name: LAYER_INFO.rate.name, status: 'loading', visible: true, opacity: 0.75 });
+  for (const [key, visible] of REGION_LAYERS) state.layers.set(key, { name: LAYER_INFO[key].name, status: 'loading', visible, opacity: 0.7 });
+  state.layers.set('nisar', { name: LAYER_INFO.nisar.name, status: 'loading', visible: false, opacity: 0.7 });
+  state.layers.set('adwr_subsidence', { name: LAYER_INFO.adwr_subsidence.name, status: 'loading', visible: false, opacity: 0.8 });
+  for (const [key] of MARKER_LAYERS) state.layers.set(key, { name: LAYER_INFO[key].name, status: 'loading', visible: true, opacity: 0.9 });
   renderHotspots(); initMap();
   state.layers.get('hotspots').layer = outlineGroup;
   renderDetails(); renderLayerControls(); selectHotspot(state.selected);
@@ -692,7 +703,20 @@ async function start() {
       config.note = [meta.track, meta.sign_convention, meta.data_release].filter(Boolean).join(' · ');
       const src = window.ATLAS_PREVIEW_IMAGES?.[key + '.png'] || new URL(key + '.png', DATA).href;
       if (map) { config.layer = L.imageOverlay(src, meta.bounds, { pane: 'measurements', opacity: config.opacity, interactive: false }); if (config.visible) config.layer.addTo(map); }
-    })
+    }),
+    (async () => {                                      // both NISAR overlays behind one switch
+      const config = state.layers.get('nisar');
+      const loaded = await Promise.all(NISAR_LAYERS.map(async key => ({ key, result: await loadJSON(key + '.json', normalizeRate) })));
+      const ready = loaded.filter(item => item.result.status === 'ready');
+      if (!ready.length) { config.status = loaded[0].result.status; config.error = loaded[0].result.error; return; }
+      config.status = 'ready';
+      config.note = ready.map(({ result: { value } }) => [value.track, value.sign_convention, value.data_release].filter(Boolean).join(' \u00b7 ')).join(' | ');
+      if (map) {
+        config.layer = L.featureGroup(ready.map(({ key, result }) => L.imageOverlay(window.ATLAS_PREVIEW_IMAGES?.[key + '.png'] || new URL(key + '.png', DATA).href,
+          result.value.bounds, { pane: 'measurements', opacity: config.opacity, interactive: false })));
+        if (config.visible) config.layer.addTo(map);
+      }
+    })()
   ];
   await Promise.all(tasks);
   renderDetails(); updateRateLayer();
