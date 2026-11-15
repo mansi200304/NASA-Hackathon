@@ -2001,7 +2001,22 @@ details.more>summary:not(#_){min-height:44px;padding:11px 16px}
 .geo-grid{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:26px;align-items:start}
 .geo-grid .geo-figure{margin:0}
 .geo-side>.geo-subhead:first-child{margin-top:0}
-@media(max-width:860px){.report-top,.report-summary-row,.geo-grid{grid-template-columns:1fr}}
+@media(max-width:860px){.report-summary-row,.geo-grid{grid-template-columns:1fr}}
+/* Rate and comparison stay side by side at every width; on narrow screens both cards get compact. */
+@media(max-width:860px){
+ .report-top:not(.single){gap:12px}
+ .workspace .details-panel .report-top>.metric:not(#_),.report-compare:not(#_){padding:14px 14px 12px;border-radius:13px}
+ .workspace .details-panel .report-top .metric-value:not(#_){font-size:clamp(24px,6.4vw,34px);line-height:1.15}
+ .workspace .details-panel .report-top .metric-value small{display:block;font-size:13px;margin-top:2px}
+ .workspace .details-panel .report-top .metric-label:not(#_){font-size:11px;letter-spacing:.04em}
+ .workspace .details-panel .report-top .metric-note:not(#_){font-size:12.5px;line-height:1.5}
+ .report-compare .metric-label{margin-bottom:8px}
+ .compare-row:not(#_){grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"name name" "bar value";row-gap:3px;column-gap:8px;min-height:44px;padding:3px 4px;font-size:12.5px}
+ .compare-name{grid-area:name}
+ .compare-bar{grid-area:bar;height:9px}
+ .compare-value{grid-area:value;font-size:12px}
+}
+
 @media(prefers-reduced-motion:reduce){.compare-bar i{animation:none}}
 /* ---- Compact time controls: round play button, checkboxes with map-colour squares ---- */
 .time-controls .time-row:not(#_){display:flex;flex-wrap:wrap;align-items:center;gap:8px}
@@ -3085,10 +3100,16 @@ function renderDetails() {
   const value = el('div', 'metric-value', hasRate ? formatNumber(series.rate_cm_yr) : 'Measurement pending');
   if (hasRate) value.append(el('small', '', (isNumber(series.rate_sigma) ? '± ' + formatNumber(series.rate_sigma) + ' ' : '') + 'cm/yr'));
   metric.append(value);
-  metric.append(note(hasRate
-    ? (isNumber(series.rate_sigma) ? (series.rate_sigma_note || 'Uncertainty supplied by the processing pipeline.') : 'Uncertainty has not been supplied.')
-    : dataError(result, 'Awaiting a referenced time series and fitted rate.')));
-  if (hasRate) metric.append(note(series.sign_convention || 'Sign convention not supplied. This value is not labelled as vertical sinking.'));
+  if (hasRate) {
+    // One plain line on the card; the full uncertainty and sign-convention notes sit behind a toggle so the card stays compact.
+    const sign = series.sign_convention || '';
+    metric.append(note(/negative values mean it moved away \(sinking\)/i.test(sign) ? 'Negative means sinking, measured along the satellite’s slanted view.' : 'Sign convention not supplied. This value is not labelled as vertical sinking.'));
+    const more = el('details', 'more metric-more');
+    more.append(el('summary', '', 'What this number means'),
+      note(isNumber(series.rate_sigma) ? (series.rate_sigma_note || 'Uncertainty supplied by the processing pipeline.') : 'Uncertainty has not been supplied.'));
+    if (sign) more.append(note(sign));
+    metric.append(more);
+  } else metric.append(note(dataError(result, 'Awaiting a referenced time series and fitted rate.')));
   const rateHelp = explainButton('rate'); rateHelp.textContent = 'Explain this rate ↗';
   metric.append(rateHelp);
   const topRow = el('div', 'report-top');

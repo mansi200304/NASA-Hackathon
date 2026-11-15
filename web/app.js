@@ -380,10 +380,16 @@ function renderDetails() {
   const value = el('div', 'metric-value', hasRate ? formatNumber(series.rate_cm_yr) : 'Measurement pending');
   if (hasRate) value.append(el('small', '', (isNumber(series.rate_sigma) ? '± ' + formatNumber(series.rate_sigma) + ' ' : '') + 'cm/yr'));
   metric.append(value);
-  metric.append(note(hasRate
-    ? (isNumber(series.rate_sigma) ? (series.rate_sigma_note || 'Uncertainty supplied by the processing pipeline.') : 'Uncertainty has not been supplied.')
-    : dataError(result, 'Awaiting a referenced time series and fitted rate.')));
-  if (hasRate) metric.append(note(series.sign_convention || 'Sign convention not supplied. This value is not labelled as vertical sinking.'));
+  if (hasRate) {
+    // One plain line on the card; the full uncertainty and sign-convention notes sit behind a toggle so the card stays compact.
+    const sign = series.sign_convention || '';
+    metric.append(note(/negative values mean it moved away \(sinking\)/i.test(sign) ? 'Negative means sinking, measured along the satellite’s slanted view.' : 'Sign convention not supplied. This value is not labelled as vertical sinking.'));
+    const more = el('details', 'more metric-more');
+    more.append(el('summary', '', 'What this number means'),
+      note(isNumber(series.rate_sigma) ? (series.rate_sigma_note || 'Uncertainty supplied by the processing pipeline.') : 'Uncertainty has not been supplied.'));
+    if (sign) more.append(note(sign));
+    metric.append(more);
+  } else metric.append(note(dataError(result, 'Awaiting a referenced time series and fitted rate.')));
   const rateHelp = explainButton('rate'); rateHelp.textContent = 'Explain this rate ↗';
   metric.append(rateHelp);
   const topRow = el('div', 'report-top');
