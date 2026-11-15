@@ -5,7 +5,7 @@
 
 | Material | Used for | Source and terms |
 |---|---|---|
-| NISAR L2 GUNW, Provisional (DOI 10.5067/NIL2GUNW-P1) | Early ground-motion record, Willcox and Eloy | NASA/ISRO NISAR mission, distributed by the ASF DAAC. NASA's Earth science data policy makes data available fully and openly, without restrictions (we could not find a stated citation requirement, and cite it anyway). Provisional = intended for exploration and process studies, partially validated (per the ASF/Earthdata catalog entry). |
+| NISAR L2 GUNW, Provisional (DOI 10.5067/NIL2GUNW-P1) | Early ground-motion record, Willcox and Eloy | NASA/ISRO NISAR mission, distributed by the ASF DAAC. NASA's Earth science data policy makes data available fully and openly, without restrictions (the NISAR Data User Guide says NISAR follows NASA's standard Data Use and Citation Guidance; we cite the collections, the User Guide and the Science Users' Handbook). Provisional = intended for exploration and process studies, partially validated (per the ASF/Earthdata catalog entry). |
 | OPERA DISP-S1 (Sentinel-1 displacement) | 2016-2026 sinking map and study-area rates | NASA JPL OPERA project via ASF DAAC. Derived from Copernicus Sentinel-1 data (ESA). Open with citation. |
 | ADWR land-subsidence products | Check of our results; official sinking zones | Arizona Department of Water Resources. Used here as a published reference for comparison. **Terms not independently verified by us; attribute ADWR and do not present our maps as ADWR products.** |
 | OpenStreetMap | Identifying probable mines and farmland near clusters | (c) OpenStreetMap contributors, ODbL. `mines_excluded` and `checked_flat` are derived from it. |

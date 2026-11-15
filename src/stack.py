@@ -10,7 +10,7 @@ REF = {"willcox": (-109.98, 31.95)}   # Dragoon Mountains, UNVERIFIED coordinate
 ap = argparse.ArgumentParser()
 ap.add_argument("--hotspot", required=True); ap.add_argument("--track", type=int, required=True); ap.add_argument("--frame", type=int, required=True)
 ap.add_argument("--dir", required=True, choices=["D", "A"]); ap.add_argument("--ref", nargs=2, type=float); ap.add_argument("--ref-km", type=float, default=5.0)
-ap.add_argument("--coh", type=float, default=0.4); ap.add_argument("--tag", default=""); ap.add_argument("--tropo", action="store_true", help="also subtract NISAR hydrostatic+wet troposphere screens")
+ap.add_argument("--coh", type=float, default=0.4); ap.add_argument("--tag", default=""); ap.add_argument("--start", default="", help="ISO date: drop pairs whose reference date is earlier (e.g. to leave out Beta-maturity pairs)"); ap.add_argument("--tropo", action="store_true", help="also subtract NISAR hydrostatic+wet troposphere screens")
 a = ap.parse_args()
 box = BOX[a.hotspot]
 import corrections as C
@@ -31,6 +31,7 @@ for k, p in sorted(best.items()):
     if not np.isfinite(r): print("skip (no valid reference pixels):", w["ref_date"]); continue
     pairs.append(dict(ref=w["ref_date"], sec=w["sec_date"], days=w["temporal_days"], d=(w["disp_mm"] - r).astype("float32"), nref=nref, tb=w["temporal_days"]))
 pairs.sort(key=lambda q: q["ref"])
+if a.start: pairs = [q for q in pairs if q["ref"] >= a.start]
 print(f"{len(pairs)} usable pairs; temporal baselines (days): {sorted({q['days'] for q in pairs})}")
 # keep the longest unbroken chain (sec of pair i == ref of pair i+1)
 chains, cur = [], [pairs[0]]

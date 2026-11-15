@@ -646,6 +646,8 @@ const dialogCopy = {
       <li><a href="https://github.com/mansi200304/NASA-Hackathon" target="_blank" rel="noopener noreferrer">Sinkronized · code and pipeline outputs</a></li>
       <li><a href="https://nisar.jpl.nasa.gov/" target="_blank" rel="noopener noreferrer">NASA-ISRO NISAR mission information</a></li>
       <li><a href="https://doi.org/10.5067/NIL2GUNW-P1" target="_blank" rel="noopener noreferrer">NISAR L2 Geocoded Unwrapped Interferogram (GUNW), Provisional · ASF DAAC</a> — DOI 10.5067/NIL2GUNW-P1; the NISAR data processed here.</li>
+      <li><a href="https://doi.org/10.5281/ZENODO.20075813" target="_blank" rel="noopener noreferrer">NISAR Data User Guide (Kristenson et al., 2026) · ASF</a> — DOI 10.5281/ZENODO.20075813; product definitions, maturity levels and availability used throughout this project.</li>
+      <li><a href="https://doi.org/10.48577/jpl.UD4HV3" target="_blank" rel="noopener noreferrer">NASA-ISRO SAR (NISAR) Mission Science Users’ Handbook, Second Edition (2025)</a> — DOI 10.48577/jpl.UD4HV3.</li>
       <li><a href="https://doi.org/10.5067/SNWG/OPL3DISPS1-V1" target="_blank" rel="noopener noreferrer">OPERA Surface Displacement from Sentinel-1 (DISP-S1), Version 1 · ASF DAAC</a> — DOI 10.5067/SNWG/OPL3DISPS1-V1; the ten-year record, built from Copernicus Sentinel-1 data (ESA).</li>
       <li><a href="https://registry.opendata.aws/copernicus-dem/" target="_blank" rel="noopener noreferrer">Copernicus 30 m DEM</a> — ground heights used to apply NISAR’s troposphere correction.</li>
       <li><a href="https://search.asf.alaska.edu/" target="_blank" rel="noopener noreferrer">Alaska Satellite Facility · SAR data discovery</a></li>

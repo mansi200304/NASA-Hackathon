@@ -28,7 +28,7 @@ out = dict(
     record=dict(willcox=dict(start=wx["dates"][0], end=wx["dates"][-1], dates=len(wx["dates"]), track=wx["track"]),
                 eloy=dict(start=eloy["dates"][0], end=eloy["dates"][-1], dates=len(eloy["dates"]), track=eloy["track"])),
     figure="nisar_vs_sentinel1_willcox.png",
-    release="NASA NISAR L2 GUNW, Provisional release (production CRID P05023)",
+    release="NASA NISAR L2 GUNW. Willcox: Provisional (CRID P05023) except the first pair, Oct 26 to Nov 7 2025, which is Beta; re-fitting without it moves the rate from -2.82 to -3.00 cm/yr. Eloy: Provisional.",
 )
 json.dump(out, open(f"{P}/nisar_summary.json", "w"), indent=1)
 shutil.copyfile(f"{ROOT}/docs/nisar_vs_sentinel1_willcox.png", f"{P}/nisar_vs_sentinel1_willcox.png")
