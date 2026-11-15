@@ -1,14 +1,23 @@
 {
-  "intro": "Sinkronized is an independent team project for NASA Space Apps 2026, “Dancing with the SARs”.",
+  "intro": "We are a three-person, cross-disciplinary team building Sinkronized for the 2026 NASA Space Apps Challenge.",
   "members": [
     {
-      "name": "Reshma Panibhate"
+      "name": "Reshma Panibhate",
+      "role": "Radar processing & validation",
+      "bio": "Processes NISAR radar observations, checks signal quality and compares measurements with published Arizona water-resource records.",
+      "study": "InSAR · Measurement quality · ADWR"
     },
     {
-      "name": "Mansi"
+      "name": "Mansi",
+      "role": "Interactive map & engineering",
+      "bio": "Builds the web atlas that brings study areas, time-linked displacement charts and supporting map layers into one interactive experience.",
+      "study": "Web mapping · Data integration · Interaction"
     },
     {
-      "name": "Ritam"
+      "name": "Ritam",
+      "role": "Design & regional storytelling",
+      "bio": "Shapes the visual narrative and geographic context connecting ground movement with Arizona’s water, infrastructure and ecosystems.",
+      "study": "Research · Context layers · Visual design"
     }
   ]
 }
