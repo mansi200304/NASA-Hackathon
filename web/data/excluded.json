@@ -1,0 +1,26 @@
+[
+ {
+  "name": "Sierrita Mine area",
+  "lat": 31.861,
+  "lon": -111.13,
+  "why": "Open-pit copper mine (OpenStreetMap). Ground motion here is mining, not groundwater."
+ },
+ {
+  "name": "Mission Complex area",
+  "lat": 31.983,
+  "lon": -111.058,
+  "why": "Copper mine complex (OpenStreetMap). Mining, not groundwater."
+ },
+ {
+  "name": "Ray Mine area",
+  "lat": 33.148,
+  "lon": -110.968,
+  "why": "Open-pit copper mine (OpenStreetMap). Mining, not groundwater."
+ },
+ {
+  "name": "Morenci area",
+  "lat": 33.127,
+  "lon": -109.346,
+  "why": "Placed at the mining town of Morenci; mine features not retrieved. Likely mining, not groundwater."
+ }
+]

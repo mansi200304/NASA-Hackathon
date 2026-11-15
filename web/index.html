@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arizona Is Sinking</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" integrity="sha384-c6Rcwz4e4CITMbu/NBmnNS8yN2sC3cUElMEMfP3vqqKFp7GOYaaBBCqmaWBjmkjb" crossorigin="anonymous">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div class="brand">
+    <h1>Arizona Is Sinking</h1>
+    <p>Radar from space shows where Arizona's ground is dropping as groundwater is pumped. Two satellites: Sentinel-1 gives ten years of trend, NISAR is the new, still-short record.</p>
+  </div>
+  <nav>
+    <button id="btn-how" type="button">How we measured</button>
+    <button id="btn-limits" type="button">Limits</button>
+    <a href="https://github.com/mansi200304/NASA-Hackathon" target="_blank" rel="noopener">Data &amp; code</a>
+  </nav>
+</header>
+
+<main>
+  <div id="map" aria-label="Map of sinking ground in Arizona"></div>
+
+  <aside id="layers" aria-label="Layers">
+    <h2>Layers</h2>
+    <div class="group">
+      <div class="group-title">On top: NISAR <span class="badge warn">Provisional, short record</span></div>
+      <p class="note-small">Rate relative to the box average. Off by default: a few months to a year of noisy data cannot yet show a reliable rate.</p>
+      <label class="row"><input type="checkbox" id="t-nisar_willcox"> NISAR, Willcox box (about 1 year)</label>
+      <input type="range" min="0" max="100" value="80" id="o-nisar_willcox" aria-label="NISAR Willcox opacity">
+      <label class="row"><input type="checkbox" id="t-nisar_eloy"> NISAR, Eloy box (under 4 months)</label>
+      <input type="range" min="0" max="100" value="80" id="o-nisar_eloy" aria-label="NISAR Eloy opacity">
+    </div>
+    <div class="group">
+      <div class="group-title">Below: Sentinel-1, 2016 to 2026 <span class="badge ok">Long trend</span></div>
+      <label class="row"><input type="checkbox" id="t-s1_rate_desc" checked> Sinking rate (descending)</label>
+      <input type="range" min="0" max="100" value="85" id="o-s1_rate_desc" aria-label="Sentinel-1 descending opacity">
+      <label class="row"><input type="checkbox" id="t-s1_rate_asc"> Cross-check (ascending)</label>
+      <input type="range" min="0" max="100" value="85" id="o-s1_rate_asc" aria-label="Sentinel-1 ascending opacity">
+    </div>
+    <div class="group">
+      <div class="group-title">Markers</div>
+      <label class="row"><input type="checkbox" id="t-hotspots" checked> Hotspots</label>
+      <label class="row"><input type="checkbox" id="t-excluded" checked> Probable mines (not groundwater)</label>
+      <label class="row"><input type="checkbox" id="t-flat" checked> Checked, no sinking found</label>
+    </div>
+    <div class="group">
+      <div class="group-title">Basemap</div>
+      <label class="row"><input type="radio" name="base" value="dark" checked> Dark</label>
+      <label class="row"><input type="radio" name="base" value="sat"> Satellite</label>
+    </div>
+    <div class="legend" aria-label="Color legend">
+      <div class="bar"></div>
+      <div class="ticks"><span>-6</span><span>-3</span><span>0</span><span>+2</span></div>
+      <p>cm per year along the satellite's line of sight. Red = ground moving away from the satellite (sinking).</p>
+    </div>
+  </aside>
+
+  <section id="panel" class="hidden" aria-live="polite">
+    <button id="close" type="button" aria-label="Close panel">&times;</button>
+    <div id="panel-body"></div>
+  </section>
+
+  <div id="hint">Click a hotspot outline for its numbers.</div>
+</main>
+
+<dialog id="dlg-how">
+  <form method="dialog"><button class="x" aria-label="Close">&times;</button></form>
+  <h2>How we measured</h2>
+  <ol>
+    <li><b>Radar measures distance.</b> A satellite sends a radar pulse down and times the echo, so it knows how far away the ground is.</li>
+    <li><b>Compare two passes.</b> The same satellite flies over the same spot every 6 to 12 days. If the ground moved between two passes, the radar waves return slightly out of step. That phase change is the movement, to a few millimetres.</li>
+    <li><b>Add up many pairs.</b> One pair is noisy, because air moisture and the ionosphere also shift the signal. Chaining many pairs over years lets the steady sinking add up while the random noise does not.</li>
+    <li><b>Two satellites.</b> Sentinel-1 (C-band) has flown since 2016, so it gives a ten-year trend. NASA-ISRO NISAR (L-band) started in late 2025, so its record is still short. We show NISAR on top and Sentinel-1 underneath so you can see the trend behind it.</li>
+    <li><b>Two look directions.</b> Satellites look at the ground from the east or the west. When both agree, the sinking is much more likely to be real.</li>
+  </ol>
+  <h3>Corrections we applied</h3>
+  <p>Solid-earth tide and ionosphere were removed from every Sentinel-1 and NISAR pair. Water vapour (troposphere) was <b>not</b> removed, which is a main source of the remaining noise.</p>
+</dialog>
+
+<dialog id="dlg-limits">
+  <form method="dialog"><button class="x" aria-label="Close">&times;</button></form>
+  <h2>Limits</h2>
+  <ul>
+    <li><b>NISAR is new.</b> It has under a year of data, with gaps, and its newest data is Provisional. Its rates here are not reliable yet; we show them with their uncertainty and say so.</li>
+    <li><b>Line of sight, not straight down.</b> Radar measures motion toward or away from the satellite. We assume subsidence is mostly vertical, but our numbers are not pure vertical values.</li>
+    <li><b>Reference choice.</b> Each satellite frame is measured against its own median ground. This can shift rates by a few millimetres per year.</li>
+    <li><b>Sinking does not prove who caused it.</b> Farmland nearby fits groundwater pumping for irrigation, but it is not proof.</li>
+    <li><b>Mines look like sinking too.</b> Open-pit mines and tailings move for other reasons. We mark the ones we found.</li>
+    <li><b>Radar loses signal over plowed fields and changing ground.</b> Gaps in the map are places with no reliable measurement, not places with no sinking.</li>
+    <li><b>Blue patches are probably not real uplift.</b> Rising values, such as on the Willcox Playa floor, most likely come from wet or swelling soil changing the radar signal. We have not verified this.</li>
+    <li><b>Radar cannot see wildlife.</b> Habitat links come from outside maps.</li>
+    <li><b>Not yet compared with ADWR.</b> We have not matched our rates against Arizona Department of Water Resources published values.</li>
+    <li><b>Unfinished.</b> Place names for some areas are best guesses and are marked with a question mark.</li>
+  </ul>
+</dialog>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" integrity="sha384-NElt3Op+9NBMCYaef5HxeJmU4Xeard/Lku8ek6hoPTvYkQPh3zLIrJP7KiRocsxO" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" integrity="sha384-bs/nf9FbdNouRbMiFcrcZfLXYPKiPaGVGplVbv7dLGECccEXDW+S3zjqSKR5ZEaD" crossorigin="anonymous"></script>
+<script src="app.js"></script>
+</body>
+</html>

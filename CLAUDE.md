@@ -265,3 +265,13 @@ The three tracks run **in parallel from hour 0**. They connect only through the 
 - NOT GROUNDWATER (per OpenStreetMap): Sahuarita A = Sierrita Mine, Sahuarita B = Mission Complex, (33.15, -110.97) = Ray Mine, (33.13, -109.35) geocodes to Morenci (mining town; mine features not retrieved). OUT OF ARIZONA: (32.41, -115.26) is Cerro Prieto geothermal field, Mexicali; (31.14, -112.89) is Caborca, Sonora.
 - FLAT (no cluster above 1 cm/yr): Tucson, Avra Valley, Marana, Yuma, Phoenix valley, West Valley.
 - Caveat for all: single-sensor LOS rates, frame-median reference (a few mm/yr bias possible), tropospheric/topographic artefacts not corrected, not validated against ADWR.
+
+### Nov 14, night: web map v0 built (web/, data from src/export_web.py)
+- Two layers: NISAR rate rasters (Willcox 128 D, Eloy 077 A) and Sentinel-1 descending mosaic (frames southeast, 34477, central, 7092, 7090) plus ascending cross-check (frame 5125). Hotspots: Eloy-Picacho, Willcox basin, North of Willcox, South of Willcox (Elfrida/McNeal area?), East of Willcox. Probable-mine markers and checked-flat markers from the same cubes.
+- DECISION TO REVIEW: the NISAR rate rasters are OFF by default and drawn relative to the box median. Reason: shown raw, each NISAR box turned uniformly dark red (about -3 cm/yr common drift from a short, noisy record), which would misread as fast sinking. Flip the default in web/index.html if the team disagrees.
+- Hotspot stats (sinking pixels <= -1 cm/yr in each box, Sentinel-1 descending; ascending median at the same pixels): Eloy-Picacho 85 km2 median -1.23 (asc -1.43, only 153 px); Willcox 386 km2 median -2.38 (asc -1.63); North of Willcox 116 km2 median -4.66 (asc -3.55); South 127 km2 median -2.86 (asc -1.91); East 337 km2 median -2.17 (no ascending coverage).
+- Ascending medians are consistently about 30% smaller than descending. Not explained yet (different look geometry, horizontal motion, reference). Treat the two directions as agreeing in sign and ranking, not in size.
+- Blue (rising) patch on the Willcox Playa floor: probably wet or swelling soil, unverified.
+- Not done: click-any-point values, ADWR comparison, farmland acres, data centers, time slider, GitHub Pages deploy (needs repo owner's OK).
+- Basemap: Esri World Dark Gray / World Imagery (CARTO tiles now require an API key). CDN scripts pinned with integrity hashes.
+- More frames in the background: north/west chain (7090 done and included; 26690, 46289, 34476 downloading/scanning).

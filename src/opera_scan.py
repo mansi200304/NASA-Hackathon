@@ -18,6 +18,7 @@ for r in order:
     s, p = blocks[r]
     with h5py.File(p, "r") as f:
         x = f["x"][:]; y = f["y"][:]; ny, nx = (len(y) // F) * F, (len(x) // F) * F
+        _w = f["spatial_ref"].attrs["crs_wkt"]; _w = _w.decode() if isinstance(_w, bytes) else _w; EPSG = int(re.findall(r'ID\["EPSG",(\d+)\]', _w)[-1])
         d = (f["displacement"][:ny, :nx] - f["corrections/solid_earth_tide"][:ny, :nx] - f["corrections/ionospheric_delay"][:ny, :nx]) * 1000
         d[f["recommended_mask"][:ny, :nx] != 1] = np.nan
     c = d.reshape(ny // F, F, nx // F, F); cnt = np.isfinite(c).sum((1, 3)); dm = np.where(cnt >= 30, np.nanmean(c, (1, 3)), np.nan).astype("float32")
@@ -32,7 +33,7 @@ rv = rate[ok]; med = np.median(rv); sig = 1.4826 * np.median(abs(rv - med))
 print(f"{ok.sum()} px ({ok.mean()*100:.0f}% of frame at 300 m); rate median {med:.2f}, robust sigma {sig:.2f} cm/yr; 1st pct {np.percentile(rv,1):.2f}, 99th {np.percentile(rv,99):.2f}")
 thr = min(-a.min_rate, med - 4 * sig); print("sinking threshold (cm/yr):", round(float(thr), 2))
 lab, n = ndimage.label(np.nan_to_num(rate, nan=0) <= thr, structure=np.ones((3, 3)))
-tr = Transformer.from_crs(32612, 4326, always_xy=True); px_km2 = (F * 30 / 1000) ** 2; rows = []
+print("frame CRS EPSG:", EPSG); tr = Transformer.from_crs(EPSG, 4326, always_xy=True); px_km2 = (F * 30 / 1000) ** 2; rows = []
 for i in range(1, n + 1):
     m = lab == i; area = m.sum() * px_km2
     if area < a.min_km2: continue
@@ -41,6 +42,6 @@ for i in range(1, n + 1):
                      bbox=[round(c, 4) for c in (*tr.transform(xs[xx].min(), ys[yy].max()), *tr.transform(xs[xx].max(), ys[yy].min()))]))
 rows.sort(key=lambda q: q["area_km2"] * -q["median_rate"], reverse=True)
 json.dump(dict(frame=a.frame, period=[dates[0], dates[-1]], ref="frame-wide median", threshold_cm_yr=float(thr), clusters=rows), open(f"{ROOT}/data/processed/hotspot_candidates_{a.name}.json", "w"), indent=1)
-os.makedirs(f"{ROOT}/data/processed/cache", exist_ok=True); np.savez_compressed(f"{ROOT}/data/processed/cache/scan_{a.name}.npz", rate=rate, x=xs, y=ys)
+os.makedirs(f"{ROOT}/data/processed/cache", exist_ok=True); np.savez_compressed(f"{ROOT}/data/processed/cache/scan_{a.name}.npz", rate=rate, x=xs, y=ys, cum=cum.astype("float32"), t=t, dates=np.array(dates), ok=ok, epsg=EPSG)
 print(f"{len(rows)} clusters >= {a.min_km2} km2")
 for q in rows[:30]: print(f"  ({q['lat']:.3f}, {q['lon']:.3f}) area {q['area_km2']:6.1f} km2 | median {q['median_rate']:5.2f} | p5 {q['p5_rate']:5.2f} | fastest {q['min_rate']:5.2f} cm/yr")
