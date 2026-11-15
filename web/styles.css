@@ -7,3 +7,41 @@
 @media(max-width:800px){.layer-section{display:none}.sidebar.layers-open .layer-section{display:block}.mobile-layer-toggle{display:inline-block;font-size:11px;color:var(--rust);padding:10px 0 0}.study-section .text-action{display:inline-flex;margin-right:25px}.sidebar-footer{padding-top:9px}}
 @media(max-width:420px){.masthead nav{width:100%;margin-left:38px;justify-content:space-between;gap:10px}.hotspot-button .place{font-size:15px}.layer-row label{font-size:11px}.layer-state{font-size:9px}.map-toolbar button{font-size:10px}.map-caption span:last-child{max-width:250px}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+/* Sonoran Sand: distinct surface and interaction roles, without layout changes. */
+:root{--slate:#6C7A89;--slate-deep:#626D76;--on-sand:#505B62}
+.masthead{background:var(--ink);border-bottom:2px solid var(--rust);color:var(--canvas)}
+.masthead .wordmark,.masthead nav button{color:var(--canvas)}
+.masthead .wordmark svg{stroke:var(--surface)}
+.masthead .title-stop{color:var(--surface)}
+.masthead .project-label{color:var(--surface);border-color:var(--slate)}
+.masthead nav button:hover{color:var(--surface)}
+.masthead a:focus-visible,.masthead button:focus-visible{outline-color:var(--canvas)}
+.sidebar{background:var(--surface)}
+.sidebar .eyebrow,.sidebar .hotspot-button .tagline,.sidebar .hotspot-button .index,
+.sidebar .layer-note,.sidebar .opacity-control,.sidebar .layer-row.unavailable label{color:var(--on-sand)}
+.sidebar h2>span{background:var(--olive);color:var(--canvas);padding:0 5px}
+.hotspot-button{padding-left:8px;padding-right:8px}
+.hotspot-button[aria-pressed=true]{background:var(--rust);border-bottom-color:var(--rust);color:var(--canvas)}
+.hotspot-button[aria-pressed=true] .place,.hotspot-button[aria-pressed=true] .index,
+.hotspot-button[aria-pressed=true] .tagline{color:var(--canvas)}
+.hotspot-button[aria-pressed=true]:hover{color:var(--canvas)}
+.layer-row{border-bottom-color:var(--rule)}
+.layer-state:not(:empty){padding:1px 4px;background:var(--canvas);color:var(--slate-deep);border:1px solid var(--rule)}
+#layer-hotspots{accent-color:var(--olive)}
+.sidebar-footer{border-top:2px solid var(--olive);background:var(--canvas);color:var(--olive);padding:12px 9px;margin-top:20px}
+.sidebar-footer .status-dot{background:var(--olive);width:6px;height:6px}
+.sidebar-footer button{color:var(--olive)}
+.details-panel{--detail-gutter:25px;--detail-top:25px;background:var(--canvas)}
+.detail-kicker{background:var(--slate-deep);color:var(--canvas);margin:calc(-1 * var(--detail-top)) calc(-1 * var(--detail-gutter)) 0;padding:15px var(--detail-gutter) 10px}
+.details-panel h1{background:var(--slate-deep);color:var(--canvas);margin:0 calc(-1 * var(--detail-gutter));padding:0 var(--detail-gutter) 9px}
+.details-panel .story-name{background:var(--slate-deep);color:var(--canvas);margin:0 calc(-1 * var(--detail-gutter)) 23px;padding:0 var(--detail-gutter) 16px;border-bottom:4px solid var(--slate)}
+.metric:not(.pending){border-top:2px solid var(--rust)}
+.metric:not(.pending) .metric-value{color:var(--rust)}
+.metric.pending .metric-value{color:var(--slate-deep)}
+.detail-section h2{color:var(--olive)}
+.validation-note{border-left:2px solid var(--slate);padding-left:9px}
+.page-footer{background:var(--ink);color:var(--surface);border-top-color:var(--slate-deep)}
+@media(min-width:1600px){.details-panel{--detail-gutter:30px;--detail-top:28px}}
+@media(max-width:1100px){.details-panel{--detail-gutter:18px;--detail-top:20px}}
+@media(max-width:800px){.details-panel{--detail-gutter:20px;--detail-top:25px}.hotspot-button{padding-left:7px;padding-right:7px}.sidebar-footer{margin-top:12px;padding:9px}}

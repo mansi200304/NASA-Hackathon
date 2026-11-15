@@ -92,7 +92,15 @@ The map update was browser-checked against all current study selections, real
 rate PNGs, basemap switching and the portable preview. A 390px phone review
 confirmed study selection, Layers disclosure and no horizontal overflow.
 
-The map-only update preserves `styles.css`, the Sonoran Sand theme and the three-column layout. NASA Worldview, ISRO Bhuvan and Copernicus Browser informed the map treatment: restrained controls, imagery as geographic context, thin outlines and visible dataset provenance. No agency affiliation is implied.
+The three-column layout and typography remain intact. Sonoran Sand has distinct
+roles: ivory canvas, sand sidebar, ink masthead/footer, rust selection and reported
+rate, olive study count/status and slate metadata headers. Small light text uses
+the darker slate variant for contrast. Scientific raster colours are independent
+of these UI colours.
+
+NASA Worldview, ISRO Bhuvan and Copernicus Browser informed the map treatment:
+restrained controls, imagery as geographic context, thin outlines and visible
+dataset provenance. No agency affiliation is implied.
 
 ## Scope
 
