@@ -10,9 +10,12 @@ REF = {"willcox": (-109.98, 31.95)}   # Dragoon Mountains, UNVERIFIED coordinate
 ap = argparse.ArgumentParser()
 ap.add_argument("--hotspot", required=True); ap.add_argument("--track", type=int, required=True); ap.add_argument("--frame", type=int, required=True)
 ap.add_argument("--dir", required=True, choices=["D", "A"]); ap.add_argument("--ref", nargs=2, type=float); ap.add_argument("--ref-km", type=float, default=5.0)
-ap.add_argument("--coh", type=float, default=0.4); ap.add_argument("--tag", default="")
+ap.add_argument("--coh", type=float, default=0.4); ap.add_argument("--tag", default=""); ap.add_argument("--tropo", action="store_true", help="also subtract NISAR hydrostatic+wet troposphere screens")
 a = ap.parse_args()
-box = BOX[a.hotspot]; refpt = tuple(a.ref) if a.ref else REF.get(a.hotspot)
+box = BOX[a.hotspot]
+import corrections as C
+dem = C.dem_for_box(box, a.hotspot) if a.tropo else None
+refpt = tuple(a.ref) if a.ref else REF.get(a.hotspot)
 if refpt is None: sys.exit("give --ref lon lat")
 pat = f"{ROOT}/data/raw/NISAR_L2_*_GUNW_*_{a.track:03d}_{a.dir}_{a.frame:03d}_*.h5"
 best = {}
@@ -21,7 +24,7 @@ for p in glob.glob(pat):
     if k not in best or "_P0" in p and "_X0" in best[k]: best[k] = p
 pairs = []
 for k, p in sorted(best.items()):
-    try: w = read_window(p, box, coh_min=a.coh)
+    try: w = read_window(p, box, coh_min=a.coh, dem=dem)
     except Exception as e: print("skip (unreadable/incomplete):", os.path.basename(p)[:60], type(e).__name__); continue
     if w is None: continue
     r, nref = ref_median(w, refpt, a.ref_km)
@@ -56,7 +59,7 @@ rp = rate_px[complete] / 10
 print(f"per-pixel LOS rate (cm/yr): median {np.median(rp):.2f}, 5th pct {np.percentile(rp,5):.2f}, 95th pct {np.percentile(rp,95):.2f}")
 out = dict(hotspot=a.hotspot, units="mm", track=f"{a.track}{a.dir}", frame=a.frame, reference=dict(lonlat=list(refpt), radius_km=a.ref_km, note="unverified hand-picked"),
            dates=dates, displacement_mm=np.round(series, 2).tolist(), rate_cm_yr=round(float(coef[0] / 10), 3), rate_sigma_cm_yr=round(float(se / 10), 3),
-           n_pixels=n_c, coherence_min=a.coh, sign_convention="d=-(lambda/4pi)*phi, UNVERIFIED")
+           n_pixels=n_c, coherence_min=a.coh, sign_convention="d=-(lambda/4pi)*phi, UNVERIFIED", troposphere_corrected=bool(a.tropo))
 os.makedirs(f"{ROOT}/data/processed", exist_ok=True)
 json.dump(out, open(f"{ROOT}/data/processed/stack_{a.hotspot}_{a.track}{a.dir}{a.tag}.json", "w"), indent=1)
 np.save(f"{ROOT}/data/processed/cache/rate_{a.hotspot}_{a.track}{a.dir}{a.tag}.npy", rate_px) if os.path.isdir(f"{ROOT}/data/processed/cache") else None

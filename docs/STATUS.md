@@ -2,6 +2,16 @@
 
 Newest first. The earlier log is at the end of AGENTS.md (section 14 and the dated entries after it); new entries go here to avoid merge conflicts with other edits to AGENTS.md and README.md.
 
+## Nov 15 2026: NISAR troposphere correction, licence
+
+- LICENSE (MIT), requirements.txt, CITATION.cff and docs/DATA_AND_LICENSES.md added. ADWR reuse terms are NOT verified; logo was generated with ChatGPT from the team's brief.
+- No newer NISAR GUNW products exist for Willcox (128 D) or Eloy (077 A) than those already processed; the record ends Oct 21 2026.
+- NISAR's own hydrostatic and wet troposphere screens are now subtracted (src/corrections.py; ground heights from the open Copernicus 30 m DEM, since the GUNW has no per-pixel DEM). The solid-earth-tide screen is nearly uniform over each box and changes nothing after referencing, so it is not applied.
+- Sign tested, not assumed (src/nisar_noise_test.py, 25 Willcox pairs, same pixels and reference): subtracting hydrostatic+wet cuts pair-to-pair jump scatter 23.3 to 16.9 mm and residual 17.8 to 13.5 mm; the opposite sign makes it 33.5 and 26 mm. So subtracting is the physical sign.
+- Willcox NISAR LOS rate: -3.44 +/- 1.23 before, -2.82 +/- 0.93 cm/yr after. Still not stable: -1.1 cm/yr if the series stops at Aug 22; lag-1 correlation -0.47 shows single bad dates remain (Sep 15 2026 is the worst). Not a reliable rate.
+- Eloy 077 A (same reference as before, 3.9 months): residual 9.2 to 6.0 mm; rate -3.92 +/- 3.00 before, -4.76 +/- 1.94 cm/yr after. Short record; Sentinel-1 gives about -1.3 at Eloy-Picacho, so this is not used as a result.
+- Sentinel-1 results are unchanged. Exports rebuilt (timeseries_*.json, rate_nisar_*.png).
+
 ## Nov 14 2026, late night: website review and plain-language insights
 
 - Ran the real front end (unchanged) against our data in a simulated page and listed exactly what a visitor sees. Found: two "not supplied" values (sign convention, data release), two permanently empty layers (Data centers, Habitat), and several things we built but never displayed.
