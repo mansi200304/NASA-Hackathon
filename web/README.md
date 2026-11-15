@@ -1,0 +1,89 @@
+# Arizona is sinking — first UI
+
+A buildless, map-first field atlas using Sonoran Sand. The map and study selection work immediately. Measurements and context overlays stay pending until real exports are available.
+
+## Run it
+
+From the **repository root**, run:
+
+    python -m http.server 8000
+
+Open http://localhost:8000/web/ . Serve the root, rather than only web/, because the app reads ../data/processed/.
+
+No npm install, build step, API key or Earthdata credential is required. Leaflet 1.9.4 is vendored under vendor/ with its license. Esri basemap tiles require internet access.
+
+## Portable design preview
+
+    node web/build-preview.mjs
+
+Open web/preview.html in a browser. This generated single HTML file embeds the current app, Leaflet and available processed JSON/GeoJSON/PNG files. It works without a local server; internet is still required for basemap tiles. Rebuild after source or data changes. The preview is a snapshot, not a live feed of repository changes.
+
+The original app in index.html remains the source of truth. No fabricated measurement fixtures are shipped.
+
+## What works
+
+- Select Eloy / Casa Grande, Buckeye / Goodyear or Willcox; the map fits the study and the details update.
+- View all study areas, fit the selected area, pan and zoom, or switch terrain/satellite basemaps.
+- Toggle available overlays and adjust their opacity. On phones, Layers opens the controls while leaving room for the map.
+- Read a fitted rate, uncertainty, observation chart, accessible observation table and reference metadata when supplied.
+- Open How we measured, Limits and Sources dialogs. Dialogs support Escape; controls have visible keyboard focus.
+- Inspect a map coordinate. Pixel-level rate/coherence sampling is explicitly unavailable: a coloured PNG is not a numeric raster.
+
+Study boxes are project-defined extents from CLAUDE.md. They are not ADWR subsidence features or mapped sinking zones.
+
+## Add real data
+
+All paths below are relative to data/processed/. Refresh the page after adding files.
+
+| File | Behaviour |
+| --- | --- |
+| hotspots.geojson | Required: project study polygons with name, slug, story; optional tagline and county. |
+| timeseries_eloy.json | Eloy details and chart; likewise buckeye and willcox. |
+| rate_eloy.json + rate_eloy.png | Georeferenced colour image; likewise other slugs. |
+| adwr_subsidence.geojson | Optional official subsidence context. |
+| datacenters.geojson | Optional compiled public-source points. |
+| habitat.geojson | Optional habitat context. |
+
+Missing optional files are normal. They produce pending states and disabled controls. Malformed files produce Review file, not a zero result.
+
+### Time series
+
+Required fields follow the project contract: hotspot, units (cm), reference, dates, displacement, rate_cm_yr, rate_sigma, adwr_rate_cm_yr. Empty arrays and null rates are allowed for pending records. Numeric observations require a nonempty reference description. Dates must be valid, unique and increasing; displacement may contain null gaps. A true numeric zero remains zero.
+
+Optional metadata displayed when provided: track (include frame in the string if needed), data_release, sign_convention. Do not set these from a guess. Without a sign convention the app calls the number a reported displacement rate, not vertical sinking. With no uncertainty, it says uncertainty was not supplied.
+
+The chart uses actual acquisition dates on the horizontal axis and breaks at null gaps. It does not add synthetic observations, fit rates or draw uncertainty that the pipeline has not exported.
+
+The ADWR value is contextual only. The interface does not subtract it from a LOS rate or claim validation until direction, reference, period and spatial footprint are comparable.
+
+### Rate image
+
+Required: bounds as [[south, west], [north, east]], units cm/yr, finite vmin < vmax, and dates containing at least a start and end date. Bounds must be geographic EPSG:4326. Optional crs must be EPSG:4326 (or 4326).
+
+Additional metadata: track, colormap, data_release, sign_convention. Optional colors is an ordered array of hex stops matching the exported PNG, from vmin to vmax. A gradient legend is drawn only if valid colors are supplied; otherwise the range is printed without inventing a ramp. The app checks image loading before showing its legend.
+
+Low-coherence/no-data pixels must be transparent in the exported PNG. This UI cannot verify the processing masks from image colours.
+
+### Context GeoJSON
+
+Use a WGS84 FeatureCollection. Data-center popups read name, status, water_use and source_url; a missing water-use value says Not published. Source links accept only HTTP(S). Imported text is inserted as text, never HTML. The current UI does not calculate exposure areas, counts, water use or causal responsibility.
+
+## Design
+
+Ivory canvas #F4EFE6, sand #E4D9C9, ink #2D2A25, rust #A64B2A and olive #52664B. Secondary text uses a darker slate #626D76 for legibility. Place names use Georgia; controls and measurements use Arial/Helvetica. System fonts keep loading predictable. Fine rules and sentence case carry the hierarchy.
+
+Brand colours are separate from the measurement ramp. Changing the UI theme must not change the scientific meaning of a raster.
+
+## Checks
+
+    node --test web/tests/model.test.mjs
+    node --check web/app.js
+
+Tests cover pending vs zero, observation gaps, references, units, dates, uncertainty, geographic bounds and source-link protocols.
+
+Browser QA: desktop (1363 × 936), all three hotspot selections, outline visibility, terrain/satellite, method dialog and Escape; responsive layout in a 390 × 844 iframe, horizontal overflow and mobile Layers disclosure. The initial source state contains no measured products, so ready-state data validators are checked with synthetic unit tests, not published measurement values.
+
+## Scope
+
+This is the first UI for team review. It does not deploy GitHub Pages or change the radar processing pipeline. For eventual Pages hosting, publish an artifact containing web/ and data/processed/ together so relative paths remain valid. Keep raw HDF5 and large rasters out of Git.
+
