@@ -4,6 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#F4EFE6">
+<link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon-32.png">
+<link rel="apple-touch-icon" href="./assets/apple-touch-icon.png">
   <meta name="description" content="The desert sinks. The radar keeps the beat. A groundwater field atlas.">
   <title>Sinkronized — The desert sinks. The radar keeps the beat.</title>
   <style>/* required styles */
@@ -748,6 +750,8 @@ svg.leaflet-image-layer.leaflet-interactive path {
 .insight-point h3{font-size:12px;font-weight:600;margin:0 0 3px;color:var(--olive)}
 .insight-point p{font-size:13px;line-height:1.6;margin:0}
 @media(max-width:800px){.insight-point p{font-size:14px}.insights-summary{font-size:17px}}
+.wordmark .logo{display:block;width:46px;height:46px;flex-shrink:0}
+@media(max-width:800px){.wordmark .logo{width:38px;height:38px}}
 </style>
   <script>/* @preserve
  * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
@@ -1339,7 +1343,7 @@ start().catch(error => {
 <body>
   <a class="skip-link" href="#details">Skip to study details</a>
   <header class="masthead">
-    <a class="wordmark" href="./" aria-label="Sinkronized, home"><svg viewBox="0 0 38 38" aria-hidden="true"><path d="M3 9h10l5 6h17M3 18h8l6 6h18M3 27h7l5 6h20"/></svg><span>Sinkronized</span></a>
+    <a class="wordmark" href="./" aria-label="Sinkronized, home"><img class="logo" src="./assets/logo.png" alt="" width="46" height="46"><span>Sinkronized</span></a>
     <span class="project-label">The desert sinks. The radar keeps the beat.</span>
     <nav aria-label="About the project">
       <button type="button" data-dialog="method">How we measured</button>

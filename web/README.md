@@ -97,6 +97,10 @@ Use a WGS84 FeatureCollection. Marker popups read name plus reason or note. Sour
 
 `timeseries_<slug>.json` carries an `insights` block (summary, two confidence ratings, and headed paragraphs) written for readers who are not experts. The panel opens with it under "In plain terms"; `cleanInsights()` in `model.mjs` drops anything malformed. Confidence ratings follow fixed rules in `src/insights.py`. Data centers and habitat are no longer layers: there is no sourced data for them.
 
+## Logo and icons
+
+The original logo is `docs/brand/sinkronized-logo-original.png`. `python src/make_logo_assets.py` trims it and writes `web/assets/` (header logo, 512 px version, browser-tab icon, phone icon). To change the logo, replace the original and re-run that command. The header image is decorative (the name beside it is the accessible label).
+
 ## Design
 
 Ivory canvas #F4EFE6, sand #E4D9C9, ink #2D2A25, rust #A64B2A and olive #52664B. Secondary text uses a darker slate #626D76 for legibility. Place names use Georgia; controls and measurements use Arial/Helvetica. System fonts keep loading predictable. Fine rules and sentence case carry the hierarchy.

@@ -29,3 +29,5 @@
 .insight-point h3{font-size:12px;font-weight:600;margin:0 0 3px;color:var(--olive)}
 .insight-point p{font-size:13px;line-height:1.6;margin:0}
 @media(max-width:800px){.insight-point p{font-size:14px}.insights-summary{font-size:17px}}
+.wordmark .logo{display:block;width:46px;height:46px;flex-shrink:0}
+@media(max-width:800px){.wordmark .logo{width:38px;height:38px}}
