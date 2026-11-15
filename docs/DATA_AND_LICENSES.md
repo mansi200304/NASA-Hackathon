@@ -5,11 +5,12 @@
 
 | Material | Used for | Source and terms |
 |---|---|---|
-| NISAR L2 GUNW, Provisional (DOI 10.5067/NIL2GUNW-P1) | Early ground-motion record, Willcox and Eloy | NASA/ISRO NISAR mission, distributed by the ASF DAAC. NASA Earth science data is open to use with citation. Provisional data: preliminary. |
+| NISAR L2 GUNW, Provisional (DOI 10.5067/NIL2GUNW-P1) | Early ground-motion record, Willcox and Eloy | NASA/ISRO NISAR mission, distributed by the ASF DAAC. NASA's Earth science data policy makes data available fully and openly, without restrictions (we could not find a stated citation requirement, and cite it anyway). Provisional = intended for exploration and process studies, partially validated (per the ASF/Earthdata catalog entry). |
 | OPERA DISP-S1 (Sentinel-1 displacement) | 2016-2026 sinking map and study-area rates | NASA JPL OPERA project via ASF DAAC. Derived from Copernicus Sentinel-1 data (ESA). Open with citation. |
 | ADWR land-subsidence products | Check of our results; official sinking zones | Arizona Department of Water Resources. Used here as a published reference for comparison. **Terms not independently verified by us; attribute ADWR and do not present our maps as ADWR products.** |
 | OpenStreetMap | Identifying probable mines and farmland near clusters | (c) OpenStreetMap contributors, ODbL. `mines_excluded` and `checked_flat` are derived from it. |
 | Esri basemap tiles | Map background | Esri terms of use; attribution is shown on the map. Not redistributed. |
+| Copernicus GLO-30 DEM | Ground heights to apply NISAR's troposphere tables (not redistributed; cached locally) | Free licence from Copernicus/ESA; EGM2008 heights; public distribution needs the source notice "Contains modified Copernicus data" and credit to DLR and Airbus for modified data. |
 | Leaflet 1.9.4 | Map library (`web/vendor/`) | BSD-2-Clause, `web/vendor/LICENSE-leaflet`. |
 | Logo | Site identity | Generated with ChatGPT (OpenAI) from our own design brief, then edited by us. |
 

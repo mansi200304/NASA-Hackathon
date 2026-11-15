@@ -1,7 +1,7 @@
 """NISAR GUNW troposphere and solid-earth-tide screens, evaluated on the 80 m pixel grid.
 The file stores each screen as a 3-D cube (20 heights, 500 m grid) in radians. A pixel needs its own ground height to pick the right slice,
 and the file has no per-pixel DEM, so heights come from the open Copernicus 30 m DEM (orthometric; converted to ellipsoidal with a fixed -28 m
-geoid offset for Arizona, small next to the 500 m layer spacing)."""
+geoid offset for Arizona. Checked against the EGM2008 grid with pyproj: -27.8 m at Willcox, -30.5 m at Eloy; the 2.5 m difference is 0.5% of the 500 m layer spacing, so it does not matter. Copernicus GLO-30 is a surface model (includes vegetation), referenced to EGM2008)."""
 import os, numpy as np, h5py, rasterio
 from rasterio.windows import from_bounds
 from scipy.ndimage import map_coordinates
