@@ -1,6 +1,6 @@
 # SlowSink
 
-*NISAR watches Arizona’s ground sink as its aquifers drain*
+*Arizona’s groundwater is draining. Its ground is sinking.*
 
 NASA Space Apps 2026 — **Dancing with the SARs** (NISAR). 
 

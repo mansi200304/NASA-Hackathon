@@ -10,7 +10,7 @@ Newest first. The earlier log is at the end of AGENTS.md (section 14 and the dat
 - Added to the layer panel: Sentinel-1 region map and cross-check, NISAR Willcox/Eloy (provisional, hidden by default), probable-mine markers, "checked, no sinking found" markers.
 - Added "In plain terms" to every study panel: summary, two confidence ratings (fixed rules, `src/insights.py`), six short headed paragraphs, about US grade 7. Eloy rates medium (where) and low (speed) because its independent-satellite match is weak; Willcox, Fort Grant Road and Elfrida rate high/high; Bowie-San Simon medium/medium (one look direction).
 - "How we measured" rewritten in plain language and now describes both satellites; Limits gained mines, blue patches and gaps; Sources gained ADWR GIS and OpenStreetMap.
-- Renamed again: the site is now **SlowSink** with the tagline “NISAR watches Arizona’s ground sink as its aquifers drain” (page title, header, dialog heading, README, AGENTS.md, search description).
+- Renamed again: the site is now **SlowSink** with the tagline “Arizona’s groundwater is draining. Its ground is sinking.” (page title, header, dialog heading, README, AGENTS.md, search description). The first tagline named NISAR; it was changed because every number on the site comes from Sentinel-1 and NISAR's record is still too short to give a reliable rate.
 - Project renamed **The Slow Sink** with the tagline "Arizona is sinking." (Mansi's title and tagline, re-applied onto Rhythm's UI: page title, header, dialog heading, README headings). Mansi's other UI changes on the `web` branch were not adopted; Rhythm's UI is the one we ship.
 - Prototype map (`web/map-v0`) removed; export intermediates now live in the gitignored `data/processed/cache/web/`.
 
