@@ -4,6 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#F4EFE6">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon-32.png">
 <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png">
   <meta name="description" content="The desert sinks. The radar keeps the beat. A groundwater field atlas.">
@@ -172,8 +175,20 @@
         <p>We distinguish the longer Sentinel-1 record from newer, preliminary NISAR measurements. Where the evidence is weak or missing, the website says so instead of presenting a guess as a result.</p>
       </div>
       <details class="overview-science-note">
-        <summary>How do two satellite viewing directions help? <span aria-hidden="true">+</span></summary>
-        <p>Satellites make ascending (generally south-to-north) and descending (generally north-to-south) passes, observing the land from different slanted angles. Comparing these perspectives can strengthen confidence and help separate some components of motion, but one view alone cannot establish a unique vertical sinking rate.</p>
+        <summary>Why look in both directions? <span aria-hidden="true">+</span></summary>
+        <div class="look-direction-grid" aria-label="Satellite viewing directions">
+          <div class="look-direction-tile">
+            <span class="direction-number">01 / ASCENDING</span>
+            <strong>South to north <span aria-hidden="true">↗</span></strong>
+            <p>The satellite generally travels northward while observing the surface at a slanted angle.</p>
+          </div>
+          <div class="look-direction-tile">
+            <span class="direction-number">02 / DESCENDING</span>
+            <strong>North to south <span aria-hidden="true">↘</span></strong>
+            <p>The satellite generally travels southward and observes from a different slanted perspective.</p>
+          </div>
+        </div>
+        <p class="look-direction-caveat">Together, these views can strengthen confidence and help separate some motion components. One direction alone cannot establish a unique vertical sinking rate.</p>
         <button type="button" class="overview-secondary" data-dialog="method">Read how the measurements work</button>
       </details>
     </div>
@@ -230,7 +245,7 @@
     </section>
   </main>
   <aside id="explain-drawer" class="explain-drawer" tabindex="-1" aria-labelledby="explain-title" aria-live="polite" hidden>
-    <div class="explain-drawer-head"><span class="eyebrow" id="explain-kicker">FIELD NOTE</span><button id="close-explain" type="button" aria-label="Close field note">Close ×</button></div>
+    <div class="explain-drawer-head"><span class="eyebrow" id="explain-kicker">EXPLANATION</span><button id="close-explain" type="button" aria-label="Close field note">Close ×</button></div>
     <h2 id="explain-title"></h2>
     <p id="explain-text"></p>
     <p id="explain-note" class="explain-note"></p>
