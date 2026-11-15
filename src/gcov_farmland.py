@@ -37,6 +37,9 @@ z0 = np.load(files[0])
 x0, y1, nx, ny, epsg = float(z0["x0"]), float(z0["y1"]), int(z0["nx"]), int(z0["ny"]), int(z0["epsg"])
 dates = [os.path.basename(f)[:8] for f in files]
 HH = np.stack([np.load(f)["hh"] for f in files]); HV = np.stack([np.load(f)["hv"] for f in files])
+rain = json.load(open(f"{P}/cache/rain_vs_backscatter.json"))     # ERA5 rain before each overpass (Open-Meteo), src: see docs/fact_check.md
+assert rain["dates"] == dates, "rain file does not match the extracted dates"
+DRY = np.array(rain["rain_3d"]) < 1.0     # dry date: under 1 mm in the 3 days before the overpass
 db = lambda a: 10 * np.log10(a)
 print(len(dates), "dates", dates[0], "to", dates[-1], "| grid", ny, "x", nx, "| linear HH range", float(np.nanmin(HH)), float(np.nanmax(HH)))
 xs = x0 + 80 * (np.arange(nx) + .5)
@@ -113,6 +116,10 @@ for g in ("cropland", "fallow", "shrubland", "barren"):
         continue
     series[g] = dict(n=int(m.sum()), hh=[round(float(np.nanmedian(HHd[i][m])), 2) for i in range(len(dates))], hv=[round(float(np.nanmedian(HVd[i][m])), 2) for i in range(len(dates))])
 out["series_db"] = series
+if "cropland" in series and "shrubland" in series:
+    out["diff_crop_minus_shrub_db"] = dict(hh=[round(a - b, 2) for a, b in zip(series["cropland"]["hh"], series["shrubland"]["hh"])],
+                                           hv=[round(a - b, 2) for a, b in zip(series["cropland"]["hv"], series["shrubland"]["hv"])])
+out["rain"] = dict(dry_dates=int(DRY.sum()), all_dates=len(dates), spearman_3d_hh=rain["spearman_3d_hh"], spearman_3d_hv=rain["spearman_3d_hv"], perm_p=rain["perm_p_3d_hh"], source=rain["source"])
 for g, s in series.items():
     print(f"  {g:10s} n={s['n']:6d} HH {min(s['hh']):6.1f}..{max(s['hh']):6.1f} dB (range {max(s['hh'])-min(s['hh']):4.1f}) | HV {min(s['hv']):6.1f}..{max(s['hv']):6.1f} dB (range {max(s['hv'])-min(s['hv']):4.1f})")
 
@@ -136,6 +143,13 @@ for name, f in feats.items():
     a = auc(f.ravel()[cs], f.ravel()[dsmp])
     sep[name] = round(max(a, 1 - a), 3)          # 0.5 = no separation, 1 = perfect, direction ignored
 out["separability_auc_cropland_vs_shrubland"] = sep
+feats_dry = {"mean HH (dB)": np.nanmean(HHd[DRY], 0), "mean HV (dB)": np.nanmean(HVd[DRY], 0), "mean HV-HH (dB)": np.nanmean((HVd - HHd)[DRY], 0),
+             "yearly spread HH (dB std)": np.nanstd(HHd[DRY], 0), "yearly spread HV (dB std)": np.nanstd(HVd[DRY], 0)}
+sep_dry = {}
+for name, f in feats_dry.items():
+    a = auc(f.ravel()[cs], f.ravel()[dsmp]); sep_dry[name] = round(max(a, 1 - a), 3)
+out["separability_auc_dry_dates_only"] = sep_dry
+print("AUC, dry dates only:", sep_dry)
 out["separability_cells_each"] = int(n_use)
 print("AUC cropland vs shrubland (0.5 none, 1 perfect):", sep)
 
@@ -168,6 +182,11 @@ act = crop & (spread > thr); idle = crop & (spread <= thr)
 out["active_vs_idle"] = dict(threshold_db=round(float(thr), 2), active_cells=int(act.sum()), idle_cells=int(idle.sum()),
                              rate_active=round(float(np.nanmedian(rate[act & np.isfinite(rate)])), 2) if (act & np.isfinite(rate)).any() else None,
                              rate_idle=round(float(np.nanmedian(rate[idle & np.isfinite(rate)])), 2) if (idle & np.isfinite(rate)).any() else None)
+ma, mi = act & np.isfinite(rate), idle & np.isfinite(rate)
+ta, ti = np.unique(tile[ma]), np.unique(tile[mi])
+ba = {t: rate[ma & (tile == t)] for t in ta}; bi = {t: rate[mi & (tile == t)] for t in ti}
+dai = [np.median(np.concatenate([ba[t] for t in rng.choice(ta, len(ta))])) - np.median(np.concatenate([bi[t] for t in rng.choice(ti, len(ti))])) for _ in range(1500)]
+out["active_vs_idle"].update(diff_cm_yr=round(float(np.median(rate[ma]) - np.median(rate[mi])), 2), diff_ci95=[round(float(np.percentile(dai, 2.5)), 2), round(float(np.percentile(dai, 97.5)), 2)], tiles_active=int(len(ta)), tiles_idle=int(len(ti)))
 print("cropland cells whose yearly HV spread exceeds 90% of desert cells:", out["active_vs_idle"])
 
 # ---- Q3c: independent check with NISAR's own L-band rate (troposphere-corrected stack of 25 pairs). C-band InSAR over irrigated fields can pick up soil-moisture

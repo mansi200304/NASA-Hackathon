@@ -153,6 +153,9 @@ test('NISAR summary: the real file validates; any bad or missing field hides the
   assert.equal(bad('confirm.willcox.date', '2027-13-45'), null);
   assert.equal(bad('figure', '../evil.png'), null);
   assert.equal(bad('sinking.nisar_cm_yr', 'NaN'), null);
+  assert.equal(bad('farmland.auc_hh_spread', 0.2), null);
+  assert.equal(bad('farmland.figure', 'x/../y.png'), null);
+  assert.equal(bad('farmland.rate_diff_lo', null), null);
   assert.equal(cleanNisar(null), null);
   assert.equal(cleanNisar({}), null);
 });

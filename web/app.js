@@ -648,6 +648,8 @@ const dialogCopy = {
       <li><a href="https://doi.org/10.5067/NIL2GUNW-P1" target="_blank" rel="noopener noreferrer">NISAR L2 Geocoded Unwrapped Interferogram (GUNW), Provisional · ASF DAAC</a> — DOI 10.5067/NIL2GUNW-P1; the NISAR data processed here.</li>
       <li><a href="https://doi.org/10.5281/ZENODO.20075813" target="_blank" rel="noopener noreferrer">NISAR Data User Guide (Kristenson et al., 2026) · ASF</a> — DOI 10.5281/ZENODO.20075813; product definitions, maturity levels and availability used throughout this project.</li>
       <li><a href="https://doi.org/10.48577/jpl.UD4HV3" target="_blank" rel="noopener noreferrer">NASA-ISRO SAR (NISAR) Mission Science Users’ Handbook, Second Edition (2025)</a> — DOI 10.48577/jpl.UD4HV3.</li>
+      <li><a href="https://ecommons.cornell.edu/entities/publication/5e298b2f-9ae6-4861-abfe-a8c194323c08" target="_blank" rel="noopener noreferrer">Devlin, K. (2025) · More Than Just Noise: Effects of Vegetation and Agriculture on InSAR Time Series Analysis</a> — Cornell University PhD dissertation; reports an average bias of about 2–4 cm/yr of apparent subsidence for crops such as cotton in Sentinel-1 data, and the largest C-band versus L-band differences in orchard crops.</li>
+      <li><a href="https://meetingorganizer.copernicus.org/EGU21/EGU21-3503.html" target="_blank" rel="noopener noreferrer">Saporta, Gomba &amp; De Zan (2021) · Analyzing an InSAR short-term systematic phase bias with regards to soil moisture and landcover</a> — EGU General Assembly 2021 abstract EGU21-3503; velocity biases that can reach several mm per year in Sentinel-1 data.</li>
       <li><a href="https://doi.org/10.5067/SNWG/OPL3DISPS1-V1" target="_blank" rel="noopener noreferrer">OPERA Surface Displacement from Sentinel-1 (DISP-S1), Version 1 · ASF DAAC</a> — DOI 10.5067/SNWG/OPL3DISPS1-V1; the ten-year record, built from Copernicus Sentinel-1 data (ESA).</li>
       <li><a href="https://registry.opendata.aws/copernicus-dem/" target="_blank" rel="noopener noreferrer">Copernicus 30 m DEM</a> — ground heights used to apply NISAR’s troposphere correction.</li>
       <li><a href="https://search.asf.alaska.edu/" target="_blank" rel="noopener noreferrer">Alaska Satellite Facility · SAR data discovery</a></li>
@@ -852,9 +854,18 @@ function renderNisar(n) {
     'eloy-rate': one(n.eloy.s1), 'eloy-date': month(n.eloy.date), overlap: (n.overlap.r < 0 ? '−' : '') + two(Math.abs(n.overlap.r)),
     's-nisar': sign(n.sinking.nisar), 's-s1': sign(n.sinking.s1), net: sign(n.playa.net), trend: sign(n.playa.trend)
   };
+  const f = n.farmland, abs1 = x => one(Math.abs(x)), mn = x => (x < 0 ? '\u2212' : '') + one(Math.abs(x));
+  Object.assign(values, {
+    dates: String(f.dates), 'box-pct': one(f.boxPct), 'sink-pct': one(f.sinkPct), times: one(f.times), acres: new Intl.NumberFormat('en-US').format(Math.round(f.acres / 100) * 100),
+    'rate-diff': abs1(f.diff), 'rate-lo': mn(f.lo), 'rate-hi': mn(f.hi), 'crop-sink': String(Math.round(f.cropSink)), 'desert-sink': String(Math.round(f.desertSink)),
+    'auc-hh': two(f.aucHH), 'auc-hv': two(f.aucHV), 'auc-mean': two(f.aucMean), 'rho-hh': two(f.rhoHH), 'rho-hv': two(f.rhoHV), dry: String(f.dry),
+    'nisar-diff': mn(f.nisarDiff), 'nisar-cells': new Intl.NumberFormat('en-US').format(f.nisarCells)
+  });
   section.querySelectorAll('[data-nisar]').forEach(node => { node.textContent = values[node.dataset.nisar] ?? ''; });
   const img = $('#nisar-figure-img');
   if (img) img.src = window.ATLAS_PREVIEW_IMAGES?.[n.figure] || new URL(n.figure, DATA).href;
+  const img2 = $('#nisar-farmland-img');
+  if (img2) img2.src = window.ATLAS_PREVIEW_IMAGES?.[n.farmland.figure] || new URL(n.farmland.figure, DATA).href;
   section.hidden = false;
 }
 loadNisar().then(renderNisar);

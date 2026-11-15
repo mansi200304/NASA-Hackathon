@@ -58,5 +58,26 @@
   }
  },
  "figure": "nisar_vs_sentinel1_willcox.png",
+ "farmland": {
+  "crop_share_box_pct": 2.1,
+  "crop_share_sinking_pct": 7.4,
+  "enrichment": 3.56,
+  "crop_acres_sinking": 8105,
+  "rate_diff_cm_yr": -2.31,
+  "rate_diff_lo": -3.22,
+  "rate_diff_hi": -1.61,
+  "share_sinking_cropland_pct": 67,
+  "share_sinking_desert_pct": 16,
+  "auc_hh_spread": 0.878,
+  "auc_hv_spread": 0.793,
+  "auc_mean_hh": 0.503,
+  "rain_rho_hh": 0.65,
+  "rain_rho_hv": 0.79,
+  "n_dates": 28,
+  "dry_dates": 21,
+  "nisar_diff_cm_yr": -5.0,
+  "nisar_cells": 405,
+  "figure": "gcov_farmland_willcox.png"
+ },
  "release": "NASA NISAR L2 GUNW. Willcox: Provisional (CRID P05023) except the first pair, Oct 26 to Nov 7 2025, which is Beta; re-fitting without it moves the rate from -2.82 to -3.00 cm/yr. Eloy: Provisional."
 }

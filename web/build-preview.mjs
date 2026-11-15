@@ -24,6 +24,8 @@ for (const feature of normalizeHotspots(data['hotspots.geojson']).features) {
 }
 try { images['nisar_vs_sentinel1_willcox.png'] = 'data:image/png;base64,' + (await readFile(new URL('../data/processed/nisar_vs_sentinel1_willcox.png', root))).toString('base64'); }
 catch (error) { if (error.code !== 'ENOENT') throw error; }
+try { images['gcov_farmland_willcox.png'] = 'data:image/png;base64,' + (await readFile(new URL('../data/processed/gcov_farmland_willcox.png', root))).toString('base64'); }
+catch (error) { if (error.code !== 'ENOENT') throw error; }
 const json = value => JSON.stringify(value).replace(/</g, '\\u003c');
 const inlineJS = 'window.ATLAS_PREVIEW_DATA=' + json(data) + ';window.ATLAS_PREVIEW_IMAGES=' + json(images) + ';\n' +
   model.replace(/^export /gm, '') + '\n' + app.replace(/^import .*?;\r?\n/, '');
