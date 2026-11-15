@@ -8,6 +8,7 @@
   <title>Arizona is sinking — Field atlas</title>
   <link rel="stylesheet" href="./vendor/leaflet.css">
   <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./map.css">
   <script src="./vendor/leaflet.js" defer></script>
   <script type="module" src="./app.js"></script>
 </head>
@@ -25,9 +26,9 @@
 
   <main class="workspace">
     <aside class="sidebar" aria-label="Study areas and map layers">
-      <div class="sidebar-intro"><span class="eyebrow">Arizona / Ground & water</span><p>Three places.<br>One shared resource.</p></div>
+      <div class="sidebar-intro"><span class="eyebrow">Arizona / Ground & water</span><p>Ground in motion.<br>One shared resource.</p></div>
       <section class="study-section" aria-labelledby="study-heading">
-        <h2 id="study-heading">Study areas <span>03</span></h2>
+        <h2 id="study-heading">Study areas <span id="study-count">—</span></h2>
         <div id="hotspot-list" class="hotspot-list"></div>
         <button id="show-all" class="text-action" type="button">View all study areas <span class="out-arrow" aria-hidden="true"></span></button>
         <button id="toggle-layers" class="mobile-layer-toggle" type="button" aria-controls="layer-section" aria-expanded="false">Layers</button>
@@ -41,10 +42,10 @@
     </aside>
 
     <section class="map-column" aria-label="Interactive study map">
-      <div class="map-toolbar"><div class="basemap-options" role="group" aria-label="Basemap"><button type="button" data-basemap="terrain" aria-pressed="true">Terrain</button><button type="button" data-basemap="satellite" aria-pressed="false">Satellite</button></div><button id="fit-study" type="button" title="Fit selected study area">Fit study</button></div>
+      <div class="map-toolbar"><div class="basemap-options" role="group" aria-label="Basemap"><button type="button" data-basemap="dark" aria-pressed="false">Dark</button><button type="button" data-basemap="terrain" aria-pressed="false">Terrain</button><button type="button" data-basemap="satellite" aria-pressed="true">Satellite</button></div><button id="fit-study" type="button" title="Fit selected study area">Fit study</button></div>
       <div id="map" role="region" aria-label="Arizona map. Use arrow keys to pan and plus or minus to zoom."></div>
       <div id="map-error" class="map-message" role="status" hidden>Basemap tiles could not load. Study outlines are still available. Try the other basemap.</div>
-      <div class="map-caption"><span id="map-location">Eloy / Casa Grande</span><span>Outlines mark study extents, not sinking zones.</span></div>
+      <div class="map-caption"><span id="map-location">Loading study areas…</span><span>Outlines mark study extents, not sinking zones.</span></div>
       <div id="rate-legend" class="rate-legend" hidden></div>
     </section>
 
