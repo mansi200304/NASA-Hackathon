@@ -1,6 +1,6 @@
 # Sinkronized — web map
 
-A buildless, map-first field atlas using Sonoran Sand. The map and study selection work immediately. Measurements and context overlays stay pending until real exports are available.
+A buildless, map-first field atlas using Sonoran Sand, with a plain-language Overview introducing subsidence, evidence and limits. The map and study selection work immediately. Measurements and context overlays stay pending until real exports are available.
 
 ## Run it
 
@@ -23,9 +23,12 @@ The original app in index.html remains the source of truth. No fabricated measur
 ## What works
 
 - Select any area supplied in `hotspots.geojson`; names, order, study numbers, file paths and outlines come from that file. There is no fixed location list or required count.
-- View all study areas, fit the selected area, pan and zoom, or switch satellite/terrain/dark basemaps. Satellite imagery is the default.
+- View all study areas, fit the selected area, pan and zoom, or switch satellite/terrain basemaps. Satellite imagery is the default; the dark basemap is no longer a selectable option.
 - Toggle available overlays and adjust their opacity. On phones, Layers opens the controls while leaving room for the map.
 - Read a fitted rate, uncertainty, observation chart, accessible observation table and reference metadata when supplied.
+- Read the opening Overview about Arizona groundwater subsidence and the two satellite viewing directions; scroll or use Explore map to reach the atlas.
+- Hover, click, tap or keyboard-step through the date-based time-series chart; where the pipeline has exported cumulative frames, the map follows the selected date. Play and sinking/stable area controls are retained from the current team release.
+- Select a study or a mapped feature for a bottom field note, or open Explain from the study detail sections. Map coordinate clicks do not invent pixel values.
 - Open How we measured, Limits and Sources dialogs. Dialogs support Escape; controls have visible keyboard focus.
 - Inspect a map coordinate. Pixel-level rate/coherence sampling is explicitly unavailable: a coloured PNG is not a numeric raster.
 
@@ -124,7 +127,7 @@ The map update was browser-checked against all current study selections, real
 rate PNGs, basemap switching and the portable preview. A 390px phone review
 confirmed study selection, Layers disclosure and no horizontal overflow.
 
-The three-column layout and typography remain intact. Sonoran Sand has distinct
+The main atlas remains a three-column, data-driven layout, with a wider left study panel and larger study-detail typography; a responsive narrative Overview appears above it. Sonoran Sand has distinct
 roles: ivory canvas, sand sidebar, ink masthead/footer, rust selection and reported
 rate, olive study count/status and slate metadata headers. Small light text uses
 the darker slate variant for contrast. Scientific raster colours are independent
@@ -138,3 +141,9 @@ dataset provenance. No agency affiliation is implied.
 
 This is the first UI for team review. It does not deploy GitHub Pages or change the radar processing pipeline. For eventual Pages hosting, publish an artifact containing web/ and data/processed/ together so relative paths remain valid. Keep raw HDF5 and large rasters out of Git.
 
+
+## Continuation — Overview and field notes
+
+The new presentation adds a responsive Overview, two-direction radar explainer and bottom field notes without changing the pipeline's scientific results, data-driven study identities/order, map raster colours or time-to-map logic. The current team implementation of dated cumulative frames and chart playback remains intact. The top navigation leads directly to the map; an Overview link returns from the study panel. Animation respects reduced-motion preferences.
+
+Serve the root at `/web/` to use cumulative frame PNGs. The self-contained preview remains a snapshot and should be regenerated with `node web/build-preview.mjs` after data changes; the timestamp frame PNGs use normal repository-relative paths unless the preview generator is extended to embed them.
