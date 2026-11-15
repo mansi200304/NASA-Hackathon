@@ -23,7 +23,7 @@ for (const feature of normalizeHotspots(data['hotspots.geojson']).features) {
 }
 const json = value => JSON.stringify(value).replace(/</g, '\\u003c');
 const inlineJS = 'window.ATLAS_PREVIEW_DATA=' + json(data) + ';window.ATLAS_PREVIEW_IMAGES=' + json(images) + ';\n' +
-  model.replace(/^export /gm, '') + '\n' + app.replace(/^import .*?;\n/, '');
+  model.replace(/^export /gm, '') + '\n' + app.replace(/^import .*?;\r?\n/, '');
 let preview = html
   .replace('<link rel="stylesheet" href="./vendor/leaflet.css">', () => '<style>' + leafletCSS + '</style>')
   .replace('<link rel="stylesheet" href="./styles.css">', () => '<style>' + css + '</style>')
