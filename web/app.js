@@ -790,7 +790,7 @@ function renderAbout(team) {
       const photo = el('img', 'team-photo');
       photo.src = new URL(member.photo, import.meta.url).href;
       photo.alt = 'Photo of ' + member.name;
-      photo.loading = 'lazy'; photo.width = 62; photo.height = 62;
+      photo.loading = 'lazy'; photo.width = 112; photo.height = 112;
       top.append(photo);
     } else {
       const avatar = el('div', 'team-avatar', initials(member.name));
