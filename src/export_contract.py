@@ -15,7 +15,7 @@ REF_TEXT = {"central": "median ground of the whole Sentinel-1 frame 7091 (descen
 TRACK = {"central": "Sentinel-1 track 27 descending, frame 7091", "southeast": "Sentinel-1 track 129 descending, frame 34478"}
 CAVEATS = ["Line-of-sight motion, not purely vertical.", "Referenced to the median ground of the whole satellite frame; a few mm/yr of bias is possible.",
            "Troposphere (water vapour) is not corrected; solid-earth tide and ionosphere are.",
-           "Uncertainty shown is the fit error of a straight line only; it ignores reference bias and is optimistic.",
+           "Uncertainty combines the straight-line fit error with the disagreement between descending and ascending satellite tracks; reference-site bias is not separately included.",
            "Sinking does not by itself show who or what caused it."]
 
 def crop_png(frame_names, bbox, slug):
@@ -30,6 +30,14 @@ def crop_png(frame_names, bbox, slug):
 def main():
     cache = {n: ew.load(n) for n in ["central", "southeast", "f5125"]}; cache = {k: v for k, v in cache.items() if v is not None}
     feats = []; report = []
+    # Uncertainty: straight-line fit error alone (0.07 to 0.15 cm/yr) ignores the biggest disagreement we measured, descending vs ascending medians.
+    # systematic term s = half the descending-ascending median difference where an ascending check exists; otherwise the largest s among the others (conservative proxy).
+    pre = {}
+    for h in ew.HOTSPOTS:
+        st0 = ew.hotspot_stats(h, cache) if h["D"] in cache else None
+        if st0 is not None: pre[h["id"]] = st0
+    sdiff = {k: abs(v["median_rate"] - v["ascending"]["median_rate"]) / 2 for k, v in pre.items() if v.get("ascending")}
+    s_proxy = max(sdiff.values()) if sdiff else 0.0
     for h in ew.HOTSPOTS:
         st = ew.hotspot_stats(h, cache) if h["D"] in cache else None
         if st is None: print("skip", h["id"]); continue
@@ -39,6 +47,7 @@ def main():
         feats.append({"type": "Feature", "geometry": {"type": "Polygon", "coordinates": [[[w, s], [e, s], [e, n], [w, n], [w, s]]]},
                       "properties": {"slug": slug, "name": h["name"], "tagline": tagline, "county": county, "story": h["story"], "confirmation": status,
                                      "land_use_note": h["land"], "source_note": "Sentinel-1 OPERA DISP-S1, 2016 to 2026; outline is the study box, not the sinking area"}})
+        sys_term = sdiff.get(h["id"], s_proxy)
         D = cache[h["D"]]; stable = st.get("stable_series_mm")
         nis = ew.nisar_block(h["nisar"])
         nisar = None if nis is None else {"track": nis["track"], "dates": nis["dates"], "displacement": [round(v / 10, 2) for v in nis["series_mm"]],
@@ -46,7 +55,10 @@ def main():
                                           "scope": nis["scope"], "status_note": "Provisional NISAR data; short record; rate not yet reliable."}
         ts = {"hotspot": slug, "units": "cm", "reference": REF_TEXT[h["D"]], "track": TRACK[h["D"]],
               "dates": st["dates"], "displacement": [round(v / 10, 2) for v in st["series_mm"]],
-              "rate_cm_yr": st["series_rate"], "rate_sigma": st["series_sigma"], "adwr_rate_cm_yr": None,
+              "rate_cm_yr": st["series_rate"], "rate_sigma": round(float(np.hypot(st["series_sigma"], sys_term)), 2), "adwr_rate_cm_yr": None,
+              "rate_sigma_fit_only": st["series_sigma"], "rate_sigma_systematic": round(float(sys_term), 2),
+              "rate_sigma_note": ("Combines the straight-line fit error with half the difference between the descending and ascending satellite medians." if h["id"] in sdiff else
+                                  "No ascending check here, so the systematic part is the largest seen at the other study areas (a conservative proxy, not a measurement)."),
               "median_rate_cm_yr": st["median_rate"], "p5_rate_cm_yr": st["p5_rate"], "fastest_rate_cm_yr": st["fastest"], "area_km2": st["area_km2"],
               "sinking_threshold_cm_yr": ew.THR, "ascending_check": st.get("ascending"), "confirmation": status,
               "stable_ground_displacement": None if stable is None else [round(v / 10, 2) for v in stable],

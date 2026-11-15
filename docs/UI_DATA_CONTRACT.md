@@ -29,6 +29,7 @@ Not provided yet, so the UI should keep its existing "Pending" state: `adwr_subs
 
 - Everything is **line of sight** (LOS), in cm or cm/yr. **Negative = ground moving away from the satellite = sinking.** Positive = rising (usually wet or swelling soil, not real uplift).
 - `rate_cm_yr` is a straight-line fit to the average of the sinking pixels. `median_rate_cm_yr` is the median of the sinking pixels and is the better headline number. Sinking pixels are those faster than `sinking_threshold_cm_yr` (-1).
+- `rate_sigma` is the uncertainty the UI shows next to `rate_cm_yr`. It combines the straight-line fit error with half the difference between the descending and ascending satellite medians (`rate_sigma_fit_only` and `rate_sigma_systematic` give the two parts; `rate_sigma_note` explains it). For `east`, which has no ascending check, the systematic part is a conservative proxy. Do not replace it with the fit-only value: that is about 0.1 cm/yr and overstates precision.
 - `displacement` is cumulative since the first date, about 6-month steps, 2016 to 2026.
 - Do not present these as vertical subsidence. Say "line of sight" where numbers appear.
 
@@ -51,3 +52,15 @@ Not provided yet, so the UI should keep its existing "Pending" state: `adwr_subs
 ## 6. Regenerating
 
 `python src/export_contract.py` rewrites every file above from the processed cubes. Do not edit these files by hand.
+
+## 7. Fields the app does not show yet (recommended before submission)
+
+The current app validates all files but only shows `rate_cm_yr`, `rate_sigma`, `reference`, `track`, the chart and `confirmation` (map tooltip). These carry the honesty of the story and are worth adding:
+
+- `caveats` (list of strings): show in every study panel.
+- `nisar` (object or null, always `"reliable": false`): show with its `status_note`, or leave out. Do not show its rate as a result.
+- `median_rate_cm_yr`, `p5_rate_cm_yr`, `area_km2`: a better headline than the straight-line fit.
+- `ascending_check`: the second-direction number.
+- `stable_ground_displacement`: second chart line, to show measurement noise.
+- `land_use_note` (in `hotspots.geojson`): what is nearby, with its source.
+- Layers: `rate_sentinel1_descending`, `rate_sentinel1_ascending` (cross-check), `rate_nisar_*` (off by default), `mines_excluded.geojson`, `checked_flat.geojson`.

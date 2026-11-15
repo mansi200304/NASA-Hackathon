@@ -48,8 +48,11 @@
   -30.82
  ],
  "rate_cm_yr": -3.12,
- "rate_sigma": 0.1,
+ "rate_sigma": 0.49,
  "adwr_rate_cm_yr": null,
+ "rate_sigma_fit_only": 0.1,
+ "rate_sigma_systematic": 0.47,
+ "rate_sigma_note": "Combines the straight-line fit error with half the difference between the descending and ascending satellite medians.",
  "median_rate_cm_yr": -2.86,
  "p5_rate_cm_yr": -6.3,
  "fastest_rate_cm_yr": -8.25,
@@ -88,7 +91,7 @@
   "Line-of-sight motion, not purely vertical.",
   "Referenced to the median ground of the whole satellite frame; a few mm/yr of bias is possible.",
   "Troposphere (water vapour) is not corrected; solid-earth tide and ionosphere are.",
-  "Uncertainty shown is the fit error of a straight line only; it ignores reference bias and is optimistic.",
+  "Uncertainty combines the straight-line fit error with the disagreement between descending and ascending satellite tracks; reference-site bias is not separately included.",
   "Sinking does not by itself show who or what caused it."
  ],
  "source": "Sentinel-1 OPERA DISP-S1 block-final granules, 6-month steps"
