@@ -118,10 +118,10 @@ def nisar_raster(key, box, file_glob, fname, ref, ref_km):
     json.dump(dict(bounds=[[S, W], [N, E]], valid_pct=round(float(np.isfinite(v).mean() * 100), 1)), open(f"{OUT}/{fname}.json", "w")); return True
 
 if __name__ == "__main__":
-    names = ["central", "southeast", "f34477", "f7092", "f5125", "f7090", "f26691", "f46289", "f34476"]
+    names = ["central", "southeast", "f34477", "f7092", "f5125", "f7090", "f26690", "f46289", "f34476"]
     cache = {n: load(n) for n in names}; cache = {k: v for k, v in cache.items() if v is not None}; print("cubes available:", sorted(cache))
     # Sentinel-1 mosaics: descending frames (priority order) and the ascending cross-check
-    desc = [n for n in ["southeast", "f34477", "central", "f7092", "f7090", "f26691", "f46289", "f34476"] if n in cache]
+    desc = [n for n in ["southeast", "f34477", "central", "f7092", "f7090", "f26690", "f46289", "f34476"] if n in cache]
     print("descending mosaic:", mosaic(desc, "s1_rate_desc"))
     print("ascending mosaic:", mosaic([n for n in ["f5125"] if n in cache], "s1_rate_asc"))
     hs = []
