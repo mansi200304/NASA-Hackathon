@@ -464,7 +464,6 @@ document.querySelectorAll('[data-dialog]').forEach(b => b.addEventListener('clic
 $('#close-dialog').addEventListener('click', () => $('#about-dialog').close());
 $('#close-explain').addEventListener('click', () => { $('#explain-drawer').hidden = true; });
 document.addEventListener('keydown', event => { if (event.key === 'Escape') $('#explain-drawer').hidden = true; });
-document.querySelectorAll('.overview-copy [data-dialog]').forEach(b => b.addEventListener('click', () => openDialog(b.dataset.dialog)));
 $('#about-dialog').addEventListener('click', e => { if (e.target === $('#about-dialog')) { const r = e.target.getBoundingClientRect(); if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) e.target.close(); } });
 $('#reload-data').addEventListener('click', () => location.reload());
 $('#toggle-layers').addEventListener('click', () => {
@@ -474,6 +473,17 @@ $('#toggle-layers').addEventListener('click', () => {
 });
 $('#show-all').addEventListener('click', showAll);
 $('#fit-study').addEventListener('click', fitSelected);
+if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  const steps = document.querySelectorAll('.overview-steps > div');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('is-visible');
+      observer.unobserve(entry.target);
+    });
+  }, { threshold: 0.1 });
+  steps.forEach(step => { step.classList.add('overview-step-in'); observer.observe(step); });
+}
 document.querySelectorAll('[data-basemap]').forEach(button => button.addEventListener('click', () => {
   if (!map) return;
   map.removeLayer(state.basemaps[state.base]); state.base = button.dataset.basemap;
