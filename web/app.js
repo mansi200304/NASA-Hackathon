@@ -54,9 +54,11 @@ function factList(items) {
   });
   return list;
 }
-function section(title) {
-  const node = el('section', 'detail-section');
-  node.append(el('h2', '', title));
+function section(title, noteKey = null) {
+  const node = el('section', 'detail-section'), header = el('div', 'detail-section-heading');
+  header.append(el('h2', '', title));
+  if (noteKey) header.append(explainButton(noteKey));
+  node.append(header);
   return node;
 }
 function svgNode(tag, attrs = {}, text) {
@@ -67,56 +69,75 @@ function svgNode(tag, attrs = {}, text) {
 }
 function makeChart(series) {
   const wrap = el('div', 'chart');
-  const svg = svgNode('svg', { viewBox: '0 0 300 170', role: 'img', 'aria-label': 'Cumulative displacement in centimetres relative to ' + series.reference });
+  const svg = svgNode('svg', { viewBox: '0 0 330 190', role: 'group', 'aria-label': 'Interactive satellite displacement observations. Focus or tap a dot to inspect the actual measurement.' });
   const valid = series.points.filter(p => isNumber(p.value));
   const stable = series.stablePoints.filter(p => isNumber(p.value));
   const start = Date.parse(series.dates[0]), end = Date.parse(series.dates.at(-1));
-  const extent = [...valid, ...stable].map(p => p.value);
-  let lo = Math.min(...extent), hi = Math.max(...extent);
-  const pad = Math.max((hi - lo) * 0.15, 0.1);
-  lo -= pad; hi += pad;
-  const x = date => 42 + (Date.parse(date) - start) / (end - start || 1) * 244;
-  const y = value => 130 - (value - lo) / (hi - lo) * 112;
-  [lo, (lo + hi) / 2, hi].forEach(value => {
-    svg.append(svgNode('line', { x1: 42, x2: 286, y1: y(value), y2: y(value), stroke: '#C9C0B2', 'stroke-width': 0.7 }));
-    svg.append(svgNode('text', { x: 35, y: y(value) + 3, 'text-anchor': 'end', class: 'chart-label' }, formatNumber(value)));
+  const values = [...valid, ...stable].map(p => p.value);
+  let lo = Math.min(...values), hi = Math.max(...values);
+  const pad = Math.max((hi - lo) * 0.15, 0.1); lo -= pad; hi += pad;
+  const x = date => 45 + (Date.parse(date) - start) / (end - start || 1) * 267;
+  const y = val => 144 - (val - lo) / (hi - lo) * 120;
+  [lo, (lo + hi) / 2, hi].forEach(v => {
+    svg.append(svgNode('line', { x1: 45, x2: 312, y1: y(v), y2: y(v), stroke: '#C9C0B2', 'stroke-width': 0.8 }));
+    svg.append(svgNode('text', { x: 38, y: y(v) + 3, 'text-anchor': 'end', class: 'chart-label' }, formatNumber(v)));
   });
-  svg.append(svgNode('text', { x: 8, y: 12, class: 'chart-label' }, 'cm'));
-  let path = '', next = true;
-  series.points.forEach(p => {
-    if (p.value === null) { next = true; return; }
-    path += (next ? 'M' : 'L') + x(p.date) + ',' + y(p.value) + ' ';
-    next = false;
-  });
-  svg.append(svgNode('path', { d: path, fill: 'none', stroke: COLORS.rust, 'stroke-width': 1.8 }));
-  if (stable.length) {
-    let stablePath = '', gap = true;
-    series.stablePoints.forEach(p => {
-      if (p.value === null) { gap = true; return; }
-      stablePath += (gap ? 'M' : 'L') + x(p.date) + ',' + y(p.value) + ' '; gap = false;
+  svg.append(svgNode('text', { x: 9, y: 13, class: 'chart-label' }, 'cm'));
+  function draw(points) {
+    let d = '', gap = true;
+    points.forEach(p => {
+      if (!isNumber(p.value)) { gap = true; return; }
+      d += (gap ? 'M' : 'L') + x(p.date) + ',' + y(p.value) + ' '; gap = false;
     });
-    svg.append(svgNode('path', { d: stablePath, fill: 'none', stroke: COLORS.slate, 'stroke-width': 1.5, 'stroke-dasharray': '4 3' }));
+    return d;
   }
-  valid.forEach(p => svg.append(svgNode('circle', { cx: x(p.date), cy: y(p.value), r: 2.5, fill: COLORS.rust })));
-  svg.append(svgNode('text', { x: 42, y: 153, class: 'chart-label' }, series.dates[0]));
-  if (series.dates.length > 1) svg.append(svgNode('text', { x: 286, y: 168, 'text-anchor': 'end', class: 'chart-label' }, series.dates.at(-1)));
-  wrap.append(svg);
-  if (stable.length) wrap.append(note('Solid rust: sinking-pixel average · Dashed slate: stable ground (measurement noise). Both are line-of-sight displacement.'));
+  svg.append(svgNode('path', { d: draw(series.points), fill: 'none', stroke: COLORS.rust, 'stroke-width': 2.2 }));
+  if (stable.length) svg.append(svgNode('path', { d: draw(series.stablePoints), fill: 'none', stroke: COLORS.slate, 'stroke-width': 1.7, 'stroke-dasharray': '4 3' }));
+  svg.append(svgNode('text', { x: 45, y: 166, class: 'chart-label' }, series.dates[0]));
+  if (series.dates.length > 1) svg.append(svgNode('text', { x: 312, y: 183, 'text-anchor': 'end', class: 'chart-label' }, series.dates.at(-1)));
+  const readout = el('output', 'chart-readout', 'Tap or focus a dot to inspect a real satellite observation.');
+  readout.setAttribute('aria-live', 'polite');
+  let active = null;
+  function addPoints(points, name, color) {
+    points.forEach(p => {
+      if (!isNumber(p.value)) return;
+      const description = name + ' · ' + p.date + ' · ' + formatNumber(p.value) + ' cm';
+      const point = svgNode('circle', { cx: x(p.date), cy: y(p.value), r: 4.3, fill: color, class: 'chart-point', tabindex: 0, role: 'button', 'aria-label': description });
+      const show = () => {
+        if (active) active.classList.remove('chart-point-active');
+        active = point; point.classList.add('chart-point-active'); readout.textContent = description;
+      };
+      point.addEventListener('mouseenter', show);
+      point.addEventListener('focus', show);
+      point.addEventListener('click', show);
+      point.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); show(); } });
+      svg.append(point);
+    });
+  }
+  addPoints(series.points, 'Study displacement', COLORS.rust);
+  addPoints(series.stablePoints, 'Stable-ground reference', COLORS.slate);
+  wrap.append(svg, readout);
+  if (stable.length) wrap.append(note('Rust: study displacement · Dashed slate: stable reference. Both are line-of-sight measurements.'));
   const details = el('details');
   details.append(el('summary', '', 'View observations as a table'));
   const table = el('table'), head = el('thead'), header = el('tr'), body = el('tbody');
   header.append(el('th', '', 'Date'), el('th', '', 'Displacement (cm)'));
   if (stable.length) header.append(el('th', '', 'Stable ground (cm)'));
   head.append(header);
-  series.points.forEach((p, i) => { const tr = el('tr'); tr.append(el('td', '', p.date), el('td', '', p.value === null ? 'No observation' : formatNumber(p.value))); if (stable.length) tr.append(el('td', '', series.stablePoints[i].value === null ? 'No observation' : formatNumber(series.stablePoints[i].value))); body.append(tr); });
+  series.points.forEach((p, i) => {
+    const tr = el('tr'); tr.append(el('td', '', p.date), el('td', '', p.value === null ? 'No observation' : formatNumber(p.value)));
+    if (stable.length) tr.append(el('td', '', series.stablePoints[i].value === null ? 'No observation' : formatNumber(series.stablePoints[i].value)));
+    body.append(tr);
+  });
   table.append(head, body); details.append(table); wrap.append(details);
   return wrap;
 }
 function renderInsights(root, series) {
   const ins = cleanInsights(series?.insights);
   if (!ins) return;
-  const box = el('section', 'insights');
-  box.append(el('h2', 'insights-title', 'In plain terms'), el('p', 'insights-summary', ins.summary));
+  const box = el('section', 'insights'), header = el('div', 'detail-section-heading');
+  header.append(el('h2', 'insights-title', 'In plain terms'), explainButton('confidence'));
+  box.append(header, el('p', 'insights-summary', ins.summary));
   if (ins.confidence) {
     const row = el('div', 'confidence-row');
     [[ins.confidence.where_label, ins.confidence.where], [ins.confidence.how_fast_label, ins.confidence.how_fast]].forEach(([label, level]) => {
@@ -133,6 +154,30 @@ function renderInsights(root, series) {
   });
   root.append(box);
 }
+const FIELD_NOTES = {
+  confidence: ['How certain is this observation?', 'Confidence describes the strength and quality of the evidence, not how concerning a place is. Several observations, an appropriate reference and independent look directions strengthen interpretation.', 'Confidence labels are from the team’s processed export.'],
+  rate: ['What does the reported rate mean?', 'This rate summarizes observed motion over a defined interval. A radar satellite views the ground at an angle, so a line-of-sight rate is not automatically a vertical sinking rate.', 'Read the rate together with its uncertainty, time interval, reference area and sign convention. A motion signal does not establish cause.'],
+  chart: ['How do I read the graph?', 'Every dot is an actual exported observation. Tap or focus a dot for its date and value. Blank periods are missing evidence, not zero movement.', 'The dashed comparison, when supplied, tracks stable-reference behavior; no intermediate observations are fabricated.'],
+  record: ['Why does metadata matter?', 'Satellite product, orbit track, look direction, real acquisition dates and reference area determine what is comparable.', 'Different viewing geometries or periods cannot automatically be combined as equivalent vertical rates.'],
+  validation: ['What does the official comparison show?', 'ADWR radar results provide important historical context. Spatial patterns, correlations and medians may agree or disagree across sensors.', 'Different periods, look directions and reference areas limit direct rate comparisons. Agreement does not by itself validate each study.'],
+  study: ['What is a study outline?', 'The boundary represents a project-defined study extent. It is not the observed subsidence footprint.', 'Names and stories are taken from the latest GeoJSON, not a fixed list.'],
+  directions: ['Why do two satellite look directions matter?', 'Ascending passes generally move from south toward north, while descending passes move from north toward south. They observe the landscape from different slanted viewing geometries. Comparing both can help distinguish some components of motion and test consistency.', 'One viewing direction alone does not uniquely determine vertical ground movement. Geometry, quality and reference selection matter.']
+};
+function showFieldNote(title, description, footnote = '') {
+  $('#explain-title').textContent = title;
+  $('#explain-text').textContent = description;
+  $('#explain-note').textContent = footnote;
+  $('#explain-drawer').hidden = false;
+}
+function explainButton(key) {
+  const button = el('button', 'explain-trigger', 'Explain ↗'); button.type = 'button';
+  button.setAttribute('aria-label', 'Explain: ' + FIELD_NOTES[key][0]);
+  button.addEventListener('click', () => showFieldNote(...FIELD_NOTES[key]));
+  return button;
+}
+function showStudyNote(feature) {
+  showFieldNote(feature.properties.name, feature.properties.story || FIELD_NOTES.study[1], FIELD_NOTES.study[2]);
+}
 function renderDetails() {
   const feature = state.hotspots.features.find(f => f.properties.slug === state.selected);
   const p = feature.properties;
@@ -145,6 +190,7 @@ function renderDetails() {
   const kicker = el('div', 'detail-kicker');
   kicker.append(el('span', '', (p.county || 'Arizona') + ', Arizona'), el('span', '', 'Study ' + String(state.slugs.indexOf(state.selected) + 1).padStart(2, '0')));
   root.append(kicker, el('h1', '', p.name), el('p', 'story-name', p.tagline));
+  const studyContext = el('div', 'study-context'); studyContext.append(explainButton('study')); root.append(studyContext);
   if (p.confirmation) root.append(el('p', 'confirmation-chip' + (p.confirmation === 'single look direction' ? ' unconfirmed' : ''), p.confirmation === 'single look direction' ? 'Unconfirmed · ' + p.confirmation : p.confirmation));
   renderInsights(root, series);
   const hasRate = series && isNumber(series.rate_cm_yr);
@@ -157,8 +203,9 @@ function renderDetails() {
     ? (isNumber(series.rate_sigma) ? (series.rate_sigma_note || 'Uncertainty supplied by the processing pipeline.') : 'Uncertainty has not been supplied.')
     : dataError(result, 'Awaiting a referenced time series and fitted rate.')));
   if (hasRate) metric.append(note(series.sign_convention || 'Sign convention not supplied. This value is not labelled as vertical sinking.'));
+  metric.append(explainButton('rate'));
   root.append(metric);
-  const chartSection = section('Displacement through time');
+  const chartSection = section('Displacement through time', 'chart');
   if (series?.hasData) {
     chartSection.append(makeChart(series), note('Relative to: ' + series.reference));
   } else {
@@ -167,7 +214,7 @@ function renderDetails() {
     chartSection.append(wait);
   }
   root.append(chartSection);
-  const record = section('Measurement record');
+  const record = section('Measurement record', 'record');
   record.append(factList([
     ['Satellite / product', series?.source || meta?.track || 'Not supplied'],
     ['Track / frame', series?.track || meta?.track || 'Coverage check pending'],
@@ -187,7 +234,7 @@ function renderDetails() {
     provisional.append(el('p', 'validation-note', series.nisar.status_note));
     root.append(provisional);
   }
-  const validation = section('ADWR comparison');
+  const validation = section('ADWR comparison', 'validation');
   if (series && (isNumber(series.adwr_rate_cm_yr) || isNumber(series.adwr_rs2_rate_cm_yr))) {
     const c = series.adwr_comparison;
     validation.append(note('Median rates over the same sinking pixels · cm/yr, line of sight · ADWR units inferred. These medians differ from the fitted rate above.'));
@@ -231,7 +278,7 @@ function renderHotspots() {
     const title = el('span', 'place', f.properties.name);
     title.append(el('span', 'tagline', f.properties.tagline));
     button.append(title);
-    button.addEventListener('click', () => selectHotspot(f.properties.slug));
+    button.addEventListener('click', () => { selectHotspot(f.properties.slug); showStudyNote(f); });
     list.append(button);
   });
 }
@@ -261,7 +308,6 @@ function initMap() {
   L.control.zoom({ position: 'topright' }).addTo(map);
   L.control.scale({ imperial: false, position: 'bottomleft' }).addTo(map);
   const tileSources = {
-    dark: { url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', attribution: 'Tiles &copy; Esri, HERE, Garmin, OpenStreetMap contributors', maxNativeZoom: 16 },
     terrain: { url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', attribution: 'Tiles &copy; Esri &mdash; Esri, HERE, Garmin, USGS, NGA, EPA, USDA, NPS' },
     satellite: { url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', attribution: 'Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community' }
   };
@@ -280,14 +326,14 @@ function initMap() {
     const tooltip = el('div', '', f.properties.name);
     if (f.properties.confirmation) tooltip.append(el('small', '', f.properties.confirmation));
     layer.bindTooltip(tooltip, { sticky: true, className: 'study-label' });
-    layer.on('click', () => selectHotspot(f.properties.slug));
+    layer.on('click', () => { selectHotspot(f.properties.slug); showStudyNote(f); });
     layer.addTo(outlineGroup); state.outlines.set(f.properties.slug, layer);
   });
   map.on('click', event => {
     // A PNG contains colours, not numeric pixels. Do not invent a pixel sampler.
-    const node = el('div');
-    node.append(el('strong', '', event.latlng.lat.toFixed(4) + ', ' + event.latlng.lng.toFixed(4)), el('p', '', 'Pixel measurements are unavailable in this first preview. Select a study area for its published record.'));
-    L.popup().setLatLng(event.latlng).setContent(node).openOn(map);
+    showFieldNote('Map coordinate · ' + event.latlng.lat.toFixed(4) + ', ' + event.latlng.lng.toFixed(4),
+      'This is a selected coordinate, not a verified ground-motion measurement. A colour-mapped PNG has no numeric value we can accurately sample here.',
+      'Select a study to inspect the actual exported observations, uncertainty and source metadata.');
   });
   new ResizeObserver(() => map.invalidateSize({ pan: false })).observe($('#map'));
 }
@@ -388,6 +434,9 @@ function makeOverlay(raw, key) {
       const source = safeSourceURL(p.source_url);
       if (source) { const a = el('a', '', 'Source'); a.href = source; a.target = '_blank'; a.rel = 'noopener noreferrer'; popup.append(a); }
       layer.bindPopup(popup);
+      layer.on('click', () => showFieldNote(p.name || p.NAME || 'Mapped context',
+        [p.reason, p.note, p.period, p.source].filter(v => typeof v === 'string' && v.trim()).join(' · ') || 'This mapped feature comes from a supplied context dataset, not a direct satellite measurement.',
+        'Read the feature provenance and study record before interpreting it.'));
     }
   });
 }
@@ -413,6 +462,9 @@ function openDialog(key) {
 }
 document.querySelectorAll('[data-dialog]').forEach(b => b.addEventListener('click', () => openDialog(b.dataset.dialog)));
 $('#close-dialog').addEventListener('click', () => $('#about-dialog').close());
+$('#close-explain').addEventListener('click', () => { $('#explain-drawer').hidden = true; });
+document.addEventListener('keydown', event => { if (event.key === 'Escape') $('#explain-drawer').hidden = true; });
+document.querySelectorAll('.overview-copy [data-dialog]').forEach(b => b.addEventListener('click', () => openDialog(b.dataset.dialog)));
 $('#about-dialog').addEventListener('click', e => { if (e.target === $('#about-dialog')) { const r = e.target.getBoundingClientRect(); if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) e.target.close(); } });
 $('#reload-data').addEventListener('click', () => location.reload());
 $('#toggle-layers').addEventListener('click', () => {
