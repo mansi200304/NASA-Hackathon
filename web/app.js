@@ -434,7 +434,7 @@ function renderHotspots() {
     const title = el('span', 'place', f.properties.name);
     title.append(el('span', 'tagline', f.properties.tagline));
     button.append(title);
-    button.addEventListener('click', () => { selectHotspot(f.properties.slug); showStudyNote(f); });
+    button.addEventListener('click', () => selectHotspot(f.properties.slug));
     list.append(button);
   });
 }
@@ -483,7 +483,7 @@ function initMap() {
     const tooltip = el('div', '', f.properties.name);
     if (f.properties.confirmation) tooltip.append(el('small', '', f.properties.confirmation));
     layer.bindTooltip(tooltip, { sticky: true, className: 'study-label' });
-    layer.on('click', () => { selectHotspot(f.properties.slug); showStudyNote(f); });
+    layer.on('click', () => selectHotspot(f.properties.slug));
     layer.addTo(outlineGroup); state.outlines.set(f.properties.slug, layer);
   });
   map.on('click', event => {
