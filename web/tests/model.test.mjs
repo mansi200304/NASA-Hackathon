@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizeSeries, normalizeRate, validateGeoJSON, safeSourceURL, formatNumber } from '../model.mjs';
+import { normalizeSeries, normalizeRate, normalizeHotspots, validateGeoJSON, safeSourceURL, formatNumber } from '../model.mjs';
+import { readFile } from 'node:fs/promises';
 
 const series = extra => ({ hotspot: 'eloy', units: 'cm', reference: 'Synthetic test reference', dates: ['2026-01-01', '2026-01-13'], displacement: [0, -1], rate_cm_yr: -2, rate_sigma: 0.2, ...extra });
 test('pending nulls never become zero, while a real zero remains valid', () => {
@@ -40,5 +41,23 @@ test('GeoJSON rejects projected coordinates; popup links reject executable schem
   assert.throws(() => validateGeoJSON({ ...feature, features: [{ type: 'Feature', geometry: { type: 'Point', coordinates: [400000, 3600000] } }] }));
   assert.equal(safeSourceURL('javascript:alert(1)'), null);
   assert.equal(safeSourceURL('https://example.com/source'), 'https://example.com/source');
+});
+test('new study identities and file order come from data, without a fixed count', () => {
+  const area = slug => ({ type: 'Feature', geometry: { type: 'Polygon', coordinates: [[[-111, 32], [-110, 32], [-110, 33], [-111, 32]]] }, properties: { slug, name: slug, story: 'Synthetic study' } });
+  const raw = { type: 'FeatureCollection', features: [area('new_basin'), area('other-basin')] };
+  assert.deepEqual(normalizeHotspots(raw).features.map(f => f.properties.slug), ['new_basin', 'other-basin']);
+  assert.equal(normalizeHotspots({ ...raw, features: [area('unseen_site')] }).features.length, 1);
+  for (const features of [[], [area('duplicate'), area('duplicate')], [area('../private')]]) {
+    assert.throws(() => normalizeHotspots({ ...raw, features }));
+  }
+});
+test('every current pipeline study loads its own supported measurement and raster record', async () => {
+  const root = new URL('../../data/processed/', import.meta.url);
+  const read = async name => JSON.parse(await readFile(new URL(name, root), 'utf8'));
+  const areas = normalizeHotspots(await read('hotspots.geojson'));
+  for (const { properties: { slug } } of areas.features) {
+    assert.equal(normalizeSeries(await read('timeseries_' + slug + '.json'), slug).hasData, true);
+    normalizeRate(await read('rate_' + slug + '.json'));
+  }
 });
 

@@ -22,14 +22,14 @@ The original app in index.html remains the source of truth. No fabricated measur
 
 ## What works
 
-- Select Eloy / Casa Grande, Buckeye / Goodyear or Willcox; the map fits the study and the details update.
-- View all study areas, fit the selected area, pan and zoom, or switch terrain/satellite basemaps.
+- Select any area supplied in `hotspots.geojson`; names, order, study numbers, file paths and outlines come from that file. There is no fixed location list or required count.
+- View all study areas, fit the selected area, pan and zoom, or switch satellite/terrain/dark basemaps. Satellite imagery is the default.
 - Toggle available overlays and adjust their opacity. On phones, Layers opens the controls while leaving room for the map.
 - Read a fitted rate, uncertainty, observation chart, accessible observation table and reference metadata when supplied.
 - Open How we measured, Limits and Sources dialogs. Dialogs support Escape; controls have visible keyboard focus.
 - Inspect a map coordinate. Pixel-level rate/coherence sampling is explicitly unavailable: a coloured PNG is not a numeric raster.
 
-Study boxes are project-defined extents from CLAUDE.md. They are not ADWR subsidence features or mapped sinking zones.
+Study boxes are pipeline-defined extents from `data/processed/hotspots.geojson`. They are not ADWR subsidence features or mapped sinking zones. The first feature is the initial selection; tentative names and question marks are preserved.
 
 ## Add real data
 
@@ -38,8 +38,8 @@ All paths below are relative to data/processed/. Refresh the page after adding f
 | File | Behaviour |
 | --- | --- |
 | hotspots.geojson | Required: project study polygons with name, slug, story; optional tagline and county. |
-| timeseries_eloy.json | Eloy details and chart; likewise buckeye and willcox. |
-| rate_eloy.json + rate_eloy.png | Georeferenced colour image; likewise other slugs. |
+| timeseries_\<slug\>.json | Details and chart for the matching study slug. |
+| rate_\<slug\>.json + rate_\<slug\>.png | Georeferenced colour image for the matching study slug. |
 | adwr_subsidence.geojson | Optional official subsidence context. |
 | datacenters.geojson | Optional compiled public-source points. |
 | habitat.geojson | Optional habitat context. |
@@ -62,6 +62,11 @@ Required: bounds as [[south, west], [north, east]], units cm/yr, finite vmin < v
 
 Additional metadata: track, colormap, data_release, sign_convention. Optional colors is an ordered array of hex stops matching the exported PNG, from vmin to vmax. A gradient legend is drawn only if valid colors are supplied; otherwise the range is printed without inventing a ramp. The app checks image loading before showing its legend.
 
+The pipeline's documented custom red/transparent/blue ramp uses a categorical
+key rather than an invented linear gradient. Track and acquisition range appear
+in the map legend. Thin, unfilled study outlines and hover labels leave the
+measurement raster visible. Raster colours and numerical results are unchanged.
+
 Low-coherence/no-data pixels must be transparent in the exported PNG. This UI cannot verify the processing masks from image colours.
 
 ### Context GeoJSON
@@ -81,7 +86,21 @@ Brand colours are separate from the measurement ramp. Changing the UI theme must
 
 Tests cover pending vs zero, observation gaps, references, units, dates, uncertainty, geographic bounds and source-link protocols.
 
-Browser QA: desktop (1363 × 936), all three hotspot selections, outline visibility, terrain/satellite, method dialog and Escape; responsive layout in a 390 × 844 iframe, horizontal overflow and mobile Layers disclosure. The initial source state contains no measured products, so ready-state data validators are checked with synthetic unit tests, not published measurement values.
+Contract checks cover arbitrary new study identities, file order, duplicate/unsafe slugs and every currently exported study's measured time-series/raster metadata, in addition to the checks above.
+
+The map update was browser-checked against all current study selections, real
+rate PNGs, basemap switching and the portable preview. A 390px phone review
+confirmed study selection, Layers disclosure and no horizontal overflow.
+
+The three-column layout and typography remain intact. Sonoran Sand has distinct
+roles: ivory canvas, sand sidebar, ink masthead/footer, rust selection and reported
+rate, olive study count/status and slate metadata headers. Small light text uses
+the darker slate variant for contrast. Scientific raster colours are independent
+of these UI colours.
+
+NASA Worldview, ISRO Bhuvan and Copernicus Browser informed the map treatment:
+restrained controls, imagery as geographic context, thin outlines and visible
+dataset provenance. No agency affiliation is implied.
 
 ## Scope
 
