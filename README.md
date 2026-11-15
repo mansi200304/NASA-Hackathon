@@ -26,12 +26,12 @@ Arizona's aquifers are being pumped faster than they refill, and the ground is s
 
 - [x] Stage 1: opened a test GUNW file (track 128, descending, Oct 9 → Oct 21 2026). Grid: EPSG:32612, 80 m pixels, wavelength 24.2 cm (1 rad ≈ 19.25 mm of line-of-sight motion), mean coherence 0.68 over valid pixels.
 - [x] Stage 1b: valid-pixel rule, ionosphere check (phase still contains it, correlation 0.98), coverage check (track 128 misses Eloy core; covers Willcox).
-- [ ] Stage 2: one-pair displacement over Eloy
-- [ ] Stage 3: track-128 stack
+- [x] Stage 2: one-pair displacement; ionosphere correction cuts the spread about 3x
+- [x] Stage 3: NISAR stacks (Willcox 128 D, 25 pairs; Eloy 077 A, 9 pairs) built. Rates are not yet reliable (noise, short record)
 - [ ] Stage 4: rate and validation against ADWR
 - [ ] Stage 5: other hotspots
 - [ ] Stage 6: overlays
-- [ ] Stage 7: web map
+- [x] Stage 7 (v0): two-layer web map in `web/` (NISAR on top, Sentinel-1 2016 to 2026 below), 5 hotspots with time series and cross-checks
 
 ## Limits
 
@@ -47,3 +47,12 @@ Arizona's aquifers are being pumped faster than they refill, and the ground is s
 NISAR GUNW (ASF), Sentinel-1 (OPERA DISP-S1 / ASF HyP3) for history, ADWR subsidence maps, USDA Cropland Data Layer, PAD-US, NHD.
 
 See [CLAUDE.md](CLAUDE.md) for the full project brief.
+
+## Run the map locally
+
+```
+cd web
+python -m http.server 8765
+```
+Open http://localhost:8765. To rebuild the map data from the processed cubes: `python src/export_web.py`.
+Open a hotspot directly with `?open=willcox` (also `eloy`, `north_willcox`, `south`, `east`).
