@@ -29,7 +29,7 @@ let preview = html
   .replace('<link rel="stylesheet" href="./styles.css">', () => '<style>' + css + '</style>')
   .replace('<link rel="stylesheet" href="./map.css">', () => '<style>' + mapCSS + '</style>')
   .replace('<script src="./vendor/leaflet.js" defer></script>', () => '<script>' + leaflet.replace(/<\/script/gi, '<\\/script') + '</script>')
-  .replace('<script src="./motion.js" defer></script>', () => '<script>' + motion.replace(/<\\/script/gi, '<\\\\/script') + '</script>')
+  .replace('<script src="./motion.js" defer></script>', () => '<script type="module">' + motion.replace(/<\/script/gi, '<\\/script') + '</script>')
   .replace('<script type="module" src="./app.js"></script>', () => '<script type="module">' + inlineJS.replace(/<\/script/gi, '<\\/script') + '</script>')
   .replace('Independent team project · Preliminary research', 'Portable preview · Preliminary research');
 const output = new URL('preview.html', root);
