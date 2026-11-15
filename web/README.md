@@ -1,4 +1,4 @@
-# Arizona is sinking — first UI
+# The Slow Sink — web map
 
 A buildless, map-first field atlas using Sonoran Sand. The map and study selection work immediately. Measurements and context overlays stay pending until real exports are available.
 

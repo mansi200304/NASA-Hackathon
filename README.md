@@ -1,4 +1,6 @@
-# Arizona Is Sinking
+# The Slow Sink
+
+*Arizona is sinking.*
 
 NASA Space Apps 2026 — **Dancing with the SARs** (NISAR). 
 
